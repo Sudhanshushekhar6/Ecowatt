@@ -10,7 +10,6 @@ import {
   Sun,
   Zap,
 } from "lucide-react";
-import Link from "next/link";
 import {
   DailyEnergyChart,
   EnergyDistributionChart,
@@ -19,35 +18,7 @@ import {
 
 export default function Dashboard() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white border-b border-gray-200">
-        <Link className="flex items-center justify-center" href="/">
-          <Sun className="h-6 w-6 text-green-600" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">
-            PrabhaWatt
-          </span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600"
-            href="#"
-          >
-            Overview
-          </Link>
-          <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600"
-            href="#"
-          >
-            Analytics
-          </Link>
-          <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600"
-            href="#"
-          >
-            Settings
-          </Link>
-        </nav>
-      </header>
+    <div className="flex flex-col min-h-[90vh] bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
