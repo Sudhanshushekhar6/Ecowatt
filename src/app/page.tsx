@@ -24,9 +24,11 @@ export default function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button className="bg-green-600 text-white hover:bg-green-700">
-                  Get Started
-                </Button>
+                <Link href="/dashboard">
+                  <Button className="bg-green-600 text-white hover:bg-green-700">
+                    Get Started
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="text-green-600 border-green-600 hover:bg-green-50"
