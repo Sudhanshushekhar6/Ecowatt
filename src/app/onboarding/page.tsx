@@ -1,5 +1,6 @@
 "use client";
 
+import { AutoCompleteInput } from "@/components/onboarding/autocomplete-input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,12 +21,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import discomData from "@/data/electricity-providers.json";
 import { ChevronLeft, ChevronRight, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
+  const [discoms, setDiscoms] = useState<string[]>([]);
+
   const [formData, setFormData] = useState({
     electricityProvider: "",
     monthlyBill: "",
@@ -45,6 +49,12 @@ export default function Onboarding() {
     notificationMethod: "",
     reportFrequency: "",
   });
+
+  useEffect(() => {
+    discomData.DISCOMs.forEach((discom) => {
+      setDiscoms((prevDiscoms) => [...prevDiscoms, discom?.DISCOM!]);
+    });
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -99,17 +109,11 @@ export default function Onboarding() {
                   <Label htmlFor="electricityProvider">
                     Current electricity provider
                   </Label>
-                  <Input
-                    id="electricityProvider"
-                    name="electricityProvider"
-                    value={formData.electricityProvider}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <AutoCompleteInput data={discoms} className="w-full" />
                 </div>
                 <div>
                   <Label htmlFor="monthlyBill">
-                    Average monthly electricity bill ($)
+                    Average monthly electricity bill (₹)
                   </Label>
                   <Input
                     id="monthlyBill"
