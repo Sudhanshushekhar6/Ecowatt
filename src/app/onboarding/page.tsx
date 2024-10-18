@@ -58,10 +58,22 @@ export default function Onboarding() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    // Handle nested state for smartDevices.other
+    if (name === "smartDevices.other") {
+      setFormData((prevData) => ({
+        ...prevData,
+        smartDevices: {
+          ...prevData.smartDevices,
+          other: value,
+        },
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleSmartDeviceChange = (
@@ -79,7 +91,6 @@ export default function Onboarding() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Here you would typically send the data to your backend
   };
 
   const nextStep = () => setStep(step + 1);

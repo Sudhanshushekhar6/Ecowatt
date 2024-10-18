@@ -151,8 +151,8 @@ export default function LearnMore() {
             </h2>
             <p className="mb-4">
               While solar energy is growing rapidly, it still represents a small
-              portion of overall electricity generation. Here&apos;s a breakdown of
-              U.S. electricity generation by source:
+              portion of overall electricity generation. Here&apos;s a breakdown
+              of U.S. electricity generation by source:
             </p>
             <div className="flex items-center justify-center">
               <EnergySourceChart />
