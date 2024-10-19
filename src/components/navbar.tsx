@@ -3,10 +3,13 @@
 import { useAuthContext } from "@/context/auth-context";
 import { Sun } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Navbar() {
   const { user } = useAuthContext();
+  const pathname = usePathname();
+  const isLandingPage = pathname === "/";
 
   useEffect(() => {
     const smoothScroll = (e: MouseEvent) => {
@@ -43,31 +46,43 @@ export default function Navbar() {
         </span>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6">
-        <a
-          className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-          href="#benefits"
-        >
-          Benefits
-        </a>
-        <a
-          className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-          href="#why-choose"
-        >
-          Why Choose Us
-        </a>
-        <a
-          className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-          href="#get-started"
-        >
-          Get Started
-        </a>
+        {isLandingPage && (
+          <>
+            <a
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href="#benefits"
+            >
+              Benefits
+            </a>
+            <a
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href="#why-choose"
+            >
+              Why Choose Us
+            </a>
+            <a
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href="#get-started"
+            >
+              Get Started
+            </a>
+          </>
+        )}
         {user ? (
-          <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-            href={"/settings"}
-          >
-            Settings
-          </Link>
+          <>
+            <Link
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href={"/dashboard"}
+            >
+              Dashboard
+            </Link>
+            <Link
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href={"/settings"}
+            >
+              Settings
+            </Link>
+          </>
         ) : (
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"

@@ -11,7 +11,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -97,11 +104,6 @@ export default function Onboarding() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
-
   const prevStep = () => setStep(step - 1);
 
   const validateStep = () => {
@@ -171,17 +173,19 @@ export default function Onboarding() {
     setShowConfirmDialog(false);
     try {
       if (!user) throw new Error("User not authenticated");
-      
+
       await setDoc(doc(db, "users", user.uid), {
         ...formData,
         createdAt: new Date(),
       });
 
       toast.success("Setup completed successfully!");
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error saving data:", error);
-      toast.error("An error occurred while saving your data. Please try again.");
+      toast.error(
+        "An error occurred while saving your data. Please try again.",
+      );
     }
   };
 
@@ -512,16 +516,18 @@ export default function Onboarding() {
           <DialogHeader>
             <DialogTitle>Confirm Setup</DialogTitle>
             <DialogDescription>
-              Are you sure you want to complete the setup with the provided information?
+              Are you sure you want to complete the setup with the provided
+              information?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={confirmAndSubmit}>
-              Confirm and Complete
-            </Button>
+            <Button onClick={confirmAndSubmit}>Confirm and Complete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

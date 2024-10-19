@@ -23,10 +23,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/auth-context";
 import { auth, db } from "@/lib/firebase";
 import { signOut, updateProfile } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { LogOut, Settings as SettingsIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Settings() {
@@ -52,6 +52,28 @@ export default function Settings() {
     reportFrequency: "",
   });
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setFormData(prevData => ({
+              ...prevData,
+              ...userData
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          toast.error("Failed to load user data. Please try again.");
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
@@ -76,9 +98,10 @@ export default function Settings() {
     if (user) {
       try {
         await updateDoc(doc(db, "users", user.uid), formData);
-        console.log("User data updated successfully");
+        toast.success("User data updated successfully");
       } catch (error) {
         console.error("Error updating user data:", error);
+        toast.error("Failed to update user data. Please try again.");
       }
     }
   };
