@@ -7,50 +7,72 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/auth-context";
-import { auth, db } from "@/lib/firebase"; // Update this path if necessary
-import { signOut } from "firebase/auth";
+import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { Battery, Leaf, Sun, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
+import { parse } from 'papaparse';
+import { useCallback, useEffect, useState } from "react";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   Legend,
   Line,
   LineChart,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
-  YAxis,
+  YAxis
 } from "recharts";
-
-const energyProductionData = [
-  { time: "00:00", solar: 0, grid: 2 },
-  { time: "04:00", solar: 0, grid: 1.8 },
-  { time: "08:00", solar: 2, grid: 1 },
-  { time: "12:00", solar: 5, grid: 0 },
-  { time: "16:00", solar: 3, grid: 0.5 },
-  { time: "20:00", solar: 0.5, grid: 1.5 },
-];
-
-const energyConsumptionData = [
-  { device: "HVAC", consumption: 35 },
-  { device: "Lighting", consumption: 20 },
-  { device: "Appliances", consumption: 25 },
-  { device: "Electronics", consumption: 15 },
-  { device: "Other", consumption: 5 },
-];
 
 export default function Dashboard() {
   const { user } = useAuthContext();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [energyData, setEnergyData] = useState<{ SendDate: string; SolarPower: number; SolarEnergy: number; Consumption: number; }[]>([]);
+
+  const processCSV = useCallback((str: string) => {
+    parse(str, {
+      header: true,
+      complete: (results) => {
+        const processedData = results.data.map((row: any) => ({
+          SendDate: row['SendDate'],
+          SolarPower: parseFloat(row['Solar Power (kW)']),
+          SolarEnergy: parseFloat(row['Solar energy Generation  (kWh)']),
+          Consumption: parseFloat(row['consumptionValue (kW)']),
+        }));
+        setEnergyData(processedData);
+        // Save to local storage
+        localStorage.setItem('energyData', JSON.stringify(processedData));
+      },
+    });
+  }, []);
+
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result;
+        if (typeof text === 'string') {
+          processCSV(text);
+        }
+      };
+      reader.readAsText(file);
+    }
+  }, [processCSV]);
+
+  useEffect(() => {
+    // Load data from local storage on component mount
+    const storedData = localStorage.getItem('energyData');
+    if (storedData) {
+      setEnergyData(JSON.parse(storedData));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -60,7 +82,7 @@ export default function Dashboard() {
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
-            setUserData(userDocSnap.data() as UserData);
+            setUserData(userDocSnap.data() as UserData); // Cast to UserData
           } else {
             console.log("No user data found!");
           }
@@ -75,15 +97,6 @@ export default function Dashboard() {
     fetchUserData();
   }, [user]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      // Redirect to home page or login page after logout
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -92,15 +105,8 @@ export default function Dashboard() {
     return <div>No user data available.</div>;
   }
 
-  const totalEnergyProduced = energyProductionData.reduce(
-    (sum, data) => sum + data.solar + data.grid,
-    0,
-  );
-  const totalSolarProduced = energyProductionData.reduce(
-    (sum, data) => sum + data.solar,
-    0,
-  );
-  const solarPercentage = (totalSolarProduced / totalEnergyProduced) * 100;
+  const totalSolarPower = energyData.reduce((sum, data) => sum + data.SolarPower, 0);
+  const totalConsumption = energyData.reduce((sum, data) => sum + data.Consumption, 0);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -120,10 +126,10 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {totalEnergyProduced.toFixed(2)} kWh
+                  {totalSolarPower.toFixed(2)} kWh
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {solarPercentage.toFixed(1)}% from solar
+                  100% from solar
                 </p>
               </CardContent>
             </Card>
@@ -185,91 +191,79 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <Tabs defaultValue="energy-production">
+          <Tabs defaultValue="power-consumption">
             <TabsList>
-              <TabsTrigger value="energy-production">
-                Energy Production
+              <TabsTrigger value="power-consumption">
+                Power Consumption vs. Solar Generation
               </TabsTrigger>
-              <TabsTrigger value="energy-consumption">
-                Energy Consumption
+              <TabsTrigger value="solar-energy">
+                Cumulative Solar Energy Generation
+              </TabsTrigger>
+              <TabsTrigger value="hourly-consumption">
+                Hourly Energy Consumption
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="energy-production">
+            <TabsContent value="power-consumption">
               <Card>
                 <CardHeader>
-                  <CardTitle>Energy Production</CardTitle>
-                  <CardDescription>
-                    Your energy production over the last 24 hours
+                  <CardTitle>Power Consumption vs. Solar Generation</CardTitle>
+                  <CardDescription className="flex items-center justify-between">
+                    <p>Comparison of consumption and solar generation</p>
+                    <Input type="file" accept=".csv" onChange={handleFileUpload} className="w-fit" />
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer
-                    config={{
-                      solar: {
-                        label: "Solar",
-                        color: "hsl(var(--chart-1))",
-                      },
-                      grid: {
-                        label: "Grid",
-                        color: "hsl(var(--chart-2))",
-                      },
-                    }}
-                    className="h-[300px]"
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={energyProductionData}>
-                        <XAxis dataKey="time" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Legend />
-                        <Line
-                          type="monotone"
-                          dataKey="solar"
-                          stroke="var(--color-solar)"
-                          strokeWidth={2}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="grid"
-                          stroke="var(--color-grid)"
-                          strokeWidth={2}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={energyData}>
+                      <XAxis dataKey="SendDate" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip />
+                      <Legend />
+                      <Line yAxisId="left" type="monotone" dataKey="Consumption" stroke="#8884d8" name="Consumption (kW)" />
+                      <Line yAxisId="right" type="monotone" dataKey="SolarPower" stroke="#82ca9d" name="Solar Power (kW)" />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="energy-consumption">
+            <TabsContent value="solar-energy">
               <Card>
                 <CardHeader>
-                  <CardTitle>Energy Consumption</CardTitle>
+                  <CardTitle>Cumulative Solar Energy Generation</CardTitle>
                   <CardDescription>
-                    Your energy consumption by device category
+                    Total solar energy generated over time
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer
-                    config={{
-                      consumption: {
-                        label: "Consumption",
-                        color: "hsl(var(--chart-1))",
-                      },
-                    }}
-                    className="h-[300px]"
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={energyConsumptionData}>
-                        <XAxis dataKey="device" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar
-                          dataKey="consumption"
-                          fill="var(--color-consumption)"
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={energyData}>
+                      <XAxis dataKey="SendDate" />
+                      <YAxis />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="SolarEnergy" stroke="#82ca9d" fill="#82ca9d" name="Solar Energy (kWh)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="hourly-consumption">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hourly Energy Consumption</CardTitle>
+                  <CardDescription>
+                    Energy consumption for each time interval
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={energyData}>
+                      <XAxis dataKey="SendDate" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="Consumption" fill="#8884d8" name="Consumption (kW)" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </TabsContent>
