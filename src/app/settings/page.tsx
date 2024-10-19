@@ -59,9 +59,9 @@ export default function Settings() {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            setFormData(prevData => ({
+            setFormData((prevData) => ({
               ...prevData,
-              ...userData
+              ...userData,
             }));
           }
         } catch (error) {
@@ -99,6 +99,7 @@ export default function Settings() {
       try {
         await updateDoc(doc(db, "users", user.uid), formData);
         toast.success("User data updated successfully");
+        router.push("/dashboard");
       } catch (error) {
         console.error("Error updating user data:", error);
         toast.error("Failed to update user data. Please try again.");

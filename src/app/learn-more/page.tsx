@@ -17,6 +17,7 @@ import {
   Zap,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LearnMore() {
   return (
@@ -152,13 +153,13 @@ export default function LearnMore() {
             <p className="mb-4">
               While solar energy is growing rapidly, it still represents a small
               portion of overall electricity generation. Here&apos;s a breakdown
-              of U.S. electricity generation by source:
+              of India&apos;s electricity generation by source:
             </p>
             <div className="flex items-center justify-center">
               <EnergySourceChart />
             </div>
             <p className="mt-4 text-sm text-gray-600">
-              Source: U.S. Energy Information Administration (EIA), 2022 data
+              Source: Renewable Energy Information, Invest India, 2024 data
             </p>
           </section>
 
@@ -245,9 +246,11 @@ export default function LearnMore() {
               solar investment with PrabhaWatt. Start your journey to greater
               energy efficiency and savings today!
             </p>
-            <Button className="bg-green-600 text-white hover:bg-green-700">
-              Get Started with PrabhaWatt
-            </Button>
+            <Link href="/sign-in">
+              <Button className="bg-green-600 text-white hover:bg-green-700">
+                Get Started with PrabhaWatt
+              </Button>
+            </Link>
           </section>
         </div>
       </main>

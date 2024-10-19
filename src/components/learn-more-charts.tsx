@@ -30,12 +30,12 @@ const solarGrowthData = [
 ];
 
 const energySourceData = [
-  { name: "Solar", value: 3, fill: "#FFB627" },
-  { name: "Wind", value: 8.4, fill: "#89CFF0" },
-  { name: "Hydro", value: 7.3, fill: "#0077BE" },
-  { name: "Nuclear", value: 10.1, fill: "#7CB9E8" },
-  { name: "Natural Gas", value: 38.3, fill: "#C4B454" },
-  { name: "Coal", value: 19.3, fill: "#4A4A4A" },
+  { name: "Solar", value: 90.76, fill: "#FFB627" },
+  { name: "Wind", value: 47.36, fill: "#89CFF0" },
+  { name: "Biomass/Co-generation", value: 10.72, fill: "#0077BE" },
+  { name: "Small Hydro", value: 5.07, fill: "#7CB9E8" },
+  { name: "Waste To Energy", value: 0.6, fill: "#C4B454" },
+  { name: "Large Hydro", value: 46.92, fill: "#4A4A4A" },
   { name: "Other", value: 13.6, fill: "#B4B4B4" },
 ];
 
@@ -87,7 +87,7 @@ export function EnergySourceChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>U.S. Electricity Generation by Source (2022)</CardTitle>
+        <CardTitle>India Electricity Generation by Source (2024)</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -107,9 +107,20 @@ export function EnergySourceChart() {
                 cy="50%"
                 outerRadius={80}
                 dataKey="value"
-                label
+                label={({ name, percent }) => `${(percent * 100).toFixed(1)}%`}
               />
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartTooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-white p-2 rounded-lg shadow-md">
+                        <p>{`${payload[0].name}: ${payload[0].value} GW`}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>

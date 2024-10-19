@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuthContext } from "@/context/auth-context";
 import { auth } from "@/lib/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -32,6 +33,11 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const { user } = useAuthContext();
+
+  if (user) {
+    router.push("/dashboard");
+  }
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

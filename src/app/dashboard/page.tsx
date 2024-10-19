@@ -13,7 +13,7 @@ import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { Battery, Leaf, Sun, Zap } from "lucide-react";
-import { parse } from 'papaparse';
+import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import {
   Area,
@@ -26,49 +26,59 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 
 export default function Dashboard() {
   const { user } = useAuthContext();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [energyData, setEnergyData] = useState<{ SendDate: string; SolarPower: number; SolarEnergy: number; Consumption: number; }[]>([]);
+  const [energyData, setEnergyData] = useState<
+    {
+      SendDate: string;
+      SolarPower: number;
+      SolarEnergy: number;
+      Consumption: number;
+    }[]
+  >([]);
 
   const processCSV = useCallback((str: string) => {
     parse(str, {
       header: true,
       complete: (results) => {
         const processedData = results.data.map((row: any) => ({
-          SendDate: row['SendDate'],
-          SolarPower: parseFloat(row['Solar Power (kW)']),
-          SolarEnergy: parseFloat(row['Solar energy Generation  (kWh)']),
-          Consumption: parseFloat(row['consumptionValue (kW)']),
+          SendDate: row["SendDate"],
+          SolarPower: parseFloat(row["Solar Power (kW)"]),
+          SolarEnergy: parseFloat(row["Solar energy Generation  (kWh)"]),
+          Consumption: parseFloat(row["consumptionValue (kW)"]),
         }));
         setEnergyData(processedData);
         // Save to local storage
-        localStorage.setItem('energyData', JSON.stringify(processedData));
+        localStorage.setItem("energyData", JSON.stringify(processedData));
       },
     });
   }, []);
 
-  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target?.result;
-        if (typeof text === 'string') {
-          processCSV(text);
-        }
-      };
-      reader.readAsText(file);
-    }
-  }, [processCSV]);
+  const handleFileUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result;
+          if (typeof text === "string") {
+            processCSV(text);
+          }
+        };
+        reader.readAsText(file);
+      }
+    },
+    [processCSV],
+  );
 
   useEffect(() => {
     // Load data from local storage on component mount
-    const storedData = localStorage.getItem('energyData');
+    const storedData = localStorage.getItem("energyData");
     if (storedData) {
       setEnergyData(JSON.parse(storedData));
     }
@@ -98,24 +108,30 @@ export default function Dashboard() {
   }, [user]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[90vh] text-sm text-muted-foreground">
+        Loading...
+      </div>
+    );
   }
 
   if (!user || !userData) {
     return <div>No user data available.</div>;
   }
 
-  const totalSolarPower = energyData.reduce((sum, data) => sum + data.SolarPower, 0);
-  const totalConsumption = energyData.reduce((sum, data) => sum + data.Consumption, 0);
+  const totalSolarPower = energyData.reduce(
+    (sum, data) => sum + data.SolarPower,
+    0,
+  );
+  const totalConsumption = energyData.reduce(
+    (sum, data) => sum + data.Consumption,
+    0,
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          <h1 className="text-3xl font-bold">
-            Welcome back, {user.displayName || "User"}!
-          </h1>
-
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -128,9 +144,7 @@ export default function Dashboard() {
                 <div className="text-2xl font-bold">
                   {totalSolarPower.toFixed(2)} kWh
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  100% from solar
-                </p>
+                <p className="text-xs text-muted-foreground">100% from solar</p>
               </CardContent>
             </Card>
             <Card>
@@ -209,7 +223,12 @@ export default function Dashboard() {
                   <CardTitle>Power Consumption vs. Solar Generation</CardTitle>
                   <CardDescription className="flex items-center justify-between">
                     <p>Comparison of consumption and solar generation</p>
-                    <Input type="file" accept=".csv" onChange={handleFileUpload} className="w-fit" />
+                    <Input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileUpload}
+                      className="w-fit"
+                    />
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -220,8 +239,20 @@ export default function Dashboard() {
                       <YAxis yAxisId="right" orientation="right" />
                       <Tooltip />
                       <Legend />
-                      <Line yAxisId="left" type="monotone" dataKey="Consumption" stroke="#8884d8" name="Consumption (kW)" />
-                      <Line yAxisId="right" type="monotone" dataKey="SolarPower" stroke="#82ca9d" name="Solar Power (kW)" />
+                      <Line
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="Consumption"
+                        stroke="#8884d8"
+                        name="Consumption (kW)"
+                      />
+                      <Line
+                        yAxisId="right"
+                        type="monotone"
+                        dataKey="SolarPower"
+                        stroke="#82ca9d"
+                        name="Solar Power (kW)"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -241,7 +272,13 @@ export default function Dashboard() {
                       <XAxis dataKey="SendDate" />
                       <YAxis />
                       <Tooltip />
-                      <Area type="monotone" dataKey="SolarEnergy" stroke="#82ca9d" fill="#82ca9d" name="Solar Energy (kWh)" />
+                      <Area
+                        type="monotone"
+                        dataKey="SolarEnergy"
+                        stroke="#82ca9d"
+                        fill="#82ca9d"
+                        name="Solar Energy (kWh)"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -261,7 +298,11 @@ export default function Dashboard() {
                       <XAxis dataKey="SendDate" />
                       <YAxis />
                       <Tooltip />
-                      <Bar dataKey="Consumption" fill="#8884d8" name="Consumption (kW)" />
+                      <Bar
+                        dataKey="Consumption"
+                        fill="#8884d8"
+                        name="Consumption (kW)"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>

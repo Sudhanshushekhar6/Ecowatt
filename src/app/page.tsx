@@ -21,7 +21,7 @@ export default function Home() {
     if (user) {
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
-      
+
       if (userDocSnap.exists()) {
         router.push("/dashboard");
       } else {
@@ -50,7 +50,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button 
+                <Button
                   className="bg-green-600 text-white hover:bg-green-700"
                   onClick={handleGetStarted}
                   disabled={isLoading}

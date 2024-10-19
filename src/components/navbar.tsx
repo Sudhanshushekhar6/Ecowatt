@@ -5,6 +5,7 @@ import { Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { Button } from "./ui/button";
 
 export default function Navbar() {
   const { user } = useAuthContext();
@@ -45,7 +46,7 @@ export default function Navbar() {
           PrabhaWatt
         </span>
       </Link>
-      <nav className="ml-auto flex gap-4 sm:gap-6">
+      <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
         {isLandingPage && (
           <>
             <a
@@ -72,6 +73,12 @@ export default function Navbar() {
           <>
             <Link
               className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href={"/learn-more"}
+            >
+              Learn More
+            </Link>
+            <Link
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
               href={"/dashboard"}
             >
               Dashboard
@@ -84,12 +91,22 @@ export default function Navbar() {
             </Link>
           </>
         ) : (
-          <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-            href={"/sign-in"}
-          >
-            Sign In
-          </Link>
+          <>
+            <Link
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href={"/learn-more"}
+            >
+              Learn More
+            </Link>
+            <Link
+              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+              href={"/sign-in"}
+            >
+              <Button size={`sm`} variant={`outline`}>
+                Sign In
+              </Button>
+            </Link>
+          </>
         )}
       </nav>
     </header>
