@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -21,7 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuthContext } from "@/context/auth-context";
 import discomData from "@/data/electricity-providers.json";
+import { db } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { ChevronLeft, ChevronRight, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -50,6 +54,10 @@ export default function Onboarding() {
     notificationMethod: "",
     reportFrequency: "",
   });
+
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { user } = useAuthContext(); // Get the current user
+  const router = useRouter();
 
   useEffect(() => {
     discomData.DISCOMs.forEach((discom) => {
@@ -95,7 +103,6 @@ export default function Onboarding() {
   };
 
   const prevStep = () => setStep(step - 1);
-  const router = useRouter();
 
   const validateStep = () => {
     switch (step) {
@@ -154,11 +161,27 @@ export default function Onboarding() {
     }
   };
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     if (validateStep()) {
-      console.log("Form submitted:", formData);
-      // router.push('/dashboard');
+      setShowConfirmDialog(true);
+    }
+  };
+
+  const confirmAndSubmit = async () => {
+    setShowConfirmDialog(false);
+    try {
+      if (!user) throw new Error("User not authenticated");
+      
+      await setDoc(doc(db, "users", user.uid), {
+        ...formData,
+        createdAt: new Date(),
+      });
+
       toast.success("Setup completed successfully!");
+      router.push('/dashboard');
+    } catch (error) {
+      console.error("Error saving data:", error);
+      toast.error("An error occurred while saving your data. Please try again.");
     }
   };
 
@@ -483,6 +506,25 @@ export default function Onboarding() {
           )}
         </CardFooter>
       </Card>
+
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Setup</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to complete the setup with the provided information?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmAndSubmit}>
+              Confirm and Complete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
