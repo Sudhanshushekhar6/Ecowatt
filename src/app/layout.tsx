@@ -1,4 +1,5 @@
 import Navbar from "@/components/navbar";
+import { AuthContextProvider } from "@/context/auth-context";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -30,8 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        {children}
+        <AuthContextProvider>
+          <Navbar />
+          {children}
+        </AuthContextProvider>
       </body>
     </html>
   );

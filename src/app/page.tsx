@@ -1,10 +1,15 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuthContext } from "@/context/auth-context";
 import { Leaf, PiggyBank, Smartphone, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
+  const { user } = useAuthContext();
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1">
@@ -22,11 +27,19 @@ export default function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Link href="/onboarding">
-                  <Button className="bg-green-600 text-white hover:bg-green-700">
-                    Get Started
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href="/onboarding">
+                    <Button className="bg-green-600 text-white hover:bg-green-700">
+                      Get Started
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/sign-in">
+                    <Button className="bg-green-600 text-white hover:bg-green-700">
+                      Get Started
+                    </Button>
+                  </Link>
+                )}
                 <Link href="/learn-more">
                   <Button
                     variant="outline"
@@ -39,7 +52,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 flex flex-col items-center justify-center">
+        <section
+          id="benefits"
+          className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 flex flex-col items-center justify-center"
+        >
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl text-center mb-12">
               Key Benefits
@@ -75,7 +91,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-white flex flex-col items-center justify-center">
+        <section
+          id="why-choose"
+          className="w-full py-12 md:py-24 lg:py-32 bg-white flex flex-col items-center justify-center"
+        >
           <div className="container px-4 md:px-6">
             <div className="grid gap-10 lg:grid-cols-2">
               <div className="space-y-4">
@@ -114,7 +133,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-900 text-white flex flex-col items-center justify-center">
+        <section
+          id="get-started"
+          className="w-full py-12 md:py-24 lg:py-32 bg-gray-900 text-white flex flex-col items-center justify-center"
+        >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
