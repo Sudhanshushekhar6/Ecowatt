@@ -3,12 +3,35 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/context/auth-context";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { Leaf, PiggyBank, Smartphone, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const { user } = useAuthContext();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGetStarted = async () => {
+    setIsLoading(true);
+    if (user) {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      
+      if (userDocSnap.exists()) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
+    } else {
+      router.push("/sign-in");
+    }
+    setIsLoading(false);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -27,19 +50,13 @@ export default function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                {user ? (
-                  <Link href="/onboarding">
-                    <Button className="bg-green-600 text-white hover:bg-green-700">
-                      Get Started
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href="/sign-in">
-                    <Button className="bg-green-600 text-white hover:bg-green-700">
-                      Get Started
-                    </Button>
-                  </Link>
-                )}
+                <Button 
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  onClick={handleGetStarted}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Get Started"}
+                </Button>
                 <Link href="/learn-more">
                   <Button
                     variant="outline"
