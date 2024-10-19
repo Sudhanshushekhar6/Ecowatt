@@ -2,25 +2,26 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { auth } from "@/lib/firebase";
 import {
-    GoogleAuthProvider,
-    signInWithEmailAndPassword,
-    signInWithPopup,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
 } from "firebase/auth";
 import { AlertCircle, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -35,6 +36,7 @@ export default function SignIn() {
     setError("");
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      toast.success("You have signed in successfully");
       router.push("/onboarding");
     } catch (error) {
       setError("Failed to sign in. Please check your email and password.");
@@ -46,6 +48,8 @@ export default function SignIn() {
     setError("");
     try {
       await signInWithPopup(auth, googleProvider);
+      toast.success("You have signed in successfully");
+
       await router.push("/onboarding");
     } catch (error) {
       setError("Failed to sign in with Google. Please try again.");
@@ -157,12 +161,6 @@ export default function SignIn() {
                 Sign up
               </Link>
             </p>
-            <Link
-              href="/forgot-password"
-              className="text-green-600 hover:underline"
-            >
-              Forgot your password?
-            </Link>
           </CardFooter>
         </Card>
       </main>

@@ -25,6 +25,7 @@ import discomData from "@/data/electricity-providers.json";
 import { ChevronLeft, ChevronRight, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -93,13 +94,72 @@ export default function Onboarding() {
     console.log("Form submitted:", formData);
   };
 
-  const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
   const router = useRouter();
 
+  const validateStep = () => {
+    switch (step) {
+      case 1:
+        if (!formData.electricityProvider) {
+          toast.error("Please select your electricity provider");
+          return false;
+        }
+        if (!formData.monthlyBill) {
+          toast.error("Please enter your average monthly electricity bill");
+          return false;
+        }
+        if (formData.hasSolarPanels) {
+          if (!formData.solarCapacity) {
+            toast.error("Please enter your solar system capacity");
+            return false;
+          }
+          if (!formData.installationDate) {
+            toast.error(
+              "Please enter the installation date of your solar panels",
+            );
+            return false;
+          }
+          if (formData.hasBatteryStorage && !formData.storageCapacity) {
+            toast.error("Please enter your battery storage capacity");
+            return false;
+          }
+        }
+        break;
+      case 2:
+        // No required fields for step 2
+        break;
+      case 3:
+        if (!formData.primaryGoal) {
+          toast.error("Please select your primary energy goal");
+          return false;
+        }
+        break;
+      case 4:
+        if (!formData.notificationMethod) {
+          toast.error("Please select your preferred notification method");
+          return false;
+        }
+        if (!formData.reportFrequency) {
+          toast.error("Please select your preferred report frequency");
+          return false;
+        }
+        break;
+    }
+    return true;
+  };
+
+  const nextStep = () => {
+    if (validateStep()) {
+      setStep(step + 1);
+    }
+  };
+
   const handleFormSubmit = () => {
-    console.log("Form submitted:", formData);
-    router.push("/dashboard");
+    if (validateStep()) {
+      console.log("Form submitted:", formData);
+      // router.push('/dashboard');
+      toast.success("Setup completed successfully!");
+    }
   };
 
   return (
@@ -112,19 +172,29 @@ export default function Onboarding() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={(e) => e.preventDefault()}>
             {step === 1 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Energy Profile</h2>
                 <div>
                   <Label htmlFor="electricityProvider">
-                    Current electricity provider
+                    * Current electricity provider
                   </Label>
-                  <AutoCompleteInput data={discoms} className="w-full" />
+                  <AutoCompleteInput
+                    data={discoms}
+                    className="w-full"
+                    value={formData.electricityProvider}
+                    setValue={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        electricityProvider: value,
+                      }))
+                    }
+                  />
                 </div>
                 <div>
                   <Label htmlFor="monthlyBill">
-                    Average monthly electricity bill (₹)
+                    * Average monthly electricity bill (₹)
                   </Label>
                   <Input
                     id="monthlyBill"
@@ -161,7 +231,7 @@ export default function Onboarding() {
                   <>
                     <div>
                       <Label htmlFor="solarCapacity">
-                        Solar system capacity (kW)
+                        * Solar system capacity (kW)
                       </Label>
                       <Input
                         id="solarCapacity"
@@ -169,11 +239,12 @@ export default function Onboarding() {
                         type="number"
                         value={formData.solarCapacity}
                         onChange={handleInputChange}
+                        required
                       />
                     </div>
                     <div>
                       <Label htmlFor="installationDate">
-                        Installation date
+                        * Installation date
                       </Label>
                       <Input
                         id="installationDate"
@@ -181,6 +252,7 @@ export default function Onboarding() {
                         type="date"
                         value={formData.installationDate}
                         onChange={handleInputChange}
+                        required
                       />
                     </div>
                     <div>
@@ -292,13 +364,14 @@ export default function Onboarding() {
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Energy Goals</h2>
                 <div>
-                  <Label>Select your primary energy goal:</Label>
+                  <Label>* Select your primary energy goal:</Label>
                   <RadioGroup
                     name="primaryGoal"
                     value={formData.primaryGoal}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, primaryGoal: value }))
                     }
+                    required
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="reduceBills" id="reduce-bills" />
@@ -338,7 +411,7 @@ export default function Onboarding() {
                 <h2 className="text-xl font-semibold">Preferences</h2>
                 <div>
                   <Label htmlFor="notificationMethod">
-                    Preferred notification method
+                    * Preferred notification method
                   </Label>
                   <Select
                     name="notificationMethod"
@@ -349,6 +422,7 @@ export default function Onboarding() {
                         notificationMethod: value,
                       }))
                     }
+                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select notification method" />
@@ -361,7 +435,9 @@ export default function Onboarding() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="reportFrequency">Frequency of reports</Label>
+                  <Label htmlFor="reportFrequency">
+                    * Frequency of reports
+                  </Label>
                   <Select
                     name="reportFrequency"
                     value={formData.reportFrequency}
@@ -371,6 +447,7 @@ export default function Onboarding() {
                         reportFrequency: value,
                       }))
                     }
+                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select report frequency" />

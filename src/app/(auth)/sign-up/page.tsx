@@ -22,6 +22,7 @@ import { AlertCircle, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -42,7 +43,8 @@ export default function SignUp() {
         password,
       );
       await updateProfile(userCredential.user, { displayName: name });
-      await router.push("/onboarding");
+      toast.success("You have signed up successfully");
+      router.push("/onboarding");
     } catch (error) {
       setError("Failed to sign up. Please try again.");
       console.error("Sign-up error:", error);
@@ -53,6 +55,7 @@ export default function SignUp() {
     setError("");
     try {
       await signInWithPopup(auth, googleProvider);
+      toast.success("You have signed up successfully");
       router.push("/onboarding");
     } catch (error) {
       setError("Failed to sign up with Google. Please try again.");

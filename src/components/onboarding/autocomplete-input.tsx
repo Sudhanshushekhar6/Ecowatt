@@ -23,13 +23,16 @@ export function AutoCompleteInput({
   text = "Select...",
   data,
   className,
+  value,
+  setValue,
 }: {
   text?: string;
   data: string[];
   className?: string;
+  value: string;
+  setValue: (value: string) => void;
 }) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Remove duplicates from data array

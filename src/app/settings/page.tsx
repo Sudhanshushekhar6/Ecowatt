@@ -27,6 +27,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { LogOut, Settings as SettingsIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Settings() {
   const { user } = useAuthContext();
@@ -85,6 +86,7 @@ export default function Settings() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      toast.success("You have been logged out successfully");
       router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -96,7 +98,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-[92vh] bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold mb-6">Settings</h1>
@@ -433,13 +435,6 @@ export default function Settings() {
           </div>
         </div>
       </main>
-      <footer className="py-6 px-4 md:px-6 mt-8 bg-white border-t border-gray-200">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm text-gray-600">
-            © 2024 PrabhaWatt. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
