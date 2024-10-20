@@ -1,10 +1,11 @@
 // pages/dashboard/index.tsx
 "use client";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DiscomInfoCard from "@/components/dashboard/DiscomInfoCard";
 import EnergyCharts from "@/components/dashboard/EnergyCharts";
+import GenerateReportButton from "@/components/dashboard/GenerateReportButton";
 import StatsCards from "@/components/dashboard/StatsCards";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,7 +16,7 @@ import {
 import { useAuthContext } from "@/context/auth-context";
 import { fetchDISCOMData, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
-import { UserData } from "@/types/user";
+import { Discom, TOUData, UserData } from "@/types/user";
 import {
   collection,
   doc,
@@ -25,6 +26,8 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -52,7 +55,7 @@ export default function Dashboard() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [locationName, setLocationName] = useState<string>("");
   const [weatherData, setWeatherData] = useState<any>(null);
-  const [discomInfo, setDiscomInfo] = useState(null);
+  const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
   const [currentTOU, setCurrentTOU] = useState<number | null>(null);
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]); // Specify the type of touHistory
 
@@ -185,7 +188,11 @@ export default function Dashboard() {
     (sum, data) => sum + data.SolarPower,
     0,
   );
-  const uniqueDays = new Set(energyData.map((data) => data.SendDate)).size;
+  const uniqueDays = new Set(
+    energyData.map((data) =>
+      new Date(data.SendDate.split(" ")[0]).toDateString(),
+    ),
+  ).size;
 
   if (loading) {
     return (
@@ -204,68 +211,93 @@ export default function Dashboard() {
   }
 
   return (
-    <DashboardLayout>
-      {/* Stats Cards Section */}
-      <StatsCards
-        userData={userData}
-        totalSolarPower={totalSolarPower}
-        uniqueDays={uniqueDays}
-        locationName={locationName}
-        weatherData={weatherData}
-      />
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Stats Cards Section */}
+          <StatsCards
+            userData={userData}
+            totalSolarPower={totalSolarPower}
+            uniqueDays={uniqueDays}
+            locationName={locationName}
+            weatherData={weatherData}
+          />
 
-      {/* Info Cards Grid */}
-      <div className="grid grid-cols-2 gap-6">
-        <DiscomInfoCard discomInfo={discomInfo} />
+          {/* Info Cards Grid */}
+          <div className="grid grid-cols-2 gap-6">
+            <DiscomInfoCard discomInfo={discomInfo} />
 
-        {/* TOU Rate History Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>TOU Rate History</CardTitle>
-            <CardDescription>Last 24 hours</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={touHistory}>
-                <XAxis
-                  dataKey="timestamp"
-                  tickFormatter={(timestamp) =>
-                    new Date(timestamp).toLocaleTimeString()
-                  }
-                  label={{
-                    value: "Time",
-                    position: "insideBottom",
-                    offset: -5,
-                  }}
-                />
-                <YAxis
-                  label={{
-                    value: "Rate (₹/kWh)",
-                    angle: -90,
-                    position: "insideLeft",
-                    offset: 15,
-                  }}
-                />
-                <Tooltip
-                  labelFormatter={(label) => new Date(label).toLocaleString()}
-                  formatter={(value) => [
-                    `₹${Number(value).toFixed(2)}/kWh`,
-                    "Rate",
-                  ]}
-                />
-                <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+            {/* TOU Rate History Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>TOU Rate History</CardTitle>
+                <CardDescription>Last 24 hours</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={touHistory}>
+                    <XAxis
+                      dataKey="timestamp"
+                      tickFormatter={(timestamp) =>
+                        new Date(timestamp).toLocaleTimeString()
+                      }
+                      label={{
+                        value: "Time",
+                        position: "insideBottom",
+                        offset: -5,
+                      }}
+                    />
+                    <YAxis
+                      label={{
+                        value: "Rate (₹/kWh)",
+                        angle: -90,
+                        position: "insideLeft",
+                        offset: 15,
+                      }}
+                    />
+                    <Tooltip
+                      labelFormatter={(label) =>
+                        new Date(label).toLocaleString()
+                      }
+                      formatter={(value) => [
+                        `₹${Number(value).toFixed(2)}/kWh`,
+                        "Rate",
+                      ]}
+                    />
+                    <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Energy Charts Section */}
-      <EnergyCharts
-        energyData={energyData}
-        handleFileUpload={handleFileUpload}
-        fileName={fileName}
-      />
-    </DashboardLayout>
+          {/* Energy Charts Section */}
+          <EnergyCharts
+            energyData={energyData}
+            handleFileUpload={handleFileUpload}
+            fileName={fileName}
+          />
+
+          <div className="flex mt-6 justify-between items-center">
+            <GenerateReportButton
+              user={user}
+              userData={userData}
+              energyData={energyData}
+              weatherData={weatherData}
+              discomInfo={discomInfo}
+              touHistory={touHistory}
+            />
+            <Link href="/settings">
+              <Button
+                variant="outline"
+                className="text-gray-600 border-gray-300 hover:bg-gray-100"
+              >
+                <Settings className="mr-2 h-4 w-4" /> System Settings
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }

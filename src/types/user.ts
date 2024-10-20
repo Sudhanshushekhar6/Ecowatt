@@ -1,8 +1,5 @@
 // types/user.ts
 export interface UserData {
-  uid: string;
-  email: string;
-  name: string;
   hasSolarPanels: boolean;
   hasBatteryStorage: boolean;
   solarCapacity: number;
