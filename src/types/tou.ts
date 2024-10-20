@@ -1,4 +1,4 @@
 type TOUData = {
-    timestamp: string;
-    rate: number;
-  };
+  timestamp: string;
+  rate: number;
+};

@@ -23,14 +23,13 @@ export default function Home() {
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
-        router.push("/dashboard");
+        await router.push("/dashboard");
       } else {
-        router.push("/onboarding");
+        await router.push("/onboarding");
       }
     } else {
-      router.push("/sign-in");
+      await router.push("/sign-in");
     }
-    setIsLoading(false);
   };
 
   return (
