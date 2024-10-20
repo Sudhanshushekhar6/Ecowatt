@@ -1,5 +1,6 @@
 "use client";
 
+import { AutoCompleteInput } from "@/components/onboarding/autocomplete-input"; // Import the AutoCompleteInput
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/auth-context";
+import discomData from "@/data/electricity-providers.json";
 import { auth, db } from "@/lib/firebase";
 import { signOut, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -121,6 +123,14 @@ export default function Settings() {
     return <div>Loading...</div>;
   }
 
+  const [discoms, setDiscoms] = useState<string[]>([]);
+
+  useEffect(() => {
+    discomData.DISCOMs.forEach((discom) => {
+      setDiscoms((prevDiscoms) => [...prevDiscoms, discom?.DISCOM!]);
+    });
+  }, []);
+
   return (
     <div className="flex flex-col min-h-[92vh] bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
@@ -171,11 +181,16 @@ export default function Settings() {
                     <Label htmlFor="electricityProvider">
                       Current electricity provider
                     </Label>
-                    <Input
-                      id="electricityProvider"
-                      name="electricityProvider"
+                    <AutoCompleteInput
+                      data={discoms} // Pass the discoms data
+                      className="w-full"
                       value={formData.electricityProvider}
-                      onChange={handleInputChange}
+                      setValue={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          electricityProvider: value,
+                        }))
+                      }
                     />
                   </div>
                   <div className="space-y-2">

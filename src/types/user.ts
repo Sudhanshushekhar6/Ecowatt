@@ -27,9 +27,14 @@ export interface WeatherData {
 }
 
 export interface Discom {
+  State: string;
   DISCOM: string;
-  state: string;
-  category: string;
-  connections: number;
-  rating: string;
+  "Total Number of consumers (Millions)": string;
+  "Total Electricity Sales (MU)": string;
+  "Total Revenue (Rs. Crore)": string;
+  "AT&C Losses (%)": string;
+  "Average power purchase cost (Rs./kWh)": string;
+  "Average Cost of Supply (Rs./kWh)": string;
+  "Average Billing Rate (Rs./kWh)": string;
+  "Profit/(Loss) of the DISCOM (Rs. Crore)": string;
 }

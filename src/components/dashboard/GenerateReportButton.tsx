@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Discom, TOUData, UserData, WeatherData } from "@/types/user";
 import {
   Document,
+  Image,
   Page,
   PDFDownloadLink,
   StyleSheet,
@@ -14,28 +15,37 @@ import React from "react";
 
 // Define styles for the PDF
 const styles = StyleSheet.create({
-  page: { padding: 30 },
-  section: { margin: 10, padding: 10 },
-  header: { fontSize: 24, marginBottom: 10 },
-  subheader: { fontSize: 18, marginTop: 10, marginBottom: 5 },
-  text: { fontSize: 12, marginBottom: 5 },
-  table: {
-    display: "flex",
-    width: "auto",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
+  page: { padding: 30, fontFamily: "Helvetica" },
+  section: { marginBottom: 20 },
+  header: {
+    fontSize: 24,
+    marginBottom: 20,
+    color: "#2c3e50",
+    textAlign: "center",
   },
-  tableRow: { margin: "auto", flexDirection: "row" },
-  tableCol: {
-    width: "25%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
+  subheader: {
+    fontSize: 18,
+    marginTop: 15,
+    marginBottom: 10,
+    color: "#34495e",
+    borderBottom: "1 solid #bdc3c7",
   },
-  tableCell: { margin: "auto", marginTop: 5, fontSize: 10 },
+  text: { fontSize: 12, marginBottom: 5, color: "#2c3e50" },
+  table: { width: "auto", marginTop: 10, marginBottom: 10 },
+  tableRow: { flexDirection: "row", borderBottom: "1 solid #bdc3c7" },
+  tableHeader: { backgroundColor: "#ecf0f1", fontWeight: "bold" },
+  tableCol: { width: "25%", padding: 5 },
+  tableCell: { fontSize: 10, color: "#2c3e50" },
+  logo: { width: 50, height: 50, marginBottom: 20, alignSelf: "center" },
+  footer: {
+    position: "absolute",
+    bottom: 30,
+    left: 30,
+    right: 30,
+    textAlign: "center",
+    fontSize: 10,
+    color: "#7f8c8d",
+  },
 });
 
 interface EnergyData {
@@ -54,7 +64,6 @@ interface MyDocumentProps {
   touHistory: TOUData[];
 }
 
-// PDF Document component
 const MyDocument: React.FC<MyDocumentProps> = ({
   user,
   userData,
@@ -65,12 +74,10 @@ const MyDocument: React.FC<MyDocumentProps> = ({
 }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text style={styles.header}>Energy Consumption Report</Text>
-        <Text style={styles.text}>
-          Generated on: {new Date().toLocaleString()}
-        </Text>
+      <Image src="icon.svg" style={styles.logo} />
+      <Text style={styles.header}>Energy Consumption Report</Text>
 
+      <View style={styles.section}>
         <Text style={styles.subheader}>User Information</Text>
         <Text style={styles.text}>Name: {user.displayName}</Text>
         <Text style={styles.text}>Email: {user.email}</Text>
@@ -84,7 +91,9 @@ const MyDocument: React.FC<MyDocumentProps> = ({
           Storage Capacity: {userData.storageCapacity} kWh
         </Text>
         <Text style={styles.text}>Monthly Bill: ₹{userData.monthlyBill}</Text>
+      </View>
 
+      <View style={styles.section}>
         <Text style={styles.subheader}>Weather Information</Text>
         <Text style={styles.text}>Location: {weatherData.name}</Text>
         <Text style={styles.text}>Temperature: {weatherData.main.temp}°C</Text>
@@ -92,10 +101,12 @@ const MyDocument: React.FC<MyDocumentProps> = ({
         <Text style={styles.text}>
           Conditions: {weatherData.weather[0].description}
         </Text>
+      </View>
 
+      <View style={styles.section}>
         <Text style={styles.subheader}>Energy Consumption Summary</Text>
         <View style={styles.table}>
-          <View style={styles.tableRow}>
+          <View style={[styles.tableRow, styles.tableHeader]}>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>Date</Text>
             </View>
@@ -132,19 +143,44 @@ const MyDocument: React.FC<MyDocumentProps> = ({
             </View>
           ))}
         </View>
+      </View>
 
+      <View style={styles.section}>
         <Text style={styles.subheader}>DISCOM Information</Text>
-        <Text style={styles.text}>DISCOM: {discomInfo.DISCOM}</Text>
-        <Text style={styles.text}>State: {discomInfo.state}</Text>
-        <Text style={styles.text}>Category: {discomInfo.category}</Text>
+        <Text style={styles.text}>DISCOM: {discomInfo["DISCOM"]}</Text>
+        <Text style={styles.text}>State: {discomInfo["State"]}</Text>
         <Text style={styles.text}>
-          Connections: {discomInfo.connections ? discomInfo.connections : "N/A"}
+          Total Number of consumers:{" "}
+          {discomInfo["Total Number of consumers (Millions)"]} Million
         </Text>
-        <Text style={styles.text}>Rating: {discomInfo.rating}</Text>
+        <Text style={styles.text}>
+          Total Electricity Sales: {discomInfo["Total Electricity Sales (MU)"]}{" "}
+          MU
+        </Text>
+        <Text style={styles.text}>
+          Total Revenue: ₹{discomInfo["Total Revenue (Rs. Crore)"]} Crore
+        </Text>
+        <Text style={styles.text}>
+          AT&C Losses: {discomInfo["AT&C Losses (%)"]}%
+        </Text>
+        <Text style={styles.text}>
+          Average power purchase cost: ₹
+          {discomInfo["Average power purchase cost (Rs./kWh)"]} /kWh
+        </Text>
+        <Text style={styles.text}>
+          Average Cost of Supply: ₹
+          {discomInfo["Average Cost of Supply (Rs./kWh)"]} /kWh
+        </Text>
+        <Text style={styles.text}>
+          Average Billing Rate: ₹{discomInfo["Average Billing Rate (Rs./kWh)"]}{" "}
+          /kWh
+        </Text>
+      </View>
 
+      <View style={styles.section}>
         <Text style={styles.subheader}>TOU Rate History</Text>
         <View style={styles.table}>
-          <View style={styles.tableRow}>
+          <View style={[styles.tableRow, styles.tableHeader]}>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>Time</Text>
             </View>
@@ -166,6 +202,10 @@ const MyDocument: React.FC<MyDocumentProps> = ({
           ))}
         </View>
       </View>
+
+      <Text style={styles.footer}>
+        Generated on: {new Date().toLocaleString()} | Page 1 of 1
+      </Text>
     </Page>
   </Document>
 );
@@ -188,6 +228,8 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
   touHistory,
 }) => {
   if (!weatherData || !discomInfo || !userData) return null;
+
+  console.log(discomInfo);
 
   return (
     <PDFDownloadLink
