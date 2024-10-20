@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,7 +13,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { Battery, Leaf, Sun, Zap } from "lucide-react";
+import {
+  BarChart3,
+  Battery,
+  MapPinHouse,
+  Settings,
+  Sun,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -41,6 +50,13 @@ export default function Dashboard() {
       Consumption: number;
     }[]
   >([]);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [locationName, setLocationName] = useState<string>("");
+  const [weatherData, setWeatherData] = useState<any>(null); // State to hold weather data
 
   const processCSV = useCallback((str: string) => {
     parse(str, {
@@ -53,7 +69,6 @@ export default function Dashboard() {
           Consumption: parseFloat(row["consumptionValue (kW)"]),
         }));
         setEnergyData(processedData);
-        // Save to local storage
         localStorage.setItem("energyData", JSON.stringify(processedData));
       },
     });
@@ -63,6 +78,7 @@ export default function Dashboard() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        setFileName(file.name);
         const reader = new FileReader();
         reader.onload = (e) => {
           const text = e.target?.result;
@@ -76,11 +92,36 @@ export default function Dashboard() {
     [processCSV],
   );
 
+  const fetchWeatherData = async (latitude: number, longitude: number) => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}&units=metric`,
+      );
+      const data = await response.json();
+      if (data) {
+        setWeatherData(data);
+        setLocationName(data.name);
+      }
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+    }
+  };
+
   useEffect(() => {
-    // Load data from local storage on component mount
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+        const { latitude, longitude } = coords;
+        setLocation({ latitude, longitude });
+        await fetchWeatherData(latitude, longitude); // Fetch weather data
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     const storedData = localStorage.getItem("energyData");
     if (storedData) {
       setEnergyData(JSON.parse(storedData));
+      setFileName("energyData.csv");
     }
   }, []);
 
@@ -92,7 +133,7 @@ export default function Dashboard() {
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
-            setUserData(userDocSnap.data() as UserData); // Cast to UserData
+            setUserData(userDocSnap.data() as UserData);
           } else {
             console.log("No user data found!");
           }
@@ -124,14 +165,28 @@ export default function Dashboard() {
     0,
   );
 
-  // Calculate the number of unique days
-  const uniqueDays = new Set(energyData.map(data => data.SendDate)).size;
+  const uniqueDays = new Set(energyData.map((data) => data.SendDate)).size;
+
+  const LocationWeatherDetails = ({
+    location,
+    weather,
+  }: {
+    location: string;
+    weather: any;
+  }) => (
+    <div className="flex absolute top-[-10px] right-[-10px] items-center text-sm justify-end text-muted-foreground hover:text-foreground">
+      <div className="flex items-center justify-center gap-2 rounded-lg bg-white p-2 shadow-md">
+        <MapPinHouse />
+        <p>{location}</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -189,20 +244,24 @@ export default function Dashboard() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="relative">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Monthly Bill
                 </CardTitle>
-                <Leaf className="h-4 w-4 text-green-600" />
+                {/* <Leaf className="h-4 w-4 text-green-600" /> */}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                ₹{userData.monthlyBill}
+                  ₹{userData.monthlyBill}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Average monthly electricity bill
                 </p>
+                <LocationWeatherDetails
+                  location={locationName}
+                  weather={weatherData}
+                />
               </CardContent>
             </Card>
           </div>
@@ -230,15 +289,34 @@ export default function Dashboard() {
                       accept=".csv"
                       onChange={handleFileUpload}
                       className="w-fit"
+                      value={fileName ? undefined : ""}
                     />
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={energyData}>
-                      <XAxis dataKey="SendDate" label={{ value: "Date", angle: 0, position: "bottom" }} />
-                      <YAxis yAxisId="left" label={{ value: "Power (kW)", angle: -90, position: "insideLeft" }} />
-                      <YAxis yAxisId="right" orientation="right" label={{ value: "Solar Power (kW)", angle: -90, position: "insideRight" }} />
+                      <XAxis
+                        dataKey="SendDate"
+                        label={{ value: "Date", angle: 0, position: "bottom" }}
+                      />
+                      <YAxis
+                        yAxisId="left"
+                        label={{
+                          value: "Power (kW)",
+                          angle: -90,
+                          position: "insideLeft",
+                        }}
+                      />
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        label={{
+                          value: "Solar Power (kW)",
+                          angle: -90,
+                          position: "insideRight",
+                        }}
+                      />
                       <Tooltip />
                       <Legend />
                       <Line
@@ -271,8 +349,17 @@ export default function Dashboard() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={energyData}>
-                      <XAxis dataKey="SendDate" label={{ value: "Date", angle: 0, position: "bottom" }} />
-                      <YAxis label={{ value: "Solar Energy (kWh)", angle: -90, position: "insideLeft" }} />
+                      <XAxis
+                        dataKey="SendDate"
+                        label={{ value: "Date", angle: 0, position: "bottom" }}
+                      />
+                      <YAxis
+                        label={{
+                          value: "Solar Energy (kWh)",
+                          angle: -90,
+                          position: "insideLeft",
+                        }}
+                      />
                       <Tooltip />
                       <Area
                         type="monotone"
@@ -297,8 +384,17 @@ export default function Dashboard() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={energyData}>
-                      <XAxis dataKey="SendDate" label={{ value: "Date", angle: 0, position: "bottom" }} />
-                      <YAxis label={{ value: "Consumption (kW)", angle: -90, position: "insideLeft" }} />
+                      <XAxis
+                        dataKey="SendDate"
+                        label={{ value: "Date", angle: 0, position: "bottom" }}
+                      />
+                      <YAxis
+                        label={{
+                          value: "Consumption (kW)",
+                          angle: -90,
+                          position: "insideLeft",
+                        }}
+                      />
                       <Tooltip />
                       <Bar
                         dataKey="Consumption"
@@ -311,96 +407,21 @@ export default function Dashboard() {
               </Card>
             </TabsContent>
           </Tabs>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Energy Saving Tips</CardTitle>
-              <CardDescription>
-                Based on your energy profile and goals
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2">
-                {userData.primaryGoal === "reduceBills" && (
-                  <>
-                    <li>
-                      Consider upgrading to energy-efficient appliances to
-                      reduce your electricity consumption.
-                    </li>
-                    <li>
-                      Use smart power strips to eliminate standby power
-                      consumption from electronics.
-                    </li>
-                  </>
-                )}
-                {userData.primaryGoal === "maximizeSolar" && (
-                  <>
-                    <li>
-                      Schedule high-energy tasks like laundry or dishwashing
-                      during peak sunlight hours.
-                    </li>
-                    <li>
-                      Consider adding a battery storage system to store excess
-                      solar energy for nighttime use.
-                    </li>
-                  </>
-                )}
-                {userData.primaryGoal === "reduceCarbon" && (
-                  <>
-                    <li>
-                      Replace any remaining incandescent bulbs with LED lighting
-                      to reduce energy waste.
-                    </li>
-                    <li>
-                      Consider upgrading to a smart thermostat to optimize your
-                      HVAC energy usage.
-                    </li>
-                  </>
-                )}
-                {userData.primaryGoal === "gridStability" && (
-                  <>
-                    <li>
-                      Participate in demand response programs offered by your
-                      utility to help balance grid load.
-                    </li>
-                    <li>
-                      If you have an EV, consider using it as a temporary power
-                      source during peak grid demand.
-                    </li>
-                  </>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Smart Devices</CardTitle>
-              <CardDescription>Connected devices in your home</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2">
-                {userData.smartDevices.thermostat && <li>Smart Thermostat</li>}
-                {userData.smartDevices.washingMachine && (
-                  <li>Smart Washing Machine</li>
-                )}
-                {userData.smartDevices.dishwasher && <li>Smart Dishwasher</li>}
-                {userData.smartDevices.evCharger && <li>EV Charger</li>}
-                {userData.smartDevices.other && (
-                  <li>{userData.smartDevices.other}</li>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
+        </div>
+        <div className="flex mt-6 justify-between items-center">
+          <Button className="bg-green-600 text-white hover:bg-green-700">
+            <BarChart3 className="mr-2 h-4 w-4" /> Generate Report
+          </Button>
+          <Link href="/settings">
+            <Button
+              variant="outline"
+              className="text-gray-600 border-gray-300 hover:bg-gray-100"
+            >
+              <Settings className="mr-2 h-4 w-4" /> System Settings
+            </Button>
+          </Link>
         </div>
       </main>
-      <footer className="py-6 px-4 md:px-6 mt-8 bg-white border-t border-gray-200">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-sm text-gray-600">
-            © 2024 PrabhaWatt. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
