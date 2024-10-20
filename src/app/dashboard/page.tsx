@@ -41,6 +41,12 @@ import {
   YAxis,
 } from "recharts";
 
+type TOUData = {
+  timestamp: string;
+  rate: number;
+};
+
+// State declarations
 export default function Dashboard() {
   const { user } = useAuthContext();
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -55,9 +61,12 @@ export default function Dashboard() {
   >([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [locationName, setLocationName] = useState<string>("");
-  const [weatherData, setWeatherData] = useState<any>(null); // State to hold weather data
+  const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
+  const [currentTOU, setCurrentTOU] = useState<number | null>(null);
+  const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
 
+  // Function declarations
   const processCSV = useCallback((str: string) => {
     parse(str, {
       header: true,
@@ -92,6 +101,23 @@ export default function Dashboard() {
     [processCSV],
   );
 
+  const fetchTOUData = useCallback(async () => {
+    try {
+      const response = await fetch("/api/tou");
+      const data = await response.json();
+      setCurrentTOU(data.rate);
+      setTOUHistory((prevHistory) => {
+        const newHistory = [
+          ...prevHistory,
+          { timestamp: data.timestamp, rate: data.rate },
+        ];
+        return newHistory.slice(-24); // Keep only the last 24 entries
+      });
+    } catch (error) {
+      console.error("Error fetching TOU data:", error);
+    }
+  }, []);
+
   const fetchWeatherData = async (latitude: number, longitude: number) => {
     try {
       const response = await fetch(
@@ -107,14 +133,28 @@ export default function Dashboard() {
     }
   };
 
+  const fetchDISCOMData = (discomName: string) => {
+    const discomInfo = discomData.DISCOMs.find(
+      (discom) => discom.DISCOM === discomName,
+    );
+    return discomInfo || null;
+  };
+
+  // ... existing useEffect hooks ...
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(async ({ coords }) => {
         const { latitude, longitude } = coords;
-        await fetchWeatherData(latitude, longitude); // Fetch weather data
+        await fetchWeatherData(latitude, longitude);
       });
     }
   }, []);
+
+  useEffect(() => {
+    fetchTOUData();
+    const interval = setInterval(fetchTOUData, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [fetchTOUData]);
 
   useEffect(() => {
     const storedData = localStorage.getItem("energyData");
@@ -123,13 +163,6 @@ export default function Dashboard() {
       setFileName("energyData.csv");
     }
   }, []);
-
-  const fetchDISCOMData = (discomName: string) => {
-    const discomInfo = discomData.DISCOMs.find(
-      (discom) => discom.DISCOM === discomName,
-    );
-    return discomInfo || null; // Return DISCOM info or null if not found
-  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -141,12 +174,9 @@ export default function Dashboard() {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data() as UserData;
             setUserData(userData);
-
-            // Fetch DISCOM data based on the stored electricity provider
             const discomData = fetchDISCOMData(userData.electricityProvider);
             if (discomData) {
-              // Set the relevant data to state for display
-              setDiscomInfo(discomData); // Assuming you have a state for DISCOM info
+              setDiscomInfo(discomData);
             }
           } else {
             console.log("No user data found!");
@@ -162,6 +192,7 @@ export default function Dashboard() {
     fetchUserData();
   }, [user]);
 
+  // ... existing loading and user data checks ...
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[90vh] text-sm text-muted-foreground">
@@ -280,7 +311,51 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <DiscomInfoCard discomInfo={discomInfo} />
+          <div className="grid grid-cols-2 gap-6">
+            <DiscomInfoCard discomInfo={discomInfo} />
+
+            <Card>
+              <CardHeader>
+                <CardTitle>TOU Rate History</CardTitle>
+                <CardDescription>Last 24 hours</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={touHistory}>
+                    <XAxis
+                      dataKey="timestamp"
+                      tickFormatter={(timestamp) =>
+                        new Date(timestamp).toLocaleTimeString()
+                      }
+                      label={{
+                        value: "Time",
+                        position: "insideBottom",
+                        offset: -5,
+                      }}
+                    />
+                    <YAxis
+                      label={{
+                        value: "Rate (₹/kWh)",
+                        angle: -90,
+                        position: "insideLeft",
+                        offset: 15,
+                      }}
+                    />
+                    <Tooltip
+                      labelFormatter={(label) =>
+                        new Date(label).toLocaleString()
+                      }
+                      formatter={(value) => [
+                        `₹${Number(value).toFixed(2)}/kWh`,
+                        "Rate",
+                      ]}
+                    />
+                    <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
 
           <Tabs defaultValue="power-consumption">
             <TabsList>
