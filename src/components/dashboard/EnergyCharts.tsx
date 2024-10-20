@@ -42,13 +42,21 @@ export default function EnergyCharts({
     <Tabs defaultValue="power-consumption">
       <TabsList>
         <TabsTrigger value="power-consumption">
-          Power Consumption vs. Solar Generation
+          {/* Short form for smaller screens */}
+          <span className="hidden md:inline">
+            Power Consumption vs. Solar Generation
+          </span>
+          <span className="inline md:hidden">PC vs. SG</span>
         </TabsTrigger>
         <TabsTrigger value="solar-energy">
-          Cumulative Solar Energy Generation
+          <span className="hidden md:inline">
+            Cumulative Solar Energy Generation
+          </span>
+          <span className="inline md:hidden">Cumulative Solar</span>
         </TabsTrigger>
         <TabsTrigger value="hourly-consumption">
-          Hourly Energy Consumption
+          <span className="hidden md:inline">Hourly Energy Consumption</span>
+          <span className="inline md:hidden">Hourly Consumption</span>
         </TabsTrigger>
       </TabsList>
 
