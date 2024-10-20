@@ -15,7 +15,7 @@ import { useAuthContext } from "@/context/auth-context";
 import discomData from "@/data/electricity-providers.json";
 import { db } from "@/lib/firebase";
 import { Discom } from "@/types/discom";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query } from "firebase/firestore";
 import {
   BarChart3,
   Battery,
@@ -40,11 +40,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-type TOUData = {
-  timestamp: string;
-  rate: number;
-};
 
 // State declarations
 export default function Dashboard() {
@@ -101,6 +96,17 @@ export default function Dashboard() {
     [processCSV],
   );
 
+  async function fetchTOUHistory() {
+    const touCollection = collection(db, 'tou-rates');
+    const q = query(touCollection, orderBy('timestamp', 'desc'), limit(24)); // Last 24 entries
+    const querySnapshot = await getDocs(q);
+    const history = querySnapshot.docs.map(doc => ({
+      timestamp: doc.data().timestamp,
+      rate: doc.data().rate,
+    }));
+    return history.reverse(); // Reverse to show oldest first
+  }
+
   const fetchTOUData = useCallback(async () => {
     try {
       const response = await fetch("/api/tou");
@@ -151,10 +157,14 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    fetchTOUHistory().then(setTOUHistory);
+  }, []);
+
+  useEffect(() => {
     fetchTOUData();
     const interval = setInterval(fetchTOUData, 60000); // Update every minute
     return () => clearInterval(interval);
-  }, [fetchTOUData]);
+  }, []);
 
   useEffect(() => {
     const storedData = localStorage.getItem("energyData");
