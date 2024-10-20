@@ -123,10 +123,9 @@ export default function Dashboard() {
     (sum, data) => sum + data.SolarPower,
     0,
   );
-  const totalConsumption = energyData.reduce(
-    (sum, data) => sum + data.Consumption,
-    0,
-  );
+
+  // Calculate the number of unique days
+  const uniqueDays = new Set(energyData.map(data => data.SendDate)).size;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -144,6 +143,9 @@ export default function Dashboard() {
                 <div className="text-2xl font-bold">
                   {totalSolarPower.toFixed(2)} kWh
                 </div>
+                <p className="text-xs mb-1 text-muted-foreground">
+                  in the past {uniqueDays} days
+                </p>
                 <p className="text-xs text-muted-foreground">100% from solar</p>
               </CardContent>
             </Card>
@@ -196,7 +198,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ${userData.monthlyBill}
+                ₹{userData.monthlyBill}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Average monthly electricity bill
@@ -234,9 +236,9 @@ export default function Dashboard() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={energyData}>
-                      <XAxis dataKey="SendDate" />
-                      <YAxis yAxisId="left" />
-                      <YAxis yAxisId="right" orientation="right" />
+                      <XAxis dataKey="SendDate" label={{ value: "Date", angle: 0, position: "bottom" }} />
+                      <YAxis yAxisId="left" label={{ value: "Power (kW)", angle: -90, position: "insideLeft" }} />
+                      <YAxis yAxisId="right" orientation="right" label={{ value: "Solar Power (kW)", angle: -90, position: "insideRight" }} />
                       <Tooltip />
                       <Legend />
                       <Line
@@ -269,8 +271,8 @@ export default function Dashboard() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={energyData}>
-                      <XAxis dataKey="SendDate" />
-                      <YAxis />
+                      <XAxis dataKey="SendDate" label={{ value: "Date", angle: 0, position: "bottom" }} />
+                      <YAxis label={{ value: "Solar Energy (kWh)", angle: -90, position: "insideLeft" }} />
                       <Tooltip />
                       <Area
                         type="monotone"
@@ -295,8 +297,8 @@ export default function Dashboard() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={energyData}>
-                      <XAxis dataKey="SendDate" />
-                      <YAxis />
+                      <XAxis dataKey="SendDate" label={{ value: "Date", angle: 0, position: "bottom" }} />
+                      <YAxis label={{ value: "Consumption (kW)", angle: -90, position: "insideLeft" }} />
                       <Tooltip />
                       <Bar
                         dataKey="Consumption"
