@@ -12,4 +12,5 @@ type UserData = {
     evCharger: boolean;
     other?: string;
   };
+  electricityProvider: string;
 };

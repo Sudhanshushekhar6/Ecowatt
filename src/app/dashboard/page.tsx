@@ -1,5 +1,6 @@
 "use client";
 
+import DiscomInfoCard from "@/components/dashboard/discom-info-card";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/auth-context";
+import discomData from "@/data/electricity-providers.json";
 import { db } from "@/lib/firebase";
+import { Discom } from "@/types/discom";
 import { doc, getDoc } from "firebase/firestore";
 import {
   BarChart3,
@@ -51,12 +54,9 @@ export default function Dashboard() {
     }[]
   >([]);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
   const [locationName, setLocationName] = useState<string>("");
   const [weatherData, setWeatherData] = useState<any>(null); // State to hold weather data
+  const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
 
   const processCSV = useCallback((str: string) => {
     parse(str, {
@@ -111,7 +111,6 @@ export default function Dashboard() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(async ({ coords }) => {
         const { latitude, longitude } = coords;
-        setLocation({ latitude, longitude });
         await fetchWeatherData(latitude, longitude); // Fetch weather data
       });
     }
@@ -125,6 +124,13 @@ export default function Dashboard() {
     }
   }, []);
 
+  const fetchDISCOMData = (discomName: string) => {
+    const discomInfo = discomData.DISCOMs.find(
+      (discom) => discom.DISCOM === discomName,
+    );
+    return discomInfo || null; // Return DISCOM info or null if not found
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
@@ -133,7 +139,15 @@ export default function Dashboard() {
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
-            setUserData(userDocSnap.data() as UserData);
+            const userData = userDocSnap.data() as UserData;
+            setUserData(userData);
+
+            // Fetch DISCOM data based on the stored electricity provider
+            const discomData = fetchDISCOMData(userData.electricityProvider);
+            if (discomData) {
+              // Set the relevant data to state for display
+              setDiscomInfo(discomData); // Assuming you have a state for DISCOM info
+            }
           } else {
             console.log("No user data found!");
           }
@@ -265,6 +279,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+
+          <DiscomInfoCard discomInfo={discomInfo} />
 
           <Tabs defaultValue="power-consumption">
             <TabsList>
