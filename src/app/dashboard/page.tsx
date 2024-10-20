@@ -185,7 +185,7 @@ export default function Dashboard() {
 
   // Calculate dashboard metrics
   const totalSolarPower = energyData.reduce(
-    (sum, data) => sum + data.SolarPower,
+    (sum, data) => sum + data.SolarEnergy,
     0,
   );
   const uniqueDays = new Set(
