@@ -38,3 +38,10 @@ export interface Discom {
   "Average Billing Rate (Rs./kWh)": string;
   "Profit/(Loss) of the DISCOM (Rs. Crore)": string;
 }
+
+export interface EnergyData {
+  SendDate: string;
+  SolarPower: number;
+  SolarEnergy: number;
+  Consumption: number;
+}

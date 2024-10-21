@@ -5,7 +5,6 @@ import DiscomInfoCard from "@/components/dashboard/DiscomInfoCard";
 import EnergyCharts from "@/components/dashboard/EnergyCharts";
 import GenerateReportButton from "@/components/dashboard/GenerateReportButton";
 import StatsCards from "@/components/dashboard/StatsCards";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,20 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuthContext } from "@/context/auth-context";
-import { fetchDISCOMData, fetchWeatherData } from "@/lib/api";
+import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
-import { Discom, TOUData, UserData } from "@/types/user";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-} from "firebase/firestore";
-import { Settings } from "lucide-react";
-import Link from "next/link";
+import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
+import { doc, getDoc } from "firebase/firestore";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -45,14 +34,7 @@ export default function Dashboard() {
   const { user } = useAuthContext();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [energyData, setEnergyData] = useState<
-    {
-      SendDate: string;
-      SolarPower: number;
-      SolarEnergy: number;
-      Consumption: number;
-    }[]
-  >([]);
+  const [energyData, setEnergyData] = useState<EnergyData[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [locationName, setLocationName] = useState<string>("");
   const [weatherData, setWeatherData] = useState<any>(null);
@@ -144,17 +126,6 @@ export default function Dashboard() {
 
     initializeDashboard();
   }, [user]);
-
-  async function fetchTOUHistory() {
-    const touCollection = collection(db, "tou-rates");
-    const q = query(touCollection, orderBy("timestamp", "desc"), limit(24)); // Last 24 entries
-    const querySnapshot = await getDocs(q);
-    const history = querySnapshot.docs.map((doc) => ({
-      timestamp: doc.data().timestamp,
-      rate: doc.data().rate,
-    }));
-    return history.reverse(); // Reverse to show oldest first
-  }
 
   useEffect(() => {
     let isMounted = true; // Flag to check if the component is mounted
@@ -278,14 +249,6 @@ export default function Dashboard() {
               discomInfo={discomInfo}
               touHistory={touHistory}
             />
-            <Link href="/settings">
-              <Button
-                variant="outline"
-                className="text-gray-600 border-gray-300 hover:bg-gray-100"
-              >
-                <Settings className="mr-2 h-4 w-4" /> System Settings
-              </Button>
-            </Link>
           </div>
         </div>
       </main>

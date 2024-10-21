@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { generateReport } from "@/lib/ai";
 import { Discom, TOUData, UserData, WeatherData } from "@/types/user";
 import {
   Document,
@@ -10,8 +11,9 @@ import {
   View,
 } from "@react-pdf/renderer";
 import { type User } from "firebase/auth";
-import { BarChart3 } from "lucide-react";
-import React from "react";
+import { BarChart3, Download, Settings } from "lucide-react";
+import Link from "next/link";
+import React, { useState } from "react";
 
 // Define styles for the PDF
 const styles = StyleSheet.create({
@@ -227,33 +229,84 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
   discomInfo,
   touHistory,
 }) => {
+  const [report, setReport] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerateReport = async () => {
+    if (!weatherData || !discomInfo || !userData) return;
+
+    setIsGenerating(true);
+    try {
+      const generatedReport = await generateReport(
+        user,
+        userData,
+        touHistory,
+        weatherData,
+        discomInfo,
+        energyData,
+      );
+      setReport(generatedReport);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      alert(
+        "An error occurred while generating the report. Please try again later.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   if (!weatherData || !discomInfo || !userData) return null;
 
   return (
-    <PDFDownloadLink
-      document={
-        <MyDocument
-          user={user}
-          userData={userData}
-          energyData={energyData}
-          weatherData={weatherData}
-          discomInfo={discomInfo}
-          touHistory={touHistory}
-        />
-      }
-      fileName="energy_consumption_report.pdf"
-    >
-      {/* @ts-ignore */}
-      {({ blob, url, loading, error }) => (
+    <div className="w-full">
+      <div className="flex items-center justify-between w-full">
         <Button
           className="bg-green-600 text-white hover:bg-green-700"
-          disabled={loading}
+          onClick={handleGenerateReport}
+          disabled={isGenerating}
         >
           <BarChart3 className="mr-2 h-4 w-4" />
-          {loading ? "Generating Report..." : "Generate Report"}
+          {isGenerating ? "Generating Report..." : "Generate Report"}
         </Button>
+        <Link href="/settings">
+          <Button
+            variant="outline"
+            className="text-gray-600 border-gray-300 hover:bg-gray-100"
+          >
+            <Settings className="mr-2 h-4 w-4" /> System Settings
+          </Button>
+        </Link>
+      </div>
+
+      {report && (
+        <div className="mt-8 p-4 bg-gray-100 rounded">
+          <h2 className="text-2xl font-bold mb-4">Generated Report</h2>
+          <p className="whitespace-pre-wrap">{report}</p>
+          <PDFDownloadLink
+            document={
+              <MyDocument
+                user={user}
+                userData={userData}
+                energyData={energyData}
+                weatherData={weatherData}
+                discomInfo={discomInfo}
+                touHistory={touHistory}
+              />
+            }
+            fileName="energy_consumption_report.pdf"
+          >
+            {/* @ts-ignore */}
+            {({ blob, url, loading, error }) => (
+              <Button className="mt-4" disabled={loading} variant={`outline`}>
+                <Download className="mr-2 h-4 w-4" />
+                {loading ? "Preparing PDF..." : "Download PDF Report"}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        </div>
       )}
-    </PDFDownloadLink>
+    </div>
   );
 };
 
