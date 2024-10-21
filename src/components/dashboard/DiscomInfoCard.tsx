@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Discom } from "@/types/discom";
+import { Discom } from "@/types/user";
 import { DollarSign, Percent, Users, Zap } from "lucide-react";
 import {
   Bar,
