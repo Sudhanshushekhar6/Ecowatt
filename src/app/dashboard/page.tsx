@@ -38,6 +38,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   // State declarations
@@ -56,7 +57,6 @@ export default function Dashboard() {
   const [locationName, setLocationName] = useState<string>("");
   const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
-  const [currentTOU, setCurrentTOU] = useState<number | null>(null);
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]); // Specify the type of touHistory
 
   // CSV processing function
@@ -156,32 +156,23 @@ export default function Dashboard() {
     return history.reverse(); // Reverse to show oldest first
   }
 
-  const fetchTOUData = useCallback(async () => {
-    try {
-      const response = await fetch("/api/tou");
-      const data = await response.json();
-      setCurrentTOU(data.rate);
-      setTOUHistory((prevHistory) => {
-        const newHistory = [
-          ...prevHistory,
-          { timestamp: data.timestamp, rate: data.rate },
-        ];
-        return newHistory.slice(-24); // Keep only the last 24 entries
-      });
-    } catch (error) {
-      console.error("Error fetching TOU data:", error);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchTOUHistory().then(setTOUHistory);
-  }, []);
+    let isMounted = true; // Flag to check if the component is mounted
+    fetchTOUHistory().then((touHistory) => {
+      if (isMounted) {
+        // Only set state if the component is still mounted
+        const latestTou = touHistory[0];
+        toast.success("Latest TOU rate fetched", {
+          description: `Current TOU rate: ${latestTou.rate}`,
+        });
+        setTOUHistory(touHistory);
+      }
+    });
 
-  useEffect(() => {
-    fetchTOUData();
-    const interval = setInterval(fetchTOUData, 60000); // Update every minute
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      isMounted = false; // Cleanup function to set the flag to false
+    };
+  }, []); // Ensure this effect runs only once
 
   // Calculate dashboard metrics
   const totalSolarPower = energyData.reduce(

@@ -71,6 +71,7 @@ export default function EnergyCharts({
                 accept=".csv"
                 onChange={handleFileUpload}
                 className="w-fit"
+                id="energy-data-file"
                 value={fileName ? undefined : ""}
               />
             </CardDescription>

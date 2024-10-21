@@ -229,8 +229,6 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
 }) => {
   if (!weatherData || !discomInfo || !userData) return null;
 
-  console.log(discomInfo);
-
   return (
     <PDFDownloadLink
       document={
