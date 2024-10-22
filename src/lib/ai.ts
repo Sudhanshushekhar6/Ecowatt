@@ -7,6 +7,242 @@ import {
   WeatherData,
 } from "../types/user";
 
+// Enhanced interfaces for the report sections
+interface ExecutiveSummary {
+  currentMonthCost: number;
+  costComparisonPercentage: number;
+  costTrend: "up" | "down";
+  totalEnergySavings: number;
+  solarGeneration: number | null;
+  batteryUsage: number | null;
+  keyRecommendations: string[];
+}
+
+interface TariffAnalysis {
+  currentRate: number;
+  averageRate: number;
+  peakRate: number;
+  offPeakRate: number;
+  forecastedRates: Array<{ time: string; rate: number }>;
+  savingsOpportunities: string[];
+}
+
+interface ConsumptionAnalytics {
+  totalConsumption: number;
+  averageDailyConsumption: number;
+  peakConsumptionTime: string;
+  peakConsumptionValue: number;
+  consumptionByTimeOfDay: Array<{ hour: number; average: number }>;
+}
+
+interface SolarAnalysis {
+  dailyGeneration: number;
+  monthlyGeneration: number;
+  efficiency: number;
+  savingsFromSolar: number;
+  potentialOptimizations: string[];
+}
+
+// Calculate executive summary without API call
+function calculateExecutiveSummary(
+  energyData: EnergyData[],
+  touData: TOUData[],
+  userData: UserData,
+): ExecutiveSummary {
+  // Get current and previous month's data
+  const now = new Date();
+  const currentMonthData = energyData.filter((data) => {
+    const date = new Date(data.SendDate);
+    return date.getMonth() === now.getMonth();
+  });
+
+  const previousMonthData = energyData.filter((data) => {
+    const date = new Date(data.SendDate);
+    return date.getMonth() === now.getMonth() - 1;
+  });
+
+  // Calculate costs
+  const averageRate =
+    touData.reduce((sum, data) => sum + data.rate, 0) / touData.length;
+
+  const currentMonthCost = currentMonthData.reduce(
+    (sum, data) => sum + data.Consumption * averageRate,
+    0,
+  );
+
+  const previousMonthCost = previousMonthData.reduce(
+    (sum, data) => sum + data.Consumption * averageRate,
+    0,
+  );
+
+  // Calculate solar generation if applicable
+  const solarGeneration = userData.hasSolarPanels
+    ? currentMonthData.reduce((sum, data) => sum + data.SolarEnergy, 0)
+    : null;
+
+  // Calculate cost comparison
+  const costComparisonPercentage = previousMonthCost
+    ? ((currentMonthCost - previousMonthCost) / previousMonthCost) * 100
+    : 0;
+
+  // Calculate energy savings from solar
+  const totalEnergySavings = solarGeneration
+    ? solarGeneration * averageRate
+    : 0;
+
+  return {
+    currentMonthCost: parseFloat(currentMonthCost.toFixed(2)),
+    costComparisonPercentage: parseFloat(costComparisonPercentage.toFixed(2)),
+    costTrend: costComparisonPercentage > 0 ? "up" : "down",
+    totalEnergySavings: parseFloat(totalEnergySavings.toFixed(2)),
+    solarGeneration: solarGeneration
+      ? parseFloat(solarGeneration.toFixed(2))
+      : null,
+    batteryUsage: userData.hasBatteryStorage ? userData.storageCapacity : null,
+    keyRecommendations: [], // Will be populated after analysis
+  };
+}
+
+// Generate tariff analysis
+async function generateTariffAnalysis(
+  touData: TOUData[],
+  discomData: Discom,
+): Promise<TariffAnalysis> {
+  const prompt = `Analyze the following Time of Use (TOU) data and DISCOM information:
+    TOU Data: ${JSON.stringify(touData)}
+    DISCOM Info: ${JSON.stringify(discomData)}
+    
+    Provide:
+    1. Peak and off-peak rate analysis
+    2. Rate forecasting for next 24 hours
+    3. Specific savings opportunities based on rate patterns`;
+
+  const response = await fetchAIResponse(prompt);
+
+  // Calculate basic metrics ourselves
+  const rates = touData.map((t) => t.rate);
+  const averageRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+  const peakRate = Math.max(...rates);
+  const offPeakRate = Math.min(...rates);
+
+  return {
+    currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
+    averageRate: parseFloat(averageRate.toFixed(2)),
+    peakRate: parseFloat(peakRate.toFixed(2)),
+    offPeakRate: parseFloat(offPeakRate.toFixed(2)),
+    forecastedRates: response.forecasted_rates || [],
+    savingsOpportunities: response.opportunities || [],
+  };
+}
+
+// Generate consumption analytics
+async function generateConsumptionAnalytics(
+  energyData: EnergyData[],
+  weatherData: WeatherData,
+): Promise<ConsumptionAnalytics> {
+  // Calculate basic metrics
+  const total = energyData.reduce((sum, data) => sum + data.Consumption, 0);
+  const daily = total / energyData.length;
+
+  // Find peak consumption
+  const peakConsumption = energyData.reduce(
+    (max, data) =>
+      data.Consumption > max.consumption
+        ? { time: data.SendDate, consumption: data.Consumption }
+        : max,
+    { time: "", consumption: 0 },
+  );
+
+  // Group consumption by hour
+  const hourlyConsumption = energyData.reduce(
+    (acc, data) => {
+      const hour = new Date(data.SendDate).getHours();
+      if (!acc[hour]) acc[hour] = [];
+      acc[hour].push(data.Consumption);
+      return acc;
+    },
+    {} as Record<number, number[]>,
+  );
+
+  // Calculate hourly averages
+  const hourlyAverages = Object.entries(hourlyConsumption).map(
+    ([hour, values]) => ({
+      hour: parseInt(hour),
+      average: values.reduce((a, b) => a + b, 0) / values.length,
+    }),
+  );
+
+  return {
+    totalConsumption: parseFloat(total.toFixed(2)),
+    averageDailyConsumption: parseFloat(daily.toFixed(2)),
+    peakConsumptionTime: peakConsumption.time,
+    peakConsumptionValue: parseFloat(peakConsumption.consumption.toFixed(2)),
+    consumptionByTimeOfDay: hourlyAverages,
+  };
+}
+
+// Generate solar analysis if applicable
+async function generateSolarAnalysis(
+  energyData: EnergyData[],
+  userData: UserData,
+  weatherData: WeatherData,
+): Promise<SolarAnalysis | null> {
+  if (!userData.hasSolarPanels) return null;
+
+  const dailyGeneration =
+    energyData.reduce((sum, data) => sum + data.SolarEnergy, 0) /
+    energyData.length;
+
+  const monthlyGeneration = dailyGeneration * 30;
+
+  // Calculate efficiency (actual vs theoretical based on capacity)
+  const theoreticalDaily = userData.solarCapacity * 5.5; // Assuming 5.5 peak sun hours
+  const efficiency = (dailyGeneration / theoreticalDaily) * 100;
+
+  return {
+    dailyGeneration: parseFloat(dailyGeneration.toFixed(2)),
+    monthlyGeneration: parseFloat(monthlyGeneration.toFixed(2)),
+    efficiency: parseFloat(efficiency.toFixed(2)),
+    savingsFromSolar: parseFloat(
+      (monthlyGeneration * parseFloat(userData.monthlyBill.toString())).toFixed(
+        2,
+      ),
+    ),
+    potentialOptimizations: [], // Will be populated by AI response
+  };
+}
+
+// Helper function for AI API calls
+async function fetchAIResponse(prompt: string) {
+  const response = await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama3-groq-70b-8192-tool-use-preview",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an energy analysis expert. Provide detailed insights in JSON format.",
+          },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 1024,
+      }),
+    },
+  );
+
+  const data = await response.json();
+  return JSON.parse(data.choices[0].message.content);
+}
+
+// Main report generation function
 export async function generateReport(
   user: User,
   userData: UserData,
@@ -14,85 +250,44 @@ export async function generateReport(
   weatherData: WeatherData,
   discomData: Discom,
   energyData: EnergyData[],
-): Promise<string> {
-  const prompt = `You are Prabhawatt. Generate a comprehensive, formal, and detailed energy report based on the following data:
-
-    User: ${JSON.stringify(user)}
-    User Data: ${JSON.stringify(userData)}
-    TOU Data: ${JSON.stringify(touData)}
-    Weather Data: ${JSON.stringify(weatherData)}
-    Discom Data: ${JSON.stringify(discomData)}
-    Energy Data: ${JSON.stringify(energyData).slice(0, 100)}
-
-    Please provide a detailed analysis and insights on the following aspects, incorporating tables, charts, and diagrams where appropriate:
-
-    1. Real-Time Tariff Analysis:
-       - Current tariff rates and how they compare to historical data
-       - Forecasted tariffs for the next 24-48 hours
-       - Potential savings opportunities based on tariff variations
-
-    2. Energy Consumption Analytics:
-       - Detailed breakdown of energy usage patterns
-       - Comparison of current consumption with historical data
-       - Identification of peak usage times and high-consumption appliances
-
-    3. Smart Scheduling Recommendations:
-       - Specific suggestions for automating appliance usage during low-tariff periods
-       - Potential cost savings from implementing these recommendations
-       - Any challenges or considerations for implementation
-
-    4. Solar Energy Management:
-       - Analysis of current solar energy production
-       - Optimization strategies for solar energy usage and storage
-       - Cost-benefit analysis of the current solar setup
-
-    5. Machine Learning Forecasts:
-       - Predicted energy consumption for the next week/month.
-       - Factors influencing the forecast (e.g., weather, historical patterns)
-       - Confidence intervals and potential variations in the forecast
-
-    6. Cost-Benefit Analysis:
-       - Detailed breakdown of current energy costs
-       - Projected savings from implementing recommendations
-       - Return on investment calculations for any suggested upgrades or changes
-
-    7. Energy Efficiency Recommendations:
-       - Specific suggestions for improving overall energy efficiency
-       - Estimated impact of each recommendation on energy consumption and costs
-       - Prioritized list of actions based on potential impact and ease of implementation
-
-    Please ensure the report is formal, concise, and to the point. Include relevant tables, charts, and diagrams to illustrate key points and make the data more accessible. Each section should provide actionable insights and clear, data-driven recommendations.`;
-
+): Promise<{
+  executiveSummary: ExecutiveSummary;
+  tariffAnalysis: TariffAnalysis;
+  consumptionAnalytics: ConsumptionAnalytics;
+  solarAnalysis: SolarAnalysis | null;
+}> {
   try {
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "llama3-groq-70b-8192-tool-use-preview",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are an AI assistant specialized in energy analysis and optimization. Provide detailed, formal reports with actionable insights. Include tables, charts, and diagrams where appropriate to illustrate key points.",
-            },
-            { role: "user", content: prompt },
-          ],
-          temperature: 0.7,
-          max_tokens: 4096,
-        }),
-      },
+    // Generate executive summary first (no API call)
+    const executiveSummary = calculateExecutiveSummary(
+      energyData,
+      touData,
+      userData,
     );
 
-    const data = await response.json();
-    console.log(data);
-    return data.choices[0].message.content;
+    // Generate all other sections in parallel
+    const [tariffAnalysis, consumptionAnalytics, solarAnalysis] =
+      await Promise.all([
+        generateTariffAnalysis(touData, discomData),
+        generateConsumptionAnalytics(energyData, weatherData),
+        userData.hasSolarPanels
+          ? generateSolarAnalysis(energyData, userData, weatherData)
+          : Promise.resolve(null),
+      ]);
+
+    // Update executive summary recommendations based on all analyses
+    executiveSummary.keyRecommendations = [
+      ...tariffAnalysis.savingsOpportunities.slice(0, 2),
+      ...(solarAnalysis?.potentialOptimizations.slice(0, 2) || []),
+    ];
+
+    return {
+      executiveSummary,
+      tariffAnalysis,
+      consumptionAnalytics,
+      solarAnalysis,
+    };
   } catch (error) {
     console.error("Error generating report:", error);
-    return "An error occurred while generating the report. Please try again later.";
+    throw new Error("Failed to generate complete report");
   }
 }

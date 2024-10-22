@@ -45,3 +45,38 @@ export interface EnergyData {
   SolarEnergy: number;
   Consumption: number;
 }
+
+export interface ExecutiveSummary {
+  currentMonthCost: number;
+  costComparisonPercentage: number;
+  costTrend: "up" | "down";
+  totalEnergySavings: number;
+  solarGeneration: number | null;
+  batteryUsage: number | null;
+  keyRecommendations: string[];
+}
+
+export interface TariffAnalysis {
+  currentRate: number;
+  averageRate: number;
+  peakRate: number;
+  offPeakRate: number;
+  forecastedRates: Array<{ time: string; rate: number }>;
+  savingsOpportunities: string[];
+}
+
+export interface ConsumptionAnalytics {
+  totalConsumption: number;
+  averageDailyConsumption: number;
+  peakConsumptionTime: string;
+  peakConsumptionValue: number;
+  consumptionByTimeOfDay: Array<{ hour: number; average: number }>;
+}
+
+export interface SolarAnalysis {
+  dailyGeneration: number;
+  monthlyGeneration: number;
+  efficiency: number;
+  savingsFromSolar: number;
+  potentialOptimizations: string[];
+}

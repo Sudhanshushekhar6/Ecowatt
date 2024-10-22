@@ -1,241 +1,242 @@
 import { Button } from "@/components/ui/button";
-import { generateReport } from "@/lib/ai";
-import { Discom, TOUData, UserData, WeatherData } from "@/types/user";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Document,
-  Image,
-  Page,
-  PDFDownloadLink,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer";
-import { type User } from "firebase/auth";
-import { BarChart3, Download, Settings } from "lucide-react";
+  ConsumptionAnalytics,
+  Discom,
+  EnergyData,
+  ExecutiveSummary,
+  SolarAnalysis,
+  TariffAnalysis,
+  TOUData,
+  UserData,
+  WeatherData,
+} from "@/types/user";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { User } from "firebase/auth";
+import {
+  AlertCircle,
+  BarChart3,
+  Battery,
+  Download,
+  Settings,
+  Sun,
+  TrendingDown,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 
-// Define styles for the PDF
-const styles = StyleSheet.create({
-  page: { padding: 30, fontFamily: "Helvetica" },
-  section: { marginBottom: 20 },
-  header: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: "#2c3e50",
-    textAlign: "center",
-  },
-  subheader: {
-    fontSize: 18,
-    marginTop: 15,
-    marginBottom: 10,
-    color: "#34495e",
-    borderBottom: "1 solid #bdc3c7",
-  },
-  text: { fontSize: 12, marginBottom: 5, color: "#2c3e50" },
-  table: { width: "auto", marginTop: 10, marginBottom: 10 },
-  tableRow: { flexDirection: "row", borderBottom: "1 solid #bdc3c7" },
-  tableHeader: { backgroundColor: "#ecf0f1", fontWeight: "bold" },
-  tableCol: { width: "25%", padding: 5 },
-  tableCell: { fontSize: 10, color: "#2c3e50" },
-  logo: { width: 50, height: 50, marginBottom: 20, alignSelf: "center" },
-  footer: {
-    position: "absolute",
-    bottom: 30,
-    left: 30,
-    right: 30,
-    textAlign: "center",
-    fontSize: 10,
-    color: "#7f8c8d",
-  },
-});
+import { generateReport } from "@/lib/ai";
+import PDFReport from "./PDFReport";
 
-interface EnergyData {
-  SendDate: string;
-  SolarPower: number;
-  SolarEnergy: number;
-  Consumption: number;
-}
+// Report Section Components
+const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
+  <Card className="w-full mb-6 bg-white">
+    <CardHeader>
+      <CardTitle className="text-xl font-bold">Executive Summary</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="p-4 rounded-lg bg-gray-50">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-gray-600">Current Month's Cost</span>
+            <Zap className="h-5 w-5 text-blue-500" />
+          </div>
+          <p className="text-2xl font-bold">
+            ₹{data.currentMonthCost.toLocaleString()}
+          </p>
+          <div className="flex items-center mt-2 text-sm">
+            {data.costTrend === "up" ? (
+              <TrendingUp className="h-4 w-4 text-red-500 mr-1" />
+            ) : (
+              <TrendingDown className="h-4 w-4 text-green-500 mr-1" />
+            )}
+            <span
+              className={
+                data.costTrend === "up" ? "text-red-500" : "text-green-500"
+              }
+            >
+              {Math.abs(data.costComparisonPercentage)}% vs last month
+            </span>
+          </div>
+        </div>
 
-interface MyDocumentProps {
+        {data.solarGeneration !== null && (
+          <div className="p-4 rounded-lg bg-gray-50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-600">Solar Generation</span>
+              <Sun className="h-5 w-5 text-yellow-500" />
+            </div>
+            <p className="text-2xl font-bold">{data.solarGeneration} kWh</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Savings: ₹{data.totalEnergySavings.toLocaleString()}
+            </p>
+          </div>
+        )}
+
+        {data.batteryUsage !== null && (
+          <div className="p-4 rounded-lg bg-gray-50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-600">Battery Usage</span>
+              <Battery className="h-5 w-5 text-green-500" />
+            </div>
+            <p className="text-2xl font-bold">{data.batteryUsage} kWh</p>
+          </div>
+        )}
+      </div>
+
+      {data.keyRecommendations.length > 0 && (
+        <div className="mt-6">
+          <h3 className="font-semibold mb-2">Key Recommendations</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            {data.keyRecommendations.map((rec, index) => (
+              <li key={index} className="text-gray-700">
+                {rec}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+);
+
+const TariffAnalysisCard = ({ data }: { data: TariffAnalysis }) => (
+  <Card className="w-full mb-6">
+    <CardHeader>
+      <CardTitle className="text-xl font-bold">Tariff Analysis</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Current Rate</p>
+          <p className="text-lg font-bold">₹{data.currentRate}/kWh</p>
+        </div>
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Average Rate</p>
+          <p className="text-lg font-bold">₹{data.averageRate}/kWh</p>
+        </div>
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Peak Rate</p>
+          <p className="text-lg font-bold">₹{data.peakRate}/kWh</p>
+        </div>
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Off-Peak Rate</p>
+          <p className="text-lg font-bold">₹{data.offPeakRate}/kWh</p>
+        </div>
+      </div>
+
+      {data.savingsOpportunities.length > 0 && (
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">Savings Opportunities</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            {data.savingsOpportunities.map((opportunity, index) => (
+              <li key={index} className="text-gray-700">
+                {opportunity}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+);
+
+const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
+  <Card className="w-full mb-6">
+    <CardHeader>
+      <CardTitle className="text-xl font-bold">Consumption Analytics</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Total Consumption</p>
+          <p className="text-xl font-bold">{data.totalConsumption} kWh</p>
+        </div>
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Daily Average</p>
+          <p className="text-xl font-bold">
+            {data.averageDailyConsumption} kWh
+          </p>
+        </div>
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">Peak Consumption</p>
+          <p className="text-xl font-bold">{data.peakConsumptionValue} kW</p>
+          <p className="text-sm text-gray-500">
+            at {new Date(data.peakConsumptionTime).toLocaleTimeString()}
+          </p>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
+  if (!data) return null;
+
+  return (
+    <Card className="w-full mb-6">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold">Solar Analysis</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">Daily Generation</p>
+            <p className="text-xl font-bold">{data.dailyGeneration} kWh</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">Monthly Generation</p>
+            <p className="text-xl font-bold">{data.monthlyGeneration} kWh</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">System Efficiency</p>
+            <p className="text-xl font-bold">{data.efficiency}%</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">Monthly Savings</p>
+            <p className="text-xl font-bold">₹{data.savingsFromSolar}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const GenerateReportButton = ({
+  user,
+  userData,
+  energyData,
+  weatherData,
+  discomInfo,
+  touHistory,
+}: {
   user: User;
   userData: UserData;
   energyData: EnergyData[];
   weatherData: WeatherData;
-  discomInfo: Discom;
-  touHistory: TOUData[];
-}
-
-const MyDocument: React.FC<MyDocumentProps> = ({
-  user,
-  userData,
-  energyData,
-  weatherData,
-  discomInfo,
-  touHistory,
-}) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <Image src="icon.svg" style={styles.logo} />
-      <Text style={styles.header}>Energy Consumption Report</Text>
-
-      <View style={styles.section}>
-        <Text style={styles.subheader}>User Information</Text>
-        <Text style={styles.text}>Name: {user.displayName}</Text>
-        <Text style={styles.text}>Email: {user.email}</Text>
-        <Text style={styles.text}>
-          Electricity Provider: {userData.electricityProvider}
-        </Text>
-        <Text style={styles.text}>
-          Solar Capacity: {userData.solarCapacity} kW
-        </Text>
-        <Text style={styles.text}>
-          Storage Capacity: {userData.storageCapacity} kWh
-        </Text>
-        <Text style={styles.text}>Monthly Bill: ₹{userData.monthlyBill}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subheader}>Weather Information</Text>
-        <Text style={styles.text}>Location: {weatherData.name}</Text>
-        <Text style={styles.text}>Temperature: {weatherData.main.temp}°C</Text>
-        <Text style={styles.text}>Humidity: {weatherData.main.humidity}%</Text>
-        <Text style={styles.text}>
-          Conditions: {weatherData.weather[0].description}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subheader}>Energy Consumption Summary</Text>
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Date</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Solar Power (kW)</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Solar Energy (kWh)</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Consumption (kW)</Text>
-            </View>
-          </View>
-          {energyData.slice(0, 5).map((data, index) => (
-            <View style={styles.tableRow} key={index}>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{data.SendDate}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {data.SolarPower.toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {data.SolarEnergy.toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {data.Consumption.toFixed(2)}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subheader}>DISCOM Information</Text>
-        <Text style={styles.text}>DISCOM: {discomInfo["DISCOM"]}</Text>
-        <Text style={styles.text}>State: {discomInfo["State"]}</Text>
-        <Text style={styles.text}>
-          Total Number of consumers:{" "}
-          {discomInfo["Total Number of consumers (Millions)"]} Million
-        </Text>
-        <Text style={styles.text}>
-          Total Electricity Sales: {discomInfo["Total Electricity Sales (MU)"]}{" "}
-          MU
-        </Text>
-        <Text style={styles.text}>
-          Total Revenue: ₹{discomInfo["Total Revenue (Rs. Crore)"]} Crore
-        </Text>
-        <Text style={styles.text}>
-          AT&C Losses: {discomInfo["AT&C Losses (%)"]}%
-        </Text>
-        <Text style={styles.text}>
-          Average power purchase cost: ₹
-          {discomInfo["Average power purchase cost (Rs./kWh)"]} /kWh
-        </Text>
-        <Text style={styles.text}>
-          Average Cost of Supply: ₹
-          {discomInfo["Average Cost of Supply (Rs./kWh)"]} /kWh
-        </Text>
-        <Text style={styles.text}>
-          Average Billing Rate: ₹{discomInfo["Average Billing Rate (Rs./kWh)"]}{" "}
-          /kWh
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subheader}>TOU Rate History</Text>
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Time</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Rate (₹/kWh)</Text>
-            </View>
-          </View>
-          {touHistory.slice(-5).map((data, index) => (
-            <View style={styles.tableRow} key={index}>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {new Date(data.timestamp).toLocaleTimeString()}
-                </Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{data.rate.toFixed(2)}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      <Text style={styles.footer}>
-        Generated on: {new Date().toLocaleString()} | Page 1 of 1
-      </Text>
-    </Page>
-  </Document>
-);
-
-interface GenerateReportButtonProps {
-  user: User;
-  userData: UserData;
-  energyData: EnergyData[];
-  weatherData: WeatherData | null;
   discomInfo: Discom | null;
   touHistory: TOUData[];
-}
-
-const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
-  user,
-  userData,
-  energyData,
-  weatherData,
-  discomInfo,
-  touHistory,
 }) => {
-  const [report, setReport] = useState<string | null>(null);
+  const [report, setReport] = useState<{
+    executiveSummary: ExecutiveSummary;
+    tariffAnalysis: TariffAnalysis;
+    consumptionAnalytics: ConsumptionAnalytics;
+    solarAnalysis: SolarAnalysis | null;
+  } | null>(null); // Update state type to match the report structure
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Update state type to allow string
 
   const handleGenerateReport = async () => {
-    if (!weatherData || !discomInfo || !userData) return;
+    if (!weatherData || !userData || !discomInfo) {
+      setError("Missing required data");
+      return;
+    }
 
     setIsGenerating(true);
+    setError(null);
+
     try {
       const generatedReport = await generateReport(
         user,
@@ -248,18 +249,14 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
       setReport(generatedReport);
     } catch (error) {
       console.error("Error generating report:", error);
-      alert(
-        "An error occurred while generating the report. Please try again later.",
-      );
+      setError("Failed to generate report. Please try again later.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  if (!weatherData || !discomInfo || !userData) return null;
-
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
       <div className="flex items-center justify-between w-full">
         <Button
           className="bg-green-600 text-white hover:bg-green-700"
@@ -269,6 +266,7 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
           <BarChart3 className="mr-2 h-4 w-4" />
           {isGenerating ? "Generating Report..." : "Generate Report"}
         </Button>
+
         <Link href="/settings">
           <Button
             variant="outline"
@@ -279,31 +277,44 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
         </Link>
       </div>
 
+      {error && (
+        <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-center">
+          <AlertCircle className="h-5 w-5 mr-2" />
+          {error}
+        </div>
+      )}
+
       {report && (
-        <div className="mt-8 p-4 bg-gray-100 rounded">
-          <h2 className="text-2xl font-bold mb-4">Generated Report</h2>
-          <p className="whitespace-pre-wrap">{report}</p>
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                user={user}
-                userData={userData}
-                energyData={energyData}
-                weatherData={weatherData}
-                discomInfo={discomInfo}
-                touHistory={touHistory}
-              />
-            }
-            fileName="energy_consumption_report.pdf"
-          >
-            {/* @ts-ignore */}
-            {({ blob, url, loading, error }) => (
-              <Button className="mt-4" disabled={loading} variant={`outline`}>
-                <Download className="mr-2 h-4 w-4" />
-                {loading ? "Preparing PDF..." : "Download PDF Report"}
-              </Button>
-            )}
-          </PDFDownloadLink>
+        <div className="space-y-6">
+          <ExecutiveSummaryCard data={report.executiveSummary} />
+          <TariffAnalysisCard data={report.tariffAnalysis} />
+          <ConsumptionAnalyticsCard data={report.consumptionAnalytics} />
+          {report.solarAnalysis && (
+            <SolarAnalysisCard data={report.solarAnalysis} />
+          )}
+
+          <div className="flex justify-end">
+            <PDFDownloadLink
+              document={
+                <PDFReport
+                  user={user}
+                  executiveSummary={report.executiveSummary}
+                  tariffAnalysis={report.tariffAnalysis}
+                  consumptionAnalytics={report.consumptionAnalytics}
+                  solarAnalysis={report.solarAnalysis}
+                />
+              }
+              fileName="energy_report.pdf"
+            >
+              {/* @ts-ignore */}
+              {({ loading }) => (
+                <Button disabled={loading} variant="outline">
+                  <Download className="mr-2 h-4 w-4" />
+                  {loading ? "Preparing PDF..." : "Download PDF Report"}
+                </Button>
+              )}
+            </PDFDownloadLink>
+          </div>
         </div>
       )}
     </div>
