@@ -1,16 +1,18 @@
 "use client";
 
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuthContext } from "@/context/auth-context";
-import { Sun } from "lucide-react";
+import { Menu, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
 export default function Navbar() {
   const { user } = useAuthContext();
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const smoothScroll = (e: MouseEvent) => {
@@ -24,6 +26,7 @@ export default function Navbar() {
           targetElement.scrollIntoView({ behavior: "smooth" });
         }
       }
+      setIsOpen(false); // Close mobile menu after clicking a link
     };
 
     const links = document.querySelectorAll('a[href^="#"]');
@@ -38,6 +41,72 @@ export default function Navbar() {
     };
   }, []);
 
+  const NavLinks = () => (
+    <>
+      {isLandingPage && (
+        <>
+          <a
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="#benefits"
+          >
+            Benefits
+          </a>
+          <a
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="#why-choose"
+          >
+            Why Choose Us
+          </a>
+          <a
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="#get-started"
+          >
+            Get Started
+          </a>
+        </>
+      )}
+      {user ? (
+        <>
+          <Link
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="/learn-more"
+          >
+            Learn More
+          </Link>
+          <Link
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="/dashboard"
+          >
+            Dashboard
+          </Link>
+          <Link
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="/settings"
+          >
+            Settings
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="/learn-more"
+          >
+            Learn More
+          </Link>
+          <Link
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="/sign-in"
+          >
+            <Button size="sm" variant="outline">
+              Sign In
+            </Button>
+          </Link>
+        </>
+      )}
+    </>
+  );
+
   return (
     <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-200 sticky top-0 bg-white z-10">
       <Link className="flex items-center justify-center" href="/">
@@ -46,69 +115,27 @@ export default function Navbar() {
           PrabhaWatt
         </span>
       </Link>
-      <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-        {isLandingPage && (
-          <>
-            <a
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href="#benefits"
-            >
-              Benefits
-            </a>
-            <a
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href="#why-choose"
-            >
-              Why Choose Us
-            </a>
-            <a
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href="#get-started"
-            >
-              Get Started
-            </a>
-          </>
-        )}
-        {user ? (
-          <>
-            <Link
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href={"/learn-more"}
-            >
-              Learn More
-            </Link>
-            <Link
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href={"/dashboard"}
-            >
-              Dashboard
-            </Link>
-            <Link
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href={"/settings"}
-            >
-              Settings
-            </Link>
-          </>
-        ) : (
-          <>
-            <Link
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href={"/learn-more"}
-            >
-              Learn More
-            </Link>
-            <Link
-              className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
-              href={"/sign-in"}
-            >
-              <Button size={`sm`} variant={`outline`}>
-                Sign In
-              </Button>
-            </Link>
-          </>
-        )}
+
+      {/* Desktop Navigation */}
+      <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
+        <NavLinks />
       </nav>
+
+      {/* Mobile Navigation */}
+      <div className="ml-auto md:hidden">
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[240px] sm:w-[300px]">
+            <nav className="flex flex-col gap-4 mt-4">
+              <NavLinks />
+            </nav>
+          </SheetContent>
+        </Sheet>
+      </div>
     </header>
   );
 }
