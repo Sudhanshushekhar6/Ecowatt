@@ -34,6 +34,7 @@ import { toast } from "sonner";
 export default function Settings() {
   const { user } = useAuthContext();
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     electricityProvider: "",
     monthlyBill: "",
@@ -54,27 +55,7 @@ export default function Settings() {
     reportFrequency: "",
   });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setFormData((prevData) => ({
-              ...prevData,
-              ...userData,
-            }));
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-          toast.error("Failed to load user data. Please try again.");
-        }
-      }
-    };
-
-    fetchUserData();
-  }, [user]);
+  const [discoms, setDiscoms] = useState<string[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -119,17 +100,41 @@ export default function Settings() {
     }
   };
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setFormData((prevData) => ({
+              ...prevData,
+              ...userData,
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          toast.error("Failed to load user data. Please try again.");
+        }
+      }
+    };
 
-  const [discoms, setDiscoms] = useState<string[]>([]);
+    fetchUserData();
+  }, [user]);
 
   useEffect(() => {
     discomData.DISCOMs.forEach((discom) => {
       setDiscoms((prevDiscoms) => [...prevDiscoms, discom?.DISCOM!]);
     });
   }, []);
+
+  if (!user) {
+    return (
+      <div className="min-h-[90vh] flex items-center justify-center text-muted-foreground text-sm">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-[92vh] bg-gray-100">

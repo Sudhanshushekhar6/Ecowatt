@@ -1,8 +1,8 @@
-const cron = require('node-cron');
-const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, addDoc } = require('firebase/firestore');
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env.local') });
+const cron = require("node-cron");
+const { initializeApp } = require("firebase/app");
+const { getFirestore, collection, addDoc } = require("firebase/firestore");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env.local") });
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -11,7 +11,7 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
@@ -61,7 +61,7 @@ function getCurrentTOURate() {
   const currentSeason = getCurrentSeason();
 
   const currentRate = baseTouRates.find(
-    (rate) => currentHour >= rate.startHour && currentHour < rate.endHour
+    (rate) => currentHour >= rate.startHour && currentHour < rate.endHour,
   );
 
   if (!currentRate) return 5.0;
@@ -84,12 +84,12 @@ async function generateAndStoreTOUData() {
     await addDoc(touCollection, { rate: currentRate, timestamp });
     console.log(`Stored TOU rate: ${currentRate} at ${timestamp}`);
   } catch (error) {
-    console.error('Error storing TOU rate:', error);
+    console.error("Error storing TOU rate:", error);
   }
 }
 
 // Run the job every hour
-cron.schedule('0 * * * *', generateAndStoreTOUData);
+cron.schedule("0 * * * *", generateAndStoreTOUData);
 
 console.log("Background process for TOU data generation started");
 
