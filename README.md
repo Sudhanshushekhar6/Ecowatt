@@ -1,6 +1,10 @@
 # PrabhaWatt
 
+[![Thumbnail](./assets/thumbnail.png)](https://prabhawatt.vercel.app/)
+
 PrabhaWatt is a Solar Energy Optimization Platform designed to help users maximize their solar energy usage, reduce electricity bills, and contribute to a more sustainable future.
+
+You can find the live version of the platform at [prabhawatt.vercel.app](https://prabhawatt.vercel.app/).
 
 ## Table of Contents
 
@@ -9,9 +13,6 @@ PrabhaWatt is a Solar Energy Optimization Platform designed to help users maximi
   - [Overview](#overview)
   - [Features](#features)
   - [Installation](#installation)
-  - [Usage](#usage)
-  - [Contributing](#contributing)
-  - [License](#license)
 
 ## Overview
 
@@ -29,24 +30,29 @@ PrabhaWatt addresses the challenges of inefficient energy usage, underutilized s
 
 ## Installation
 
-```
-# Installation instructions to be added
-```
-
-## Usage
+1. Clone the repository:
 
 ```
-# Usage instructions to be added
+git clone https://github.com/ChiragAgg5k/prabhawatt
+cd prabhawatt
 ```
 
-## Contributing
+2. Install the required dependencies:
 
-We welcome contributions to the PrabhaWatt project. Please read our contributing guidelines before submitting pull requests.
+```
+npm install # or pnpm, yarn, etc.
+```
 
-## License
+3. Add the environment variables according to the `.env.example` file:
 
-[License information to be added]
+```
+cp .env.example .env
+```
 
----
+4. Run the application:
 
-**Note: This project is a Work in Progress. Features and documentation are subject to change.**
+```
+npm run dev # or pnpm dev, yarn dev, etc.
+```
+
+You can now access the application at `http://localhost:3000`.
