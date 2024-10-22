@@ -134,7 +134,7 @@ export default function Dashboard() {
         // Only set state if the component is still mounted
         const latestTou = touHistory[0];
         toast.success("Latest TOU rate fetched", {
-          description: `Current TOU rate: ${latestTou.rate}`,
+          description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
         });
         setTOUHistory(touHistory);
       }
