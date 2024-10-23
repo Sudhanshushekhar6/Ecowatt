@@ -46,6 +46,7 @@ export interface EnergyData {
   Consumption: number;
 }
 
+// Executive Summary Interface
 export interface ExecutiveSummary {
   currentMonthCost: number;
   costComparisonPercentage: number;
@@ -53,30 +54,51 @@ export interface ExecutiveSummary {
   totalEnergySavings: number;
   solarGeneration: number | null;
   batteryUsage: number | null;
-  keyRecommendations: string[];
+  keyRecommendations: Array<{
+    text: string;
+    priority: "high" | "medium" | "low";
+    estimatedImpact: string;
+  }>;
 }
 
+// Tariff Analysis Interface
 export interface TariffAnalysis {
   currentRate: number;
   averageRate: number;
   peakRate: number;
   offPeakRate: number;
-  forecastedRates: Array<{ time: string; rate: number }>;
+  forecastedRates: Array<{
+    time: string;
+    rate: number;
+  }>;
   savingsOpportunities: string[];
+  pattern_analysis: string;
 }
 
+// Consumption Analytics Interface
 export interface ConsumptionAnalytics {
   totalConsumption: number;
   averageDailyConsumption: number;
   peakConsumptionTime: string;
   peakConsumptionValue: number;
-  consumptionByTimeOfDay: Array<{ hour: number; average: number }>;
+  consumptionByTimeOfDay: Array<{
+    hour: number;
+    average: number;
+  }>;
+  unusualPatterns?: string[];
+  weatherImpact?: string;
+  optimizationOpportunities?: string[];
+  timeOfDayRecommendations?: string[];
 }
 
+// Solar Analysis Interface
 export interface SolarAnalysis {
   dailyGeneration: number;
   monthlyGeneration: number;
   efficiency: number;
   savingsFromSolar: number;
-  potentialOptimizations: string[];
+  optimizations: string[];
+  maintenance_tasks: string[];
+  weather_impact: string;
+  storage_tips: string[];
 }

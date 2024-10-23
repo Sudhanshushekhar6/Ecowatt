@@ -7,7 +7,7 @@ import {
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { User } from "firebase/auth";
 
-// Create styles
+// Enhanced styles
 const styles = StyleSheet.create({
   page: {
     padding: 30,
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     color: "#1a365d",
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 30,
   },
   sectionTitle: {
     fontSize: 18,
@@ -29,10 +29,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e2e8f0",
     paddingBottom: 5,
   },
+  subSectionTitle: {
+    fontSize: 14,
+    marginTop: 15,
+    marginBottom: 8,
+    color: "#4a5568",
+    fontWeight: "bold",
+  },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   gridItem: {
     width: "50%",
@@ -50,11 +57,37 @@ const styles = StyleSheet.create({
   },
   list: {
     marginLeft: 15,
+    marginTop: 5,
   },
   listItem: {
     fontSize: 12,
     marginBottom: 5,
     color: "#4a5568",
+  },
+  priorityHigh: {
+    color: "#e53e3e",
+  },
+  priorityMedium: {
+    color: "#d69e2e",
+  },
+  priorityLow: {
+    color: "#38a169",
+  },
+  smallText: {
+    fontSize: 10,
+    color: "#718096",
+    marginTop: 2,
+  },
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+    marginVertical: 10,
+  },
+  dateGenerated: {
+    fontSize: 10,
+    color: "#718096",
+    marginTop: 20,
+    textAlign: "right",
   },
 });
 
@@ -87,12 +120,16 @@ const PDFReport = ({
             <Text style={styles.value}>
               ₹{executiveSummary.currentMonthCost.toLocaleString()}
             </Text>
+            <Text style={styles.smallText}>
+              {executiveSummary.costTrend === "up" ? "↑" : "↓"}{" "}
+              {Math.abs(executiveSummary.costComparisonPercentage)}% vs last
+              month
+            </Text>
           </View>
           <View style={styles.gridItem}>
-            <Text style={styles.label}>Cost Trend</Text>
+            <Text style={styles.label}>Total Energy Savings</Text>
             <Text style={styles.value}>
-              {executiveSummary.costTrend === "up" ? "↑" : "↓"}{" "}
-              {Math.abs(executiveSummary.costComparisonPercentage)}%
+              ₹{executiveSummary.totalEnergySavings.toLocaleString()}
             </Text>
           </View>
           {executiveSummary.solarGeneration && (
@@ -112,15 +149,28 @@ const PDFReport = ({
             </View>
           )}
         </View>
-        {executiveSummary.keyRecommendations.length > 0 && (
-          <View style={styles.list}>
-            {executiveSummary.keyRecommendations.map((rec, index) => (
-              <Text key={index} style={styles.listItem}>
-                • {rec}
+
+        <Text style={styles.subSectionTitle}>Key Recommendations</Text>
+        <View style={styles.list}>
+          {executiveSummary.keyRecommendations.map((rec, index) => (
+            <View key={index}>
+              <Text
+                style={[
+                  styles.listItem,
+                  rec.priority === "high"
+                    ? styles.priorityHigh
+                    : rec.priority === "medium"
+                      ? styles.priorityMedium
+                      : styles.priorityLow,
+                ]}
+              >
+                • {rec.text}
+                {"\n"} Priority: {rec.priority.toUpperCase()}
+                {"\n"} Impact: {rec.estimatedImpact}
               </Text>
-            ))}
-          </View>
-        )}
+            </View>
+          ))}
+        </View>
       </View>
 
       {/* Tariff Analysis Section */}
@@ -144,15 +194,27 @@ const PDFReport = ({
             <Text style={styles.value}>₹{tariffAnalysis.offPeakRate}/kWh</Text>
           </View>
         </View>
-        {tariffAnalysis.savingsOpportunities.length > 0 && (
-          <View style={styles.list}>
-            {tariffAnalysis.savingsOpportunities.map((opportunity, index) => (
-              <Text key={index} style={styles.listItem}>
-                • {opportunity}
-              </Text>
-            ))}
-          </View>
-        )}
+
+        <Text style={styles.subSectionTitle}>Pattern Analysis</Text>
+        <Text style={styles.listItem}>{tariffAnalysis.pattern_analysis}</Text>
+
+        <Text style={styles.subSectionTitle}>Forecasted Rates</Text>
+        <View style={styles.list}>
+          {tariffAnalysis.forecastedRates.map((rate, index) => (
+            <Text key={index} style={styles.listItem}>
+              • {rate.time}: ₹{rate.rate}/kWh
+            </Text>
+          ))}
+        </View>
+
+        <Text style={styles.subSectionTitle}>Savings Opportunities</Text>
+        <View style={styles.list}>
+          {tariffAnalysis.savingsOpportunities.map((opportunity, index) => (
+            <Text key={index} style={styles.listItem}>
+              • {opportunity}
+            </Text>
+          ))}
+        </View>
       </View>
 
       {/* Consumption Analytics Section */}
@@ -176,7 +238,7 @@ const PDFReport = ({
             <Text style={styles.value}>
               {consumptionAnalytics.peakConsumptionValue} kW
             </Text>
-            <Text style={styles.label}>
+            <Text style={styles.smallText}>
               at{" "}
               {new Date(
                 consumptionAnalytics.peakConsumptionTime,
@@ -184,6 +246,54 @@ const PDFReport = ({
             </Text>
           </View>
         </View>
+
+        <Text style={styles.subSectionTitle}>Consumption by Time of Day</Text>
+        <View style={styles.list}>
+          {consumptionAnalytics.consumptionByTimeOfDay.map((data, index) => (
+            <Text key={index} style={styles.listItem}>
+              • {data.hour}:00 - Average: {data.average} kW
+            </Text>
+          ))}
+        </View>
+
+        {consumptionAnalytics.unusualPatterns && (
+          <>
+            <Text style={styles.subSectionTitle}>Unusual Patterns</Text>
+            <View style={styles.list}>
+              {consumptionAnalytics.unusualPatterns.map((pattern, index) => (
+                <Text key={index} style={styles.listItem}>
+                  • {pattern}
+                </Text>
+              ))}
+            </View>
+          </>
+        )}
+
+        {consumptionAnalytics.weatherImpact && (
+          <>
+            <Text style={styles.subSectionTitle}>Weather Impact</Text>
+            <Text style={styles.listItem}>
+              {consumptionAnalytics.weatherImpact}
+            </Text>
+          </>
+        )}
+
+        {consumptionAnalytics.timeOfDayRecommendations && (
+          <>
+            <Text style={styles.subSectionTitle}>
+              Time-of-Day Recommendations
+            </Text>
+            <View style={styles.list}>
+              {consumptionAnalytics.timeOfDayRecommendations.map(
+                (rec, index) => (
+                  <Text key={index} style={styles.listItem}>
+                    • {rec}
+                  </Text>
+                ),
+              )}
+            </View>
+          </>
+        )}
       </View>
 
       {/* Solar Analysis Section */}
@@ -214,19 +324,42 @@ const PDFReport = ({
               </Text>
             </View>
           </View>
-          {solarAnalysis.potentialOptimizations.length > 0 && (
-            <View style={styles.list}>
-              {solarAnalysis.potentialOptimizations.map(
-                (optimization, index) => (
-                  <Text key={index} style={styles.listItem}>
-                    • {optimization}
-                  </Text>
-                ),
-              )}
-            </View>
-          )}
+
+          <Text style={styles.subSectionTitle}>System Optimizations</Text>
+          <View style={styles.list}>
+            {solarAnalysis.optimizations.map((optimization, index) => (
+              <Text key={index} style={styles.listItem}>
+                • {optimization}
+              </Text>
+            ))}
+          </View>
+
+          <Text style={styles.subSectionTitle}>Maintenance Tasks</Text>
+          <View style={styles.list}>
+            {solarAnalysis.maintenance_tasks.map((task, index) => (
+              <Text key={index} style={styles.listItem}>
+                • {task}
+              </Text>
+            ))}
+          </View>
+
+          <Text style={styles.subSectionTitle}>Weather Impact</Text>
+          <Text style={styles.listItem}>{solarAnalysis.weather_impact}</Text>
+
+          <Text style={styles.subSectionTitle}>Storage Tips</Text>
+          <View style={styles.list}>
+            {solarAnalysis.storage_tips.map((tip, index) => (
+              <Text key={index} style={styles.listItem}>
+                • {tip}
+              </Text>
+            ))}
+          </View>
         </View>
       )}
+
+      <Text style={styles.dateGenerated}>
+        Generated on: {new Date().toLocaleString()}
+      </Text>
     </Page>
   </Document>
 );

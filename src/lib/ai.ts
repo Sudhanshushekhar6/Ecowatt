@@ -62,8 +62,6 @@ async function calculateExecutiveSummary(
   // Get AI recommendations based on all available data
   const aiPrompt = `
     Analyze this energy consumption data and provide key recommendations:
-    Current day consumption: ${JSON.stringify(currentDayData)}
-    Previous day consumption: ${JSON.stringify(previousDayData)}
     Cost comparison: ${costComparisonPercentage}% ${costComparisonPercentage > 0 ? "increase" : "decrease"}
     Solar generation: ${solarGeneration}
     Weather data: ${JSON.stringify(weatherData)}
@@ -88,13 +86,15 @@ async function calculateExecutiveSummary(
   `;
 
   const aiResponse = await fetchAIResponse(aiPrompt);
-  const recommendations = aiResponse?.recommendations?.map(
-    (rec: any) => rec.text,
-  ) || [
-    "Monitor and optimize peak usage times",
-    "Consider scheduling high-energy activities during off-peak hours",
-    "Regular maintenance of energy systems for optimal performance",
-  ];
+  console.log("Executive Summary", aiResponse);
+
+  const recommendations: {
+    text: string;
+    priority: "high" | "medium" | "low";
+    estimatedImpact: string;
+  }[] = aiResponse?.recommendations ? aiResponse.recommendations : [];
+
+  console.log("executive summary recommendations", recommendations);
 
   return {
     currentMonthCost: parseFloat(currentDayCost.toFixed(2)),
@@ -141,6 +141,7 @@ async function generateTariffAnalysis(
   `;
 
   const aiResponse = await fetchAIResponse(aiPrompt);
+  console.log("Tariffs", aiResponse);
 
   return {
     currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
@@ -149,6 +150,7 @@ async function generateTariffAnalysis(
     offPeakRate: parseFloat(offPeakRate.toFixed(2)),
     forecastedRates: aiResponse?.forecasted_rates || [],
     savingsOpportunities: aiResponse?.savings_opportunities || [],
+    pattern_analysis: aiResponse.pattern_analysis || "",
   };
 }
 
@@ -206,7 +208,8 @@ async function generateConsumptionAnalytics(
     4. Time-of-day recommendations
   `;
 
-  await fetchAIResponse(aiPrompt); // Use insights in future updates
+  const aiResponse = await fetchAIResponse(aiPrompt); // Use insights in future updates
+  console.log("Consumption", aiResponse);
 
   return {
     totalConsumption: parseFloat(totalConsumption.toFixed(2)),
@@ -271,10 +274,20 @@ async function generateSolarAnalysis(
     monthlyGeneration: parseFloat(monthlyGeneration.toFixed(2)),
     efficiency: parseFloat(efficiency.toFixed(2)),
     savingsFromSolar: parseFloat(savingsFromSolar.toFixed(2)),
-    potentialOptimizations: aiResponse?.optimizations || [
+    optimizations: aiResponse?.optimizations || [
       "Clean solar panels regularly to maintain efficiency",
       "Consider adjusting panel angles seasonally",
       "Monitor shading patterns throughout the day",
+    ],
+    maintenance_tasks: aiResponse?.maintenance_tasks || [
+      "Clean solar panels regularly to maintain efficiency",
+      "Consider adjusting panel angles seasonally",
+      "Monitor shading patterns throughout the day",
+    ],
+    weather_impact: aiResponse?.weather_impact || "",
+    storage_tips: aiResponse?.storage_tips || [
+      "Consider installing a battery storage system",
+      "Regularly monitor battery usage and adjust usage accordingly",
     ],
   };
 }
@@ -301,11 +314,13 @@ async function fetchAIResponse(prompt: string): Promise<any> {
           ],
           temperature: 0.7,
           max_tokens: 1024,
+          response_format: { type: "json_object" },
         }),
       },
     );
 
     if (!response.ok) {
+      console.log(response);
       throw new Error(`API call failed: ${response.statusText}`);
     }
 
