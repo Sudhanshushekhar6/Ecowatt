@@ -2,15 +2,20 @@
 import contractABI from "@/data/contract-abi.json";
 import { UserData } from "@/types/user";
 import Web3 from "web3";
-import { Contract } from "web3-eth-contract";
 import { AbiItem, toWei } from "web3-utils";
 
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
+declare global {
+  interface Window {
+    ethereum: any; // You can replace 'any' with a more specific type if available
+  }
+}
+
 export class EnergyTradingService {
-  private web3: Web3;
-  private contract: Contract; // Change to use the default Contract type
-  private currentAccount: string | null = null; // Track the current account
+  private web3: any;
+  private contract: any;
+  private currentAccount: string | null = null;
 
   constructor() {
     if (
