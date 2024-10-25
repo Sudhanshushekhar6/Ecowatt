@@ -174,12 +174,10 @@ export default function Home() {
                   <Button
                     className="bg-green-600 text-white hover:bg-green-700"
                     type="submit"
-                    onClick={
-                      (e) => {
-                        e.preventDefault();
-                        handleGetStarted();
-                      }
-                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleGetStarted();
+                    }}
                   >
                     Get Started
                   </Button>

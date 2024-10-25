@@ -1,4 +1,3 @@
-import { User } from "firebase/auth";
 import {
   ConsumptionAnalytics,
   Discom,
@@ -61,18 +60,33 @@ async function calculateExecutiveSummary(
 
   // Get AI recommendations based on all available data
   const aiPrompt = `
-    Analyze this energy consumption data and provide key recommendations:
-    Cost comparison: ${costComparisonPercentage}% ${costComparisonPercentage > 0 ? "increase" : "decrease"}
-    Solar generation: ${solarGeneration}
-    Weather data: ${JSON.stringify(weatherData)}
-    User has solar: ${userData.hasSolarPanels}
-    User has battery: ${userData.hasBatteryStorage}
+    Analyze household energy metrics and provide actionable recommendations:
 
-    Provide:
-    1. List of 3-5 specific, actionable recommendations
-    2. Priority level for each recommendation
-    3. Estimated impact on energy consumption
-    
+    CONSUMPTION METRICS:
+    - Cost trend: ${costComparisonPercentage.toFixed(2)}% ${costComparisonPercentage > 0 ? "increase" : "decrease"}
+    - Current day cost: ${currentDayCost.toFixed(2)}
+    - Previous day cost: ${previousDayCost.toFixed(2)}
+
+    ENERGY INFRASTRUCTURE:
+    - Solar installed: ${userData.hasSolarPanels ? "Yes" : "No"}
+    - Solar capacity: ${userData.hasSolarPanels ? userData.solarCapacity + " kW" : "N/A"}
+    - Battery storage: ${userData.hasBatteryStorage ? userData.storageCapacity + " kWh" : "No"}
+    - Monthly bill: ${userData.monthlyBill} Rs
+    - Electricity provider: ${userData.electricityProvider}
+
+    WEATHER CONDITIONS:
+    - Temperature: ${weatherData.main.temp}°C
+    - Humidity: ${weatherData.main.humidity}%
+    - Weather: ${weatherData.weather[0].main}
+    - Description: ${weatherData.weather[0].description}
+
+    Based on this data, provide recommendations that:
+    1. Address the most impactful cost-saving opportunities
+    2. Consider existing infrastructure (solar/battery if present)
+    3. Account for current weather conditions
+    4. Can be implemented immediately
+    5. Have measurable impact on energy costs
+
     Format the response as JSON with structure:
     {
       "recommendations": [
@@ -86,15 +100,12 @@ async function calculateExecutiveSummary(
   `;
 
   const aiResponse = await fetchAIResponse(aiPrompt);
-  console.log("Executive Summary", aiResponse);
 
   const recommendations: {
     text: string;
     priority: "high" | "medium" | "low";
     estimatedImpact: string;
   }[] = aiResponse?.recommendations ? aiResponse.recommendations : [];
-
-  console.log("executive summary recommendations", recommendations);
 
   return {
     currentMonthCost: parseFloat(currentDayCost.toFixed(2)),
@@ -120,18 +131,31 @@ async function generateTariffAnalysis(
   const offPeakRate = Math.min(...rates);
 
   const aiPrompt = `
-    Analyze this tariff data and provide insights:
-    Time of Use Data: ${JSON.stringify(touData)}
-    DISCOM Info: ${JSON.stringify(discomData)}
-    Average Rate: ${averageRate}
-    Peak Rate: ${peakRate}
-    Off-Peak Rate: ${offPeakRate}
+    Analyze electricity tariffs and identify cost-saving opportunities:
 
-    Provide:
-    1. Rate forecasting for next 24 hours
-    2. Specific savings opportunities
-    3. Pattern analysis of rate variations
-    
+    CURRENT TARIFF METRICS:
+    - Average rate: ${averageRate.toFixed(2)} Rs/kWh
+    - Peak rate: ${peakRate.toFixed(2)} Rs/kWh
+    - Off-peak rate: ${offPeakRate.toFixed(2)} Rs/kWh
+
+    UTILITY PROVIDER DETAILS:
+    - State: ${discomData.State}
+    - DISCOM: ${discomData.DISCOM}
+    - Consumer base: ${discomData["Total Number of consumers (Millions)"]} million
+    - Power purchase cost: ${discomData["Average power purchase cost (Rs./kWh)"]} Rs/kWh
+    - Supply cost: ${discomData["Average Cost of Supply (Rs./kWh)"]} Rs/kWh
+    - Billing rate: ${discomData["Average Billing Rate (Rs./kWh)"]} Rs/kWh
+    - AT&C losses: ${discomData["AT&C Losses (%)"]}%
+
+    TIME OF USE PATTERNS:
+    ${touData.map((t) => `- ${new Date(t.timestamp).toLocaleTimeString()}: ${t.rate} Rs/kWh`).join("\n    ")}
+
+    Analyze and provide:
+    1. 24-hour rate forecasts based on historical patterns
+    2. Specific times for cost-saving activities
+    3. Peak vs off-peak usage strategies
+    4. Load shifting opportunities
+
     Format as JSON with structure:
     {
       "forecasted_rates": [{"time": "HH:MM", "rate": number}],
@@ -141,7 +165,6 @@ async function generateTariffAnalysis(
   `;
 
   const aiResponse = await fetchAIResponse(aiPrompt);
-  console.log("Tariffs", aiResponse);
 
   return {
     currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
@@ -195,21 +218,41 @@ async function generateConsumptionAnalytics(
 
   // Get AI insights for consumption patterns
   const aiPrompt = `
-    Analyze this consumption data and provide insights:
-    Daily consumption: ${totalConsumption}
-    Peak consumption: ${peakConsumption.consumption} at ${peakConsumption.time}
-    Hourly patterns: ${JSON.stringify(hourlyAverages)}
-    Weather conditions: ${JSON.stringify(weatherData)}
+    Analyze energy consumption patterns considering weather impact:
 
-    Identify:
-    1. Unusual consumption patterns
-    2. Weather impact on consumption
-    3. Optimization opportunities
-    4. Time-of-day recommendations
+    CONSUMPTION METRICS:
+    - Daily total: ${totalConsumption.toFixed(2)} kWh
+    - Peak consumption: ${peakConsumption.consumption.toFixed(2)} kWh at ${new Date(peakConsumption.time).toLocaleTimeString()}
+    - Average hourly: ${(totalConsumption / 24).toFixed(2)} kWh
+
+    HOURLY CONSUMPTION PATTERN:
+    ${hourlyAverages
+      .map(
+        (h) =>
+          `- Hour ${h.hour.toString().padStart(2, "0")}: ${h.average.toFixed(2)} kWh`,
+      )
+      .join("\n    ")}
+
+    WEATHER CONDITIONS:
+    - Temperature: ${weatherData.main.temp}°C
+    - Humidity: ${weatherData.main.humidity}%
+    - Conditions: ${weatherData.weather[0].main}
+    - Details: ${weatherData.weather[0].description}
+
+    Analyze and identify:
+    1. Unusual consumption patterns and their causes
+    2. Weather impact on energy usage
+    3. Time-based optimization opportunities
+    4. Specific recommendations for each time of day
+
+    Format response to match ConsumptionAnalytics interface with:
+    - unusualPatterns: Array of identified unusual patterns
+    - weatherImpact: Weather correlation analysis
+    - optimizationOpportunities: List of optimization opportunities
+    - timeOfDayRecommendations: Time-specific recommendations
   `;
 
   const aiResponse = await fetchAIResponse(aiPrompt); // Use insights in future updates
-  console.log("Consumption", aiResponse);
 
   return {
     totalConsumption: parseFloat(totalConsumption.toFixed(2)),
@@ -243,21 +286,38 @@ async function generateSolarAnalysis(
   const savingsFromSolar =
     (dailyGeneration * parseFloat(userData.monthlyBill.toString())) / 30;
 
-  // Get AI recommendations for solar optimization
   const aiPrompt = `
-    Analyze solar generation data and provide optimization recommendations:
-    Daily generation: ${dailyGeneration}
-    System efficiency: ${efficiency}%
-    Weather conditions: ${JSON.stringify(weatherData)}
-    Solar capacity: ${userData.solarCapacity}
-    Battery storage: ${userData.hasBatteryStorage ? userData.storageCapacity : "None"}
+    Analyze solar system performance and provide optimization guidance:
 
-    Provide:
+    SYSTEM SPECIFICATIONS:
+    - Solar capacity: ${userData.solarCapacity} kW
+    - Battery storage: ${userData.hasBatteryStorage ? userData.storageCapacity + " kWh" : "None"}
+    - Daily generation: ${dailyGeneration.toFixed(2)} kWh
+    - System efficiency: ${efficiency.toFixed(2)}%
+    - Monthly generation: ${monthlyGeneration.toFixed(2)} kWh
+    - Daily savings: ${savingsFromSolar.toFixed(2)} Rs
+
+    WEATHER IMPACT:
+    - Temperature: ${weatherData.main.temp}°C
+    - Weather condition: ${weatherData.weather[0].main}
+    - Detailed weather: ${weatherData.weather[0].description}
+    - Humidity: ${weatherData.main.humidity}%
+
+    GENERATION DATA:
+    ${energyData
+      .slice(-24)
+      .map(
+        (d) =>
+          `- ${new Date(d.SendDate).toLocaleTimeString()}: ${d.SolarEnergy?.toFixed(2) || 0} kWh`,
+      )
+      .join("\n    ")}
+
+    Analyze and provide:
     1. Specific optimization recommendations
-    2. Maintenance suggestions
-    3. Weather impact analysis
-    4. Storage optimization if applicable
-    
+    2. Required maintenance tasks
+    3. Analysis of weather impact on generation
+    4. Battery storage optimization tips (if applicable)
+
     Format as JSON with structure:
     {
       "optimizations": ["detailed recommendation 1", "detailed recommendation 2"],
@@ -332,9 +392,7 @@ async function fetchAIResponse(prompt: string): Promise<any> {
   }
 }
 
-// Main report generation function
 export async function generateReport(
-  user: User,
   userData: UserData,
   touData: TOUData[],
   weatherData: WeatherData,

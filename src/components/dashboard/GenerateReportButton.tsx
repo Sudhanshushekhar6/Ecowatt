@@ -60,7 +60,6 @@ const GenerateReportButton = ({
 
     try {
       const generatedReport = await generateReport(
-        user,
         userData,
         touHistory,
         weatherData,
