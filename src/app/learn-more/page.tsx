@@ -4,7 +4,7 @@ import {
   EnergySourceChart,
   SavingsProjectionChart,
   SolarGrowthChart,
-} from "@/components/learn-more-charts";
+} from "@/components/learn-more/learn-more-charts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -76,6 +76,14 @@ export default function LearnMore() {
             <div className="flex items-center justify-center">
               <SolarGrowthChart />
             </div>
+            <Link
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://www.statista.com/outlook/io/energy/renewable-energy/solar-energy/worldwide#production`}
+              className="mt-4 text-sm text-gray-600 hover:underline"
+            >
+              Source: Statista Solar Energy - Worldwide
+            </Link>
           </section>
 
           <section>
@@ -155,12 +163,17 @@ export default function LearnMore() {
               portion of overall electricity generation. Here&apos;s a breakdown
               of India&apos;s electricity generation by source:
             </p>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center mb-2">
               <EnergySourceChart />
             </div>
-            <p className="mt-4 text-sm text-gray-600">
+            <Link
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://www.investindia.gov.in/sector/renewable-energy#:~:text=This%20is%20the%20world's%20largest,(as%20of%20Sep%202024).`}
+              className="mt-4 text-sm text-gray-600 hover:underline"
+            >
               Source: Renewable Energy Information, Invest India, 2024 data
-            </p>
+            </Link>
           </section>
 
           <section>

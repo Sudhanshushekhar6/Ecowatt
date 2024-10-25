@@ -8,7 +8,7 @@ import {
   TOUData,
   UserData,
   WeatherData,
-} from "../types/user";
+} from "@/types/user";
 
 function groupDataByDay(energyData: EnergyData[]): Map<string, EnergyData[]> {
   const dataByDay = new Map<string, EnergyData[]>();

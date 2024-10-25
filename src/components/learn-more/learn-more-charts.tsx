@@ -19,16 +19,23 @@ import {
   YAxis,
 } from "recharts";
 
+// source - https://www.statista.com/outlook/io/energy/renewable-energy/solar-energy/worldwide#production
 const solarGrowthData = [
-  { year: 2010, capacity: 40 },
-  { year: 2012, capacity: 100 },
-  { year: 2014, capacity: 177 },
-  { year: 2016, capacity: 303 },
-  { year: 2018, capacity: 509 },
-  { year: 2020, capacity: 714 },
-  { year: 2022, capacity: 1000 },
+  { year: 2018, capacity: 0.63 },
+  { year: 2019, capacity: 0.74 },
+  { year: 2020, capacity: 0.87 },
+  { year: 2021, capacity: 1.05 },
+  { year: 2022, capacity: 1.23 },
+  { year: 2023, capacity: 1.05 },
+  { year: 2024, capacity: 1.3 },
+  { year: 2025, capacity: 1.39 },
+  { year: 2026, capacity: 1.5 },
+  { year: 2027, capacity: 1.61 },
+  { year: 2028, capacity: 1.73 },
+  { year: 2029, capacity: 1.85 },
 ];
 
+// source - https://www.investindia.gov.in/sector/renewable-energy#:~:text=This%20is%20the%20world's%20largest,(as%20of%20Sep%202024)
 const energySourceData = [
   { name: "Solar", value: 90.76, fill: "#FFB627" },
   { name: "Wind", value: 47.36, fill: "#89CFF0" },
@@ -52,13 +59,15 @@ export function SolarGrowthChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Global Solar Capacity Growth</CardTitle>
+        <CardTitle>
+          Global Solar Capacity Growth (Current and Projected)
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
           config={{
             capacity: {
-              label: "Capacity (GW)",
+              label: "Kwh (Trillion)",
               color: "#FFB627",
             },
           }}
@@ -66,8 +75,13 @@ export function SolarGrowthChart() {
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={solarGrowthData}>
-              <XAxis dataKey="year" />
-              <YAxis />
+              <XAxis
+                dataKey="year"
+                label={{ value: "Year", position: "bottom" }}
+              />
+              <YAxis
+                label={{ value: "Trillion Kilo-Watt-Hours", angle: -90 }}
+              />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Line
                 type="monotone"

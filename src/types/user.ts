@@ -46,7 +46,6 @@ export interface EnergyData {
   Consumption: number;
 }
 
-// Executive Summary Interface
 export interface ExecutiveSummary {
   currentMonthCost: number;
   costComparisonPercentage: number;
@@ -61,7 +60,6 @@ export interface ExecutiveSummary {
   }>;
 }
 
-// Tariff Analysis Interface
 export interface TariffAnalysis {
   currentRate: number;
   averageRate: number;
@@ -75,7 +73,6 @@ export interface TariffAnalysis {
   pattern_analysis: string;
 }
 
-// Consumption Analytics Interface
 export interface ConsumptionAnalytics {
   totalConsumption: number;
   averageDailyConsumption: number;
@@ -91,7 +88,6 @@ export interface ConsumptionAnalytics {
   timeOfDayRecommendations?: string[];
 }
 
-// Solar Analysis Interface
 export interface SolarAnalysis {
   dailyGeneration: number;
   monthlyGeneration: number;
