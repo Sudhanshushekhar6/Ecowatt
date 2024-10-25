@@ -54,12 +54,12 @@ export default function StatsCards({
         <CardContent>
           <div className="text-2xl font-bold">
             {userData.hasBatteryStorage
-              ? `${userData.storageCapacity} kWh`
+              ? `${userData.storageCapacity} kW`
               : "N/A"}
           </div>
           <p className="text-xs text-muted-foreground">
             {userData.hasBatteryStorage
-              ? "Total Capacity"
+              ? "Total Battery Capacity"
               : "No battery storage"}
           </p>
         </CardContent>
