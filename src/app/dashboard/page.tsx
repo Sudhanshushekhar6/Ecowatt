@@ -1,17 +1,10 @@
-// pages/dashboard/index.tsx
 "use client";
 
 import DiscomInfoCard from "@/components/dashboard/DiscomInfoCard";
 import EnergyCharts from "@/components/dashboard/EnergyCharts";
 import GenerateReportButton from "@/components/dashboard/GenerateReportButton";
 import StatsCards from "@/components/dashboard/StatsCards";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import TOURateHistoryCard from "@/components/dashboard/TOURateHistoryCard";
 import { useAuthContext } from "@/context/auth-context";
 import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
@@ -19,18 +12,9 @@ import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
 import { doc, getDoc } from "firebase/firestore";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
-import {
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { toast } from "sonner";
 
 export default function Dashboard() {
-  // State declarations
   const { user } = useAuthContext();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +23,7 @@ export default function Dashboard() {
   const [locationName, setLocationName] = useState<string>("");
   const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
-  const [touHistory, setTOUHistory] = useState<TOUData[]>([]); // Specify the type of touHistory
+  const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
 
   // CSV processing function
   const processCSV = useCallback((str: string) => {
@@ -128,10 +112,9 @@ export default function Dashboard() {
   }, [user]);
 
   useEffect(() => {
-    let isMounted = true; // Flag to check if the component is mounted
+    let isMounted = true;
     fetchTOUHistory().then((touHistory) => {
       if (isMounted) {
-        // Only set state if the component is still mounted
         const latestTou = touHistory[0];
         toast.success("Latest TOU rate fetched", {
           description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
@@ -141,9 +124,9 @@ export default function Dashboard() {
     });
 
     return () => {
-      isMounted = false; // Cleanup function to set the flag to false
+      isMounted = false;
     };
-  }, []); // Ensure this effect runs only once
+  }, []);
 
   // Calculate dashboard metrics
   const totalSolarPower = energyData.reduce(
@@ -188,49 +171,7 @@ export default function Dashboard() {
           {/* Info Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DiscomInfoCard discomInfo={discomInfo} />
-
-            {/* TOU Rate History Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>TOU Rate History</CardTitle>
-                <CardDescription>Last 24 hours</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={touHistory}>
-                    <XAxis
-                      dataKey="timestamp"
-                      tickFormatter={(timestamp) =>
-                        new Date(timestamp).toLocaleTimeString()
-                      }
-                      label={{
-                        value: "Time",
-                        position: "insideBottom",
-                        offset: -5,
-                      }}
-                    />
-                    <YAxis
-                      label={{
-                        value: "Rate (₹/kWh)",
-                        angle: -90,
-                        position: "insideLeft",
-                        offset: 15,
-                      }}
-                    />
-                    <Tooltip
-                      labelFormatter={(label) =>
-                        new Date(label).toLocaleString()
-                      }
-                      formatter={(value) => [
-                        `₹${Number(value).toFixed(2)}/kWh`,
-                        "Rate",
-                      ]}
-                    />
-                    <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+            <TOURateHistoryCard touHistory={touHistory} />
           </div>
 
           {/* Energy Charts Section */}
