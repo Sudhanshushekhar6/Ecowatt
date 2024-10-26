@@ -11,7 +11,7 @@ import { db } from '@/lib/firebase';
 import { energyTradingService } from '@/lib/web3';
 import { UserData } from '@/types/user';
 import { doc, getDoc } from 'firebase/firestore';
-import { Loader2, PlusCircle, ShoppingCart, WalletIcon } from 'lucide-react';
+import { Coins, Loader2, PlusCircle, ShoppingCart, WalletIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 export default function Trading() {
@@ -20,7 +20,7 @@ export default function Trading() {
     const [amount, setAmount] = useState('');
     const [price, setPrice] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isRegistered, setIsRegistered] = useState(false);
+    const [mintAmount, setMintAmount] = useState('');
     const [userWallet, setUserWallet] = useState('');
     const { user } = useAuthContext();
 
@@ -49,7 +49,6 @@ export default function Trading() {
             const userInfo = await energyTradingService.getUserInfo(walletAddress);
             console.log("User info:", userInfo);
             if (userInfo.isRegistered) {
-                setIsRegistered(true);
                 return;
             }
 
@@ -62,7 +61,6 @@ export default function Trading() {
 
                 try {
                     await energyTradingService.registerUser(userData);
-                    setIsRegistered(true);
                 } catch (error) {
                     console.error('Error registering user in smart contract:', error);
                 } finally {
@@ -125,6 +123,25 @@ export default function Trading() {
         }
     };
 
+    const handleMintTokens = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const mintAmountNum = parseFloat(mintAmount);
+            const tokenPrice = 0.001; // TOKEN_PRICE from smart contract (in ETH)
+            const totalCost = mintAmountNum * tokenPrice;
+            
+            await energyTradingService.mintEnergyTokens(mintAmountNum)
+            
+            await loadUserBalance();
+            setMintAmount('');
+        } catch (error) {
+            console.error('Error minting tokens:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="container mx-auto p-6 max-w-6xl">
             <div className="space-y-6">
@@ -155,7 +172,47 @@ export default function Trading() {
                     </AlertDescription>
                 </Alert>
 
-                <Card>
+                <div className='flex flex-col md:flex-row items-center justify-between gap-4'>
+
+                <Card className=''>
+                    <CardHeader>
+                        <CardTitle>Mint Energy Tokens</CardTitle>
+                        <CardDescription>
+                            Convert your ETH to energy tokens. Rate: 0.001 ETH per token
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleMintTokens} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="mintAmount">Amount to Mint (kWh)</Label>
+                                <Input
+                                    id="mintAmount"
+                                    type="number"
+                                    value={mintAmount}
+                                    onChange={(e) => setMintAmount(e.target.value)}
+                                    placeholder="Enter amount to mint"
+                                    required
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    Cost: {(parseFloat(mintAmount) || 0) * 0.001} ETH
+                                </p>
+                            </div>
+                            <Button
+                                type="submit"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Coins className="mr-2 h-4 w-4" />
+                                )}
+                                Mint Tokens
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+
+                <Card className='w-full flex-1'>
                     <CardHeader>
                         <CardTitle>Create New Offer</CardTitle>
                         <CardDescription>
@@ -202,6 +259,8 @@ export default function Trading() {
                         </form>
                     </CardContent>
                 </Card>
+
+                </div>
 
                 <Separator className="my-8" />
 

@@ -50,7 +50,6 @@ export class EnergyTradingService {
   private currentAccount: string | null = null;
 
   constructor() {
-    // Check if running in a browser environment
     if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
       this.web3 = new Web3(window.ethereum);
       this.contract = new this.web3.eth.Contract(
@@ -67,12 +66,11 @@ export class EnergyTradingService {
       window.ethereum.on("chainChanged", () => {
         window.location.reload();
       });
+
     } else {
-      // Handle the case where the Web3 provider is not available
       console.error("Web3 provider not found");
-      // Optionally, you can throw an error or set a flag
-      this.web3 = null; // or handle it as needed
-      this.contract = null; // or handle it as needed
+      this.web3 = null;
+      this.contract = null;
     }
   }
 
@@ -91,7 +89,13 @@ export class EnergyTradingService {
 
   async changeWallet(): Promise<string | null> {
     try {
-      const accounts = await this.connectWallet();
+      await window.ethereum.request({
+        method: "wallet_requestPermissions",
+        params: [{ eth_accounts: {} }],
+      });
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
       this.currentAccount = accounts[0];
       return this.currentAccount;
     } catch (error) {
@@ -187,6 +191,23 @@ export class EnergyTradingService {
       return parseFloat(fromWei(balance, "ether"));
     } catch (error) {
       console.error("Error getting user balance:", error);
+      throw this.handleError(error);
+    }
+  }
+
+  async mintEnergyTokens(amount: number): Promise<void> {
+    try {
+      const accounts = await this.connectWallet();
+      
+      // Convert to wei (now using uint96 for amount)
+      const amountWei = toWei(amount.toString(), "ether");
+      console.log("amountWei:", amountWei);
+
+      await this.contract.methods
+        .mintEnergyTokens(amountWei)
+        .send({ from: accounts[0] });
+    } catch (error) {
+      console.error("Error minting energy tokens:", error);
       throw this.handleError(error);
     }
   }
