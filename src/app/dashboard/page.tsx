@@ -139,6 +139,25 @@ export default function Dashboard() {
     ),
   ).size;
 
+  function calculateCurrentBatteryPower() {
+    let currentBatteryPower = 0;
+
+    for (let i = 0; i < energyData.length; i++) {
+      const current = energyData[i];
+      currentBatteryPower += current.SolarEnergy || 0;
+      currentBatteryPower -= current.Consumption;
+      currentBatteryPower = Math.max(currentBatteryPower, 0);
+      currentBatteryPower = Math.min(
+        currentBatteryPower,
+        userData ? parseFloat(userData.storageCapacity) : 0,
+      );
+    }
+
+    return currentBatteryPower;
+  }
+
+  const currentBatteryPower = calculateCurrentBatteryPower();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[90vh] text-sm text-muted-foreground">
@@ -162,6 +181,7 @@ export default function Dashboard() {
           {/* Stats Cards Section */}
           <StatsCards
             userData={userData}
+            currentBatteryPower={currentBatteryPower}
             totalSolarPower={totalSolarPower}
             uniqueDays={uniqueDays}
             locationName={locationName}
@@ -170,7 +190,7 @@ export default function Dashboard() {
 
           {/* Info Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DiscomInfoCard discomInfo={discomInfo} />
+            <DiscomInfoCard discomInfo={discomInfo} touHistory={touHistory} />
             <TOURateHistoryCard touHistory={touHistory} />
           </div>
 

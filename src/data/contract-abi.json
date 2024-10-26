@@ -1,0 +1,413 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "AlreadyRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "BatchTooLarge",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ContractIsPaused",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InactiveOffer",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientEnergy",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientPayment",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidRange",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "Unauthorized",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "by",
+        "type": "address"
+      }
+    ],
+    "name": "ContractPaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "by",
+        "type": "address"
+      }
+    ],
+    "name": "ContractUnpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "amount",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "pricePerUnit",
+        "type": "uint96"
+      }
+    ],
+    "name": "EnergyOffered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "buyer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "amount",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "EnergyPurchased",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "amount",
+        "type": "uint96"
+      }
+    ],
+    "name": "EnergyTokensMinted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "solarCapacity",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "storageCapacity",
+        "type": "uint96"
+      }
+    ],
+    "name": "UserRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint96",
+        "name": "_amount",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "_pricePerUnit",
+        "type": "uint96"
+      }
+    ],
+    "name": "createEnergyOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getActiveOffers",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "activeOfferIds",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getUserBalance",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "",
+        "type": "uint96"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getUserInfo",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "energyTokenBalance",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "solarCapacity",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "storageCapacity",
+        "type": "uint96"
+      },
+      {
+        "internalType": "bool",
+        "name": "hasSolarPanels",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "hasBatteryStorage",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isRegistered",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint96",
+        "name": "_amount",
+        "type": "uint96"
+      }
+    ],
+    "name": "mintEnergyTokens",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "offerCount",
+    "outputs": [
+      {
+        "internalType": "uint248",
+        "name": "",
+        "type": "uint248"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint96",
+        "name": "_amount",
+        "type": "uint96"
+      }
+    ],
+    "name": "purchaseEnergy",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_hasSolarPanels",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "_hasBatteryStorage",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint96",
+        "name": "_solarCapacity",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "_storageCapacity",
+        "type": "uint96"
+      }
+    ],
+    "name": "registerUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unpause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

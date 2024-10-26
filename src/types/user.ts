@@ -3,7 +3,7 @@ export interface UserData {
   hasSolarPanels: boolean;
   hasBatteryStorage: boolean;
   solarCapacity: number;
-  storageCapacity: number;
+  storageCapacity: string;
   monthlyBill: number;
   electricityProvider: string;
 }

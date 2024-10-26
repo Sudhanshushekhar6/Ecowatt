@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Discom } from "@/types/user";
+import { Discom, TOUData } from "@/types/user";
 import { DollarSign, Percent, Users, Zap } from "lucide-react";
 import {
   Bar,
@@ -16,7 +16,13 @@ import {
   YAxis,
 } from "recharts";
 
-const DiscomInfoCard = ({ discomInfo }: { discomInfo: Discom | null }) => {
+const DiscomInfoCard = ({
+  discomInfo,
+  touHistory,
+}: {
+  discomInfo: Discom | null;
+  touHistory: TOUData[];
+}) => {
   if (!discomInfo) return null;
 
   const chartData = [
@@ -44,28 +50,45 @@ const DiscomInfoCard = ({ discomInfo }: { discomInfo: Discom | null }) => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Users className="h-5 w-5" />
-              <span className="font-semibold">Total Consumers:</span>
-              <span>
-                {discomInfo["Total Number of consumers (Millions)"]} Million
-              </span>
+          <div className="flex flex-col items-center justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5" />
+                <span className="font-semibold">Total Consumers:</span>
+                <span>
+                  {discomInfo["Total Number of consumers (Millions)"]} Million
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Zap className="h-5 w-5" />
+                <span className="font-semibold">Total Electricity Sales:</span>
+                <span>{discomInfo["Total Electricity Sales (MU)"]} MU</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <DollarSign className="h-5 w-5" />
+                <span className="font-semibold">Total Revenue:</span>
+                <span>₹{discomInfo["Total Revenue (Rs. Crore)"]} Crore</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Percent className="h-5 w-5" />
+                <span className="font-semibold">AT&C Losses:</span>
+                <span>{discomInfo["AT&C Losses (%)"]}%</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Zap className="h-5 w-5" />
-              <span className="font-semibold">Total Electricity Sales:</span>
-              <span>{discomInfo["Total Electricity Sales (MU)"]} MU</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <DollarSign className="h-5 w-5" />
-              <span className="font-semibold">Total Revenue:</span>
-              <span>₹{discomInfo["Total Revenue (Rs. Crore)"]} Crore</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Percent className="h-5 w-5" />
-              <span className="font-semibold">AT&C Losses:</span>
-              <span>{discomInfo["AT&C Losses (%)"]}%</span>
+            <div className="border border-gray-200 rounded-lg p-4 text-sm mt-4">
+              <p>
+                Current Grid Electricity Rate (Avg + ToU-Tariff) = ₹
+                {discomInfo["Average Billing Rate (Rs./kWh)"]} + ₹
+                {touHistory ? touHistory[0].rate : "N/A"}
+              </p>
+              <p className="mt-2 font-bold">
+                ₹
+                {(
+                  parseFloat(discomInfo["Average Billing Rate (Rs./kWh)"]) +
+                  parseFloat(touHistory ? touHistory[0].rate.toString() : "0")
+                ).toFixed(2)}{" "}
+                / kWh
+              </p>
             </div>
           </div>
           <div className="h-64 w-full">

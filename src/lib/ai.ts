@@ -115,7 +115,7 @@ async function calculateExecutiveSummary(
     solarGeneration: solarGeneration
       ? parseFloat(solarGeneration.toFixed(2))
       : null,
-    batteryUsage: userData.hasBatteryStorage ? userData.storageCapacity : null,
+    batteryUsage: userData.hasBatteryStorage ? parseFloat(userData.storageCapacity) : null,
     keyRecommendations: recommendations,
   };
 }

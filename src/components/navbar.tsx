@@ -81,6 +81,12 @@ export default function Navbar() {
           </Link>
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            href="/trading"
+          >
+            Trading
+          </Link>
+          <Link
+            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/settings"
           >
             Settings
