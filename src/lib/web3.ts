@@ -45,11 +45,12 @@ declare global {
 }
 
 export class EnergyTradingService {
-  private web3: Web3;
+  private web3: Web3 | null;
   private contract: any;
   private currentAccount: string | null = null;
 
   constructor() {
+    // Check if running in a browser environment
     if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
       this.web3 = new Web3(window.ethereum);
       this.contract = new this.web3.eth.Contract(
@@ -67,7 +68,11 @@ export class EnergyTradingService {
         window.location.reload();
       });
     } else {
-      throw new Error("Web3 provider not found");
+      // Handle the case where the Web3 provider is not available
+      console.error("Web3 provider not found");
+      // Optionally, you can throw an error or set a flag
+      this.web3 = null; // or handle it as needed
+      this.contract = null; // or handle it as needed
     }
   }
 
