@@ -17,8 +17,11 @@ import {
 import {
   AlertCircle,
   Battery,
+  BatteryLow,
+  CheckCircle,
   Clock,
   CloudRain,
+  NotepadText,
   Sun,
   TrendingDown,
   TrendingUp,
@@ -235,7 +238,14 @@ const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {data.unusualPatterns.join(" ")}
+                <h4 className="font-semibold mb-2">
+                  Unusual Consumption Patterns
+                </h4>
+                <ul className="list-disc pl-4">
+                  {data.unusualPatterns.map((pattern, index) => (
+                    <li key={index}>{pattern}</li>
+                  ))}
+                </ul>
               </AlertDescription>
             </Alert>
           )}
@@ -306,6 +316,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
           <TabsContent value="optimizations" className="space-y-2">
             {data.optimizations.map((opt, index) => (
               <Alert key={index}>
+                <CheckCircle className="h-4 w-4 text-green-600" />
                 <AlertDescription>{opt}</AlertDescription>
               </Alert>
             ))}
@@ -318,6 +329,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
           <TabsContent value="maintenance" className="space-y-2">
             {data.maintenance_tasks.map((task, index) => (
               <Alert key={index}>
+                <NotepadText className="h-4 w-4 text-blue-600" />
                 <AlertDescription>{task}</AlertDescription>
               </Alert>
             ))}
@@ -326,6 +338,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
           <TabsContent value="storage" className="space-y-2">
             {data.storage_tips.map((tip, index) => (
               <Alert key={index}>
+                <BatteryLow className="h-4 w-4 text-red-600" />
                 <AlertDescription>{tip}</AlertDescription>
               </Alert>
             ))}

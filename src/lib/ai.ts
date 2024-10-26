@@ -152,21 +152,32 @@ async function generateTariffAnalysis(
     TIME OF USE PATTERNS:
     ${touData.map((t) => `- ${new Date(t.timestamp).toLocaleTimeString()}: ${t.rate} Rs/kWh`).join("\n    ")}
 
-    Analyze and provide:
-    1. 24-hour rate forecasts based on historical patterns
-    2. Specific times for cost-saving activities
-    3. Peak vs off-peak usage strategies
-    4. Load shifting opportunities
-
-    Format as JSON with structure:
+    Analyze the data and return a JSON response in exactly this format:
     {
-      "forecasted_rates": [{"time": "HH:MM", "rate": number}],
-      "savings_opportunities": ["detailed opportunity 1", "detailed opportunity 2"],
-      "pattern_analysis": "string"
+      "forecasted_rates": [
+        {
+          "time": "HH:MM",    // Provide exactly 24 entries, one for each hour of the day (00:00 to 23:00)
+          "rate": number      // Rate in Rs/kWh with 2 decimal places
+        }
+      ],
+      "savings_opportunities": [
+        "detailed opportunity 1",  // Each opportunity should be a clear, actionable recommendation
+        "detailed opportunity 2"   // Include timing, expected savings, and specific actions
+      ],
+      "pattern_analysis": "string" // Single comprehensive analysis of daily and weekly patterns
     }
-  `;
+
+    Requirements:
+    1. forecasted_rates must contain exactly 24 hourly forecasts
+    2. Time format must be in 24-hour format (HH:MM)
+    3. Rates should consider historical patterns, DISCOM pricing, and time of day
+    4. Savings opportunities should be specific and actionable
+    5. Pattern analysis should cover daily trends and peak/off-peak insights
+    6. Rates should not be constant
+`;
 
   const aiResponse = await fetchAIResponse(aiPrompt);
+  console.log(aiResponse);
 
   return {
     currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
@@ -220,7 +231,7 @@ async function generateConsumptionAnalytics(
 
   // Get AI insights for consumption patterns
   const aiPrompt = `
-    Analyze energy consumption patterns considering weather impact:
+    Analyze the following energy consumption data and return a JSON response.
 
     CONSUMPTION METRICS:
     - Daily total: ${totalConsumption.toFixed(2)} kWh
@@ -241,18 +252,45 @@ async function generateConsumptionAnalytics(
     - Conditions: ${weatherData.weather[0].main}
     - Details: ${weatherData.weather[0].description}
 
-    Analyze and identify:
-    1. Unusual consumption patterns and their causes
-    2. Weather impact on energy usage
-    3. Time-based optimization opportunities
-    4. Specific recommendations for each time of day
+    Analyze the data and provide insights in the following JSON structure. Ensure all numbers are provided as numbers, not strings:
 
-    Format response to match ConsumptionAnalytics interface with:
-    - unusualPatterns: Array of identified unusual patterns
-    - weatherImpact: Weather correlation analysis
-    - optimizationOpportunities: List of optimization opportunities
-    - timeOfDayRecommendations: Time-specific recommendations
-  `;
+    {
+      "totalConsumption": [total consumption in kWh as number],
+      "averageDailyConsumption": [daily average in kWh as number],
+      "peakConsumptionTime": [peak time in format "M/D/YYYY HH:mm"],
+      "peakConsumptionValue": [peak consumption value in kW as number],
+      "consumptionByTimeOfDay": [
+        {
+          "hour": [hour as number 0-23],
+          "average": [average consumption for that hour as number]
+        },
+        ...
+      ],
+      "unusualPatterns": [
+        "Description of unusual pattern 1",
+        "Description of unusual pattern 2"
+      ],
+      "weatherImpact": "Comprehensive analysis of weather impact on consumption",
+      "optimizationOpportunities": [
+        "Specific optimization suggestion 1",
+        "Specific optimization suggestion 2"
+      ],
+      "timeOfDayRecommendations": [
+        "Time-specific recommendation 1",
+        "Time-specific recommendation 2"
+      ]
+    }
+
+    Important formatting rules:
+    1. Ensure the response is valid JSON
+    2. All number values should be actual numbers, not strings
+    3. Arrays should contain string elements for text fields
+    4. Keep time format consistent as "M/D/YYYY HH:mm"
+    5. Hour values in consumptionByTimeOfDay should be numbers 0-23
+    6. All text descriptions should be clear and actionable
+    7. Ensure weatherImpact is a single comprehensive string
+    8. Recommendations should be specific and practical
+`;
 
   const aiResponse = await fetchAIResponse(aiPrompt); // Use insights in future updates
 
@@ -262,6 +300,10 @@ async function generateConsumptionAnalytics(
     peakConsumptionTime: peakConsumption.time,
     peakConsumptionValue: parseFloat(peakConsumption.consumption.toFixed(2)),
     consumptionByTimeOfDay: hourlyAverages,
+    unusualPatterns: aiResponse?.unusualPatterns,
+    weatherImpact: aiResponse?.weatherImpact,
+    optimizationOpportunities: aiResponse?.optimizationOpportunities,
+    timeOfDayRecommendations: aiResponse?.timeOfDayRecommendations,
   };
 }
 
