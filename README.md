@@ -6,6 +6,8 @@ PrabhaWatt is a Solar Energy Optimization Platform designed to help users maximi
 
 You can find the live version of the platform at [prabhawatt.vercel.app](https://prabhawatt.vercel.app/).
 
+Example energy data file: [energy_data.csv](./assets/Energy%20data.csv)
+
 ## Table of Contents
 
 - [PrabhaWatt](#prabhawatt)

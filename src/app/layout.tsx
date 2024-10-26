@@ -2,6 +2,7 @@ import Navbar from "@/components/navbar";
 import { AuthContextProvider } from "@/context/auth-context";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthContextProvider>
+          <NextTopLoader showSpinner={false} color="#65a30d" />
           <Navbar />
           {children}
           <Toaster />

@@ -11,7 +11,7 @@ import { db } from "@/lib/firebase";
 import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { parse } from "papaparse";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 function calculateCurrentBatteryPower(
@@ -104,6 +104,8 @@ export default function Dashboard() {
     }
   }, []);
 
+  const prevBatteryPowerRef = useRef<number | undefined>(undefined);
+
   // Calculate current battery power
   useEffect(() => {
     if (user && userData) {
@@ -113,28 +115,28 @@ export default function Dashboard() {
       );
 
       if (
-        userData.currentBatteryPower === undefined ||
-        userData.currentBatteryPower !== currentBatteryPower
+        prevBatteryPowerRef.current !== currentBatteryPower &&
+        (userData.currentBatteryPower === undefined ||
+          userData.currentBatteryPower !== currentBatteryPower)
       ) {
+        prevBatteryPowerRef.current = currentBatteryPower;
+
         updateDoc(doc(db, "users", user.uid), {
           currentBatteryPower: currentBatteryPower,
         });
-        toast.success("Your battery power has been updated successfully");
-      }
-      setUserData((prevData) => {
-        if (prevData) {
+
+        setUserData((prevData) => {
+          if (!prevData) return null;
           return {
             ...prevData,
-            currentBatteryPower:
-              currentBatteryPower !== undefined
-                ? currentBatteryPower
-                : prevData.currentBatteryPower,
+            currentBatteryPower: currentBatteryPower,
           };
-        }
-        return null;
-      });
+        });
+
+        toast.success("Your battery power has been updated successfully");
+      }
     }
-  }, [energyData, userData, user]);
+  }, [user, energyData]);
 
   // Initialize dashboard data
   useEffect(() => {
@@ -168,7 +170,7 @@ export default function Dashboard() {
     let isMounted = true;
     fetchTOUHistory().then((touHistory) => {
       if (isMounted) {
-        const latestTou = touHistory[0];
+        const latestTou = touHistory[touHistory.length - 1];
         toast.success("Latest TOU rate fetched", {
           description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
         });

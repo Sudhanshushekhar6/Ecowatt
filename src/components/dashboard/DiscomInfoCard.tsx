@@ -79,14 +79,18 @@ const DiscomInfoCard = ({
               <p>
                 Current Grid Electricity Rate (Avg + ToU-Tariff) = ₹
                 {discomInfo["Average Billing Rate (Rs./kWh)"]} + ₹
-                {touHistory[0] ? touHistory[0].rate : "N/A"}
+                {touHistory.length > 0
+                  ? touHistory[touHistory.length - 1].rate
+                  : "N/A"}
               </p>
               <p className="mt-2 font-bold">
                 ₹
                 {(
                   parseFloat(discomInfo["Average Billing Rate (Rs./kWh)"]) +
                   parseFloat(
-                    touHistory[0] ? touHistory[0].rate.toString() : "0",
+                    touHistory.length > 0
+                      ? touHistory[touHistory.length - 1].rate.toString()
+                      : "0",
                   )
                 ).toFixed(2)}{" "}
                 / kWh
