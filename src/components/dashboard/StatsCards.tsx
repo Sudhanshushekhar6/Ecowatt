@@ -6,6 +6,7 @@ import { Battery, MapPinHouse, Sun, Zap } from "lucide-react";
 interface StatsCardsProps {
   userData: UserData;
   totalSolarPower: number;
+  currentBatteryPower: number;
   uniqueDays: number;
   locationName: string;
   weatherData: any;
@@ -22,6 +23,7 @@ const LocationWeatherDetails = ({ location }: { location: string }) => (
 
 export default function StatsCards({
   userData,
+  currentBatteryPower,
   totalSolarPower,
   uniqueDays,
   locationName,
@@ -31,18 +33,23 @@ export default function StatsCards({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Total Energy Produced
+            Current Battery Power
           </CardTitle>
           <Zap className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            {totalSolarPower.toFixed(2)} kWh
+          <div className="text-2xl flex items-center justify-start">
+            <p className="font-bold">{currentBatteryPower.toFixed(1)} kWh</p>
+            <p className="text-xs text-muted-foreground ml-2">
+              {currentBatteryPower.toFixed(1) === userData.storageCapacity
+                ? "(Full)"
+                : ""}
+            </p>
           </div>
-          <p className="text-xs mb-1 text-muted-foreground">
-            in the past {uniqueDays} days
+          <p className="text-xs text-muted-foreground">
+            {totalSolarPower.toFixed(2)} kW produced in the past {uniqueDays}{" "}
+            days
           </p>
-          <p className="text-xs text-muted-foreground">100% from solar</p>
         </CardContent>
       </Card>
 
@@ -67,7 +74,9 @@ export default function StatsCards({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Solar System</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Solar System Capacity
+          </CardTitle>
           <Sun className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
@@ -75,7 +84,7 @@ export default function StatsCards({
             {userData.hasSolarPanels ? `${userData.solarCapacity} kW` : "N/A"}
           </div>
           <p className="text-xs text-muted-foreground">
-            {userData.hasSolarPanels ? "System Capacity" : "No solar panels"}
+            Capacity of Solar Panels
           </p>
         </CardContent>
       </Card>

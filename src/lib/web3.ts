@@ -16,7 +16,7 @@ export enum EnergyTradingError {
   InsufficientBalance = "InsufficientBalance",
   InactiveOffer = "InactiveOffer",
   InsufficientEnergy = "InsufficientEnergy",
-  InvalidAddress = "InvalidAddress"
+  InvalidAddress = "InvalidAddress",
 }
 
 // Types for the contract responses
@@ -30,13 +30,13 @@ export interface EnergyOffer {
 }
 
 export interface UserInfo {
-    energyTokenBalance: string;
-    solarCapacity: string;
-    storageCapacity: string;
-    hasSolarPanels: boolean;
-    hasBatteryStorage: boolean;
-    isRegistered: boolean;
-  }
+  energyTokenBalance: string;
+  solarCapacity: string;
+  storageCapacity: string;
+  hasSolarPanels: boolean;
+  hasBatteryStorage: boolean;
+  isRegistered: boolean;
+}
 
 declare global {
   interface Window {
@@ -50,11 +50,14 @@ export class EnergyTradingService {
   private currentAccount: string | null = null;
 
   constructor() {
-    if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    if (
+      typeof window !== "undefined" &&
+      typeof window.ethereum !== "undefined"
+    ) {
       this.web3 = new Web3(window.ethereum);
       this.contract = new this.web3.eth.Contract(
         contractABI as AbiItem[],
-        contractAddress
+        contractAddress,
       );
 
       // Listen for account changes
@@ -66,7 +69,6 @@ export class EnergyTradingService {
       window.ethereum.on("chainChanged", () => {
         window.location.reload();
       });
-
     } else {
       console.error("Web3 provider not found");
       this.web3 = null;
@@ -107,17 +109,23 @@ export class EnergyTradingService {
   async registerUser(userData: UserData): Promise<void> {
     try {
       const accounts = await this.connectWallet();
-      
+
       // Convert capacities to wei (now using uint96)
-      const solarCapacityWei = toWei(userData.solarCapacity.toString(), "ether");
-      const storageCapacityWei = toWei(userData.storageCapacity.toString(), "ether");
+      const solarCapacityWei = toWei(
+        userData.solarCapacity.toString(),
+        "ether",
+      );
+      const storageCapacityWei = toWei(
+        userData.storageCapacity.toString(),
+        "ether",
+      );
 
       await this.contract.methods
         .registerUser(
           userData.hasSolarPanels,
           userData.hasBatteryStorage,
           solarCapacityWei,
-          storageCapacityWei
+          storageCapacityWei,
         )
         .send({ from: accounts[0] });
     } catch (error) {
@@ -129,14 +137,14 @@ export class EnergyTradingService {
   async getUserInfo(address: string): Promise<UserInfo> {
     try {
       const result = await this.contract.methods.getUserInfo(address).call();
-      
+
       return {
         energyTokenBalance: fromWei(result.energyTokenBalance, "ether"),
         solarCapacity: fromWei(result.solarCapacity, "ether"),
         storageCapacity: fromWei(result.storageCapacity, "ether"),
         hasSolarPanels: result.hasSolarPanels,
         hasBatteryStorage: result.hasBatteryStorage,
-        isRegistered: result.isRegistered
+        isRegistered: result.isRegistered,
       };
     } catch (error) {
       console.error("Error getting user info:", error);
@@ -147,7 +155,7 @@ export class EnergyTradingService {
   async createEnergyOffer(amount: number, pricePerUnit: number): Promise<void> {
     try {
       const accounts = await this.connectWallet();
-      
+
       // Convert to wei (now using uint96)
       const amountWei = toWei(amount.toString(), "ether");
       const priceWei = toWei(pricePerUnit.toString(), "ether");
@@ -164,21 +172,19 @@ export class EnergyTradingService {
   async purchaseEnergy(
     offerId: number,
     amount: number,
-    totalPrice: number
+    totalPrice: number,
   ): Promise<void> {
     try {
       const accounts = await this.connectWallet();
-      
+
       // Convert to wei (now using uint96 for amount)
       const amountWei = toWei(amount.toString(), "ether");
       const totalPriceWei = toWei(totalPrice.toString(), "ether");
 
-      await this.contract.methods
-        .purchaseEnergy(offerId, amountWei)
-        .send({
-          from: accounts[0],
-          value: totalPriceWei,
-        });
+      await this.contract.methods.purchaseEnergy(offerId, amountWei).send({
+        from: accounts[0],
+        value: totalPriceWei,
+      });
     } catch (error) {
       console.error("Error purchasing energy:", error);
       throw this.handleError(error);
@@ -187,7 +193,9 @@ export class EnergyTradingService {
 
   async getUserBalance(address: string): Promise<number> {
     try {
-      const balance = await this.contract.methods.getUserBalance(address).call();
+      const balance = await this.contract.methods
+        .getUserBalance(address)
+        .call();
       return parseFloat(fromWei(balance, "ether"));
     } catch (error) {
       console.error("Error getting user balance:", error);
@@ -198,7 +206,7 @@ export class EnergyTradingService {
   async mintEnergyTokens(amount: number): Promise<void> {
     try {
       const accounts = await this.connectWallet();
-      
+
       // Convert to wei (now using uint96 for amount)
       const amountWei = toWei(amount.toString(), "ether");
       console.log("amountWei:", amountWei);
@@ -214,7 +222,9 @@ export class EnergyTradingService {
 
   async getActiveOffers(): Promise<EnergyOffer[]> {
     try {
-      const activeOfferIds = await this.contract.methods.getActiveOffers().call();
+      const activeOfferIds = await this.contract.methods
+        .getActiveOffers()
+        .call();
       const offers = await Promise.all(
         activeOfferIds.map(async (id: number) => {
           const offer = await this.contract.methods.energyOffers(id).call();
@@ -226,7 +236,7 @@ export class EnergyTradingService {
             timestamp: new Date(parseInt(offer.timestamp) * 1000),
             isActive: offer.isActive,
           };
-        })
+        }),
       );
       return offers;
     } catch (error) {
