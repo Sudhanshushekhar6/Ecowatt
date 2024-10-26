@@ -100,7 +100,7 @@ export default function Trading() {
     try {
       const accounts = await energyTradingService.connectWallet();
       const balance = await energyTradingService.getUserBalance(accounts[0]);
-      setUserBalance(balance);
+      setUserBalance(Number(balance)); // Convert to number
     } catch (error) {
       console.error("Error loading balance:", error);
     }
