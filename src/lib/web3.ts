@@ -1,4 +1,4 @@
-// utils/web3.ts
+// lib/web3.ts
 import contractABI from "@/data/contract-abi.json";
 import { UserData } from "@/types/user";
 import Web3 from "web3";

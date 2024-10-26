@@ -168,7 +168,10 @@ export default function Trading() {
 
                 <Alert>
                     <AlertDescription className="text-lg">
-                        Your Energy Balance: <span className="font-bold">{userBalance} kWh</span>
+                        Your Energy Balance: <span className="font-bold">{userBalance} ET</span>
+                        <span
+                        className='text-sm text-muted-foreground ml-2'
+                        >(Energy Tokens)</span>
                     </AlertDescription>
                 </Alert>
 
