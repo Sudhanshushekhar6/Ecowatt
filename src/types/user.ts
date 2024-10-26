@@ -6,6 +6,7 @@ export interface UserData {
   storageCapacity: string;
   monthlyBill: number;
   electricityProvider: string;
+  currentBatteryPower?: number;
 }
 
 export interface TOUData {

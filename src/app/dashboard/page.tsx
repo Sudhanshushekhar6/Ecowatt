@@ -9,10 +9,30 @@ import { useAuthContext } from "@/context/auth-context";
 import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
 import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+
+function calculateCurrentBatteryPower(
+  energyData: EnergyData[],
+  userData: UserData | null,
+) {
+  let currentBatteryPower = 0;
+
+  for (let i = 0; i < energyData.length; i++) {
+    const current = energyData[i];
+    currentBatteryPower += current.SolarEnergy || 0;
+    currentBatteryPower -= current.Consumption;
+    currentBatteryPower = Math.max(currentBatteryPower, 0);
+    currentBatteryPower = Math.min(
+      currentBatteryPower,
+      userData ? parseFloat(userData.storageCapacity) : 0,
+    );
+  }
+
+  return currentBatteryPower;
+}
 
 export default function Dashboard() {
   const { user } = useAuthContext();
@@ -84,6 +104,38 @@ export default function Dashboard() {
     }
   }, []);
 
+  // Calculate current battery power
+  useEffect(() => {
+    if (user && userData) {
+      const currentBatteryPower = calculateCurrentBatteryPower(
+        energyData,
+        userData,
+      );
+
+      if (
+        userData.currentBatteryPower === undefined ||
+        userData.currentBatteryPower !== currentBatteryPower
+      ) {
+        updateDoc(doc(db, "users", user.uid), {
+          currentBatteryPower: currentBatteryPower,
+        });
+        toast.success("Your battery power has been updated successfully");
+      }
+      setUserData((prevData) => {
+        if (prevData) {
+          return {
+            ...prevData,
+            currentBatteryPower:
+              currentBatteryPower !== undefined
+                ? currentBatteryPower
+                : prevData.currentBatteryPower,
+          };
+        }
+        return null;
+      });
+    }
+  }, [energyData, userData, user]);
+
   // Initialize dashboard data
   useEffect(() => {
     const initializeDashboard = async () => {
@@ -140,25 +192,6 @@ export default function Dashboard() {
     ),
   ).size;
 
-  function calculateCurrentBatteryPower() {
-    let currentBatteryPower = 0;
-
-    for (let i = 0; i < energyData.length; i++) {
-      const current = energyData[i];
-      currentBatteryPower += current.SolarEnergy || 0;
-      currentBatteryPower -= current.Consumption;
-      currentBatteryPower = Math.max(currentBatteryPower, 0);
-      currentBatteryPower = Math.min(
-        currentBatteryPower,
-        userData ? parseFloat(userData.storageCapacity) : 0,
-      );
-    }
-
-    return currentBatteryPower;
-  }
-
-  const currentBatteryPower = calculateCurrentBatteryPower();
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[90vh] text-sm text-muted-foreground">
@@ -182,7 +215,6 @@ export default function Dashboard() {
           {/* Stats Cards Section */}
           <StatsCards
             userData={userData}
-            currentBatteryPower={currentBatteryPower}
             totalSolarPower={totalSolarPower}
             uniqueDays={uniqueDays}
             locationName={locationName}

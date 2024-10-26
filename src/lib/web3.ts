@@ -191,12 +191,13 @@ export class EnergyTradingService {
     }
   }
 
-  async getUserBalance(address: string): Promise<number> {
+  async getUserBalance(address: string): Promise<string> {
     try {
       const balance = await this.contract.methods
         .getUserBalance(address)
         .call();
-      return parseFloat(fromWei(balance, "ether"));
+
+      return balance.toString();
     } catch (error) {
       console.error("Error getting user balance:", error);
       throw this.handleError(error);
@@ -207,13 +208,15 @@ export class EnergyTradingService {
     try {
       const accounts = await this.connectWallet();
 
-      // Convert to wei (now using uint96 for amount)
-      const amountWei = toWei(amount.toString(), "ether");
-      console.log("amountWei:", amountWei);
+      const tokenAmount = Math.floor(amount).toString();
 
-      await this.contract.methods
-        .mintEnergyTokens(amountWei)
-        .send({ from: accounts[0] });
+      const paymentRequired = Math.floor(amount) * 0.001;
+      const paymentInWei = toWei(paymentRequired.toString(), "ether");
+
+      await this.contract.methods.mintEnergyTokens(tokenAmount).send({
+        from: accounts[0],
+        value: paymentInWei,
+      });
     } catch (error) {
       console.error("Error minting energy tokens:", error);
       throw this.handleError(error);

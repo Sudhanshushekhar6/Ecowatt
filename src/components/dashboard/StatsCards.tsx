@@ -6,7 +6,6 @@ import { Battery, MapPinHouse, Sun, Zap } from "lucide-react";
 interface StatsCardsProps {
   userData: UserData;
   totalSolarPower: number;
-  currentBatteryPower: number;
   uniqueDays: number;
   locationName: string;
   weatherData: any;
@@ -23,7 +22,6 @@ const LocationWeatherDetails = ({ location }: { location: string }) => (
 
 export default function StatsCards({
   userData,
-  currentBatteryPower,
   totalSolarPower,
   uniqueDays,
   locationName,
@@ -39,9 +37,16 @@ export default function StatsCards({
         </CardHeader>
         <CardContent>
           <div className="text-2xl flex items-center justify-start">
-            <p className="font-bold">{currentBatteryPower.toFixed(1)} kW</p>
+            <p className="font-bold">
+              {userData.currentBatteryPower !== undefined
+                ? userData.currentBatteryPower.toFixed(1)
+                : 0}{" "}
+              kW
+            </p>
             <p className="text-xs text-muted-foreground ml-2">
-              {currentBatteryPower.toFixed(1) === userData.storageCapacity
+              {userData.currentBatteryPower !== undefined &&
+              userData.currentBatteryPower.toFixed(1) ===
+                userData.storageCapacity
                 ? "(Full)"
                 : ""}
             </p>
