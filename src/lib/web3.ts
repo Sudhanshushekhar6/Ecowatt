@@ -29,6 +29,15 @@ export interface EnergyOffer {
   isActive: boolean;
 }
 
+export interface UserInfo {
+    energyTokenBalance: string;
+    solarCapacity: string;
+    storageCapacity: string;
+    hasSolarPanels: boolean;
+    hasBatteryStorage: boolean;
+    isRegistered: boolean;
+  }
+
 declare global {
   interface Window {
     ethereum: any;
@@ -104,6 +113,24 @@ export class EnergyTradingService {
         .send({ from: accounts[0] });
     } catch (error) {
       console.error("Error registering user:", error);
+      throw this.handleError(error);
+    }
+  }
+
+  async getUserInfo(address: string): Promise<UserInfo> {
+    try {
+      const result = await this.contract.methods.getUserInfo(address).call();
+      
+      return {
+        energyTokenBalance: fromWei(result.energyTokenBalance, "ether"),
+        solarCapacity: fromWei(result.solarCapacity, "ether"),
+        storageCapacity: fromWei(result.storageCapacity, "ether"),
+        hasSolarPanels: result.hasSolarPanels,
+        hasBatteryStorage: result.hasBatteryStorage,
+        isRegistered: result.isRegistered
+      };
+    } catch (error) {
+      console.error("Error getting user info:", error);
       throw this.handleError(error);
     }
   }
@@ -192,17 +219,6 @@ export class EnergyTradingService {
       }
     }
     return error;
-  }
-
-  // Helper method to check if a number fits within uint96
-  private validateUint96(value: string): boolean {
-    const maxUint96 = BigInt("79228162514264337593543950335");
-    try {
-      const bigIntValue = BigInt(value);
-      return bigIntValue >= 0 && bigIntValue <= maxUint96;
-    } catch {
-      return false;
-    }
   }
 }
 

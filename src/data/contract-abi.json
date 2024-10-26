@@ -11,6 +11,11 @@
 	},
 	{
 		"inputs": [],
+		"name": "BatchTooLarge",
+		"type": "error"
+	},
+	{
+		"inputs": [],
 		"name": "ContractIsPaused",
 		"type": "error"
 	},
@@ -36,12 +41,17 @@
 	},
 	{
 		"inputs": [],
-		"name": "InvalidAddress",
+		"name": "InvalidRange",
 		"type": "error"
 	},
 	{
 		"inputs": [],
 		"name": "NotRegistered",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "TransferFailed",
 		"type": "error"
 	},
 	{
@@ -92,15 +102,15 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "amount",
-				"type": "uint256"
+				"type": "uint96"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "pricePerUnit",
-				"type": "uint256"
+				"type": "uint96"
 			}
 		],
 		"name": "EnergyOffered",
@@ -129,9 +139,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "amount",
-				"type": "uint256"
+				"type": "uint96"
 			},
 			{
 				"indexed": false,
@@ -154,9 +164,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "amount",
-				"type": "uint256"
+				"type": "uint96"
 			}
 		],
 		"name": "EnergyTokensMinted",
@@ -173,15 +183,15 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "solarCapacity",
-				"type": "uint256"
+				"type": "uint96"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "storageCapacity",
-				"type": "uint256"
+				"type": "uint96"
 			}
 		],
 		"name": "UserRegistered",
@@ -206,18 +216,7 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "startIndex",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "endIndex",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
 		"name": "getActiveOffers",
 		"outputs": [
 			{
@@ -240,9 +239,53 @@
 		"name": "getUserBalance",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "",
-				"type": "uint256"
+				"type": "uint96"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			}
+		],
+		"name": "getUserInfo",
+		"outputs": [
+			{
+				"internalType": "uint96",
+				"name": "energyTokenBalance",
+				"type": "uint96"
+			},
+			{
+				"internalType": "uint96",
+				"name": "solarCapacity",
+				"type": "uint96"
+			},
+			{
+				"internalType": "uint96",
+				"name": "storageCapacity",
+				"type": "uint96"
+			},
+			{
+				"internalType": "bool",
+				"name": "hasSolarPanels",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "hasBatteryStorage",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isRegistered",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",

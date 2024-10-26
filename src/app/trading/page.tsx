@@ -6,7 +6,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useAuthContext } from '@/context/auth-context';
+import { db } from '@/lib/firebase';
 import { energyTradingService } from '@/lib/web3';
+import { UserData } from '@/types/user';
+import { doc, getDoc } from 'firebase/firestore';
 import { Loader2, PlusCircle, ShoppingCart, WalletIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
@@ -16,12 +20,62 @@ export default function Trading() {
     const [amount, setAmount] = useState('');
     const [price, setPrice] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [userWallet, setUserWallet] = useState('');
+    const { user } = useAuthContext();
+
     useEffect(() => {
-        loadOffers();
-        loadUserBalance();
-    }, []);
-    
+        const initializeData = async () => {
+            try {
+                const accounts = await energyTradingService.connectWallet();
+                setUserWallet(accounts[0]);
+
+                await checkAndRegisterUser(accounts[0]);
+
+                await loadOffers();
+                await loadUserBalance();
+            } catch (error) {
+                console.error('Error initializing data:', error);
+            }
+        };
+
+        initializeData();
+    }, [user, userWallet]);
+
+    const checkAndRegisterUser = async (walletAddress: string) => {
+        if (!user || !userWallet) return;
+
+        try {
+            const userInfo = await energyTradingService.getUserInfo(walletAddress);
+            console.log("User info:", userInfo);
+            if (userInfo.isRegistered) {
+                setIsRegistered(true);
+                return;
+            }
+
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data() as UserData;
+                setIsLoading(true);
+
+                try {
+                    await energyTradingService.registerUser(userData);
+                    setIsRegistered(true);
+                } catch (error) {
+                    console.error('Error registering user in smart contract:', error);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                console.error('No user data found in Firestore');
+            }
+        } catch (error) {
+            console.error('Error checking/registering user:', error);
+        }
+    };
+
     const loadOffers = async () => {
         try {
             const offers = await energyTradingService.getActiveOffers();
@@ -30,7 +84,7 @@ export default function Trading() {
             console.error('Error loading offers:', error);
         }
     };
-    
+
     const loadUserBalance = async () => {
         try {
             const accounts = await energyTradingService.connectWallet();
@@ -40,7 +94,7 @@ export default function Trading() {
             console.error('Error loading balance:', error);
         }
     };
-    
+
     const handleCreateOffer = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -70,18 +124,18 @@ export default function Trading() {
             setIsLoading(false);
         }
     };
-    
+
     return (
         <div className="container mx-auto p-6 max-w-6xl">
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                    <h1 className="text-3xl font-bold">Prabhwatt Market</h1>
-                    <p className='text-sm text-muted-foreground'>
-                        Got too much Solar Power? Want to sell it? Prabhwatt Market is the place for you! List your solar power for sale and make a profit.
-                    </p>
+                        <h1 className="text-3xl font-bold">Prabhwatt Market</h1>
+                        <p className='text-sm text-muted-foreground'>
+                            Got too much Solar Power? Want to sell it? Prabhwatt Market is the place for you! List your solar power for sale and make a profit.
+                        </p>
                     </div>
-                    <Button 
+                    <Button
                         variant="outline"
                         onClick={handleChangeWallet}
                         disabled={isLoading}
@@ -134,8 +188,8 @@ export default function Trading() {
                                     />
                                 </div>
                             </div>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
@@ -175,7 +229,7 @@ export default function Trading() {
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button 
+                                    <Button
                                         className="w-full"
                                         onClick={() => energyTradingService.purchaseEnergy(
                                             offer.id,
