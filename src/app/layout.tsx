@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: "Prabhawatt",
   description:
     "Illuminate Your Savings with PrabhaWatt: Where Solar Meets Smart",
+  openGraph: {
+    images: ["/preview.png"],
+  },
 };
 
 export default function RootLayout({

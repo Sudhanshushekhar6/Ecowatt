@@ -1,60 +1,123 @@
-# PrabhaWatt
+# PrabhaWatt - Solar Energy Optimization Platform
 
-[![Thumbnail](./assets/thumbnail.png)](https://prabhawatt.vercel.app/)
+[![Made with Next.js](https://img.shields.io/badge/Made%20with-Next.js-000000?style=flat-square&logo=Next.js)](https://nextjs.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
-PrabhaWatt is a Solar Energy Optimization Platform designed to help users maximize their solar energy usage, reduce electricity bills, and contribute to a more sustainable future.
+PrabhaWatt is an intelligent solar energy optimization platform designed to revolutionize how users manage and maximize their solar energy usage. By combining real-time monitoring, advanced analytics, and machine learning, we help users reduce electricity bills while contributing to a sustainable future.
 
-You can find the live version of the platform at [prabhawatt.vercel.app](https://prabhawatt.vercel.app/).
+🌐 **[Live Demo](https://prabhawatt.vercel.app/)** | 📊 **[Sample Energy Data](./assets/Energy%20data.csv)**
 
-Example energy data file: [energy_data.csv](./assets/Energy%20data.csv)
+![PrabhaWatt Dashboard Preview](./public/preview.png)
 
-## Table of Contents
+## 📑 Table of Contents
 
-- [PrabhaWatt](#prabhawatt)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Features](#features)
-  - [Installation](#installation)
+- [PrabhaWatt - Solar Energy Optimization Platform](#prabhawatt---solar-energy-optimization-platform)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [✨ Features](#-features)
+  - [🛠 Technology Stack](#-technology-stack)
+  - [🚀 Getting Started](#-getting-started)
+  - [🤝 Contributing](#-contributing)
+  - [💡 Support](#-support)
+  - [📄 License](#-license)
 
-## Overview
+## ✨ Features
 
-PrabhaWatt addresses the challenges of inefficient energy usage, underutilized solar power, and lack of real-time data for cost optimization. Our platform provides an integrated solution for intelligent energy management, focusing on solar energy utilization in India.
+- **📊 Real-Time Monitoring**
 
-## Features
+  - Live energy consumption tracking
+  - Dynamic tariff rate updates
+  - Solar generation monitoring
 
-- Real-Time Tariff Monitoring
-- Energy Consumption Analytics
-- Smart Scheduling
-- Solar Energy Management
-- Machine Learning Forecasting
-- User Notifications
-- Cost-Benefit Analysis
+- **🤖 Smart Analytics**
 
-## Installation
+  - Machine learning-powered consumption forecasting
+  - Usage pattern analysis
+  - Cost optimization recommendations
 
-1. Clone the repository:
+- **⚡ Energy Management**
 
-```
+  - Intelligent load scheduling
+  - Solar energy utilization optimization
+  - Automated device control
+
+- **💰 Financial Tools**
+
+  - Cost-benefit analysis
+  - ROI calculator
+  - Bill prediction
+
+- **📱 User Experience**
+  - Responsive web interface
+  - Real-time notifications
+  - Custom alerts and reminders
+
+## 🛠 Technology Stack
+
+- **Frontend**: Next.js, TailwindCSS, ShadcnUI
+- **Backend**: Next.js API Routes, Node.js, Firebase
+- **ML/Analytics**: Groq, Firebase Analytics
+- **Database**: Firebase
+- **APIs**: RESTful architecture
+
+## 🚀 Getting Started
+
+1. **Clone the repository**
+
+```bash
 git clone https://github.com/ChiragAgg5k/prabhawatt
 cd prabhawatt
 ```
 
-2. Install the required dependencies:
+2. **Install dependencies**
 
-```
-npm install # or pnpm, yarn, etc.
+```bash
+npm install
+# or
+pnpm install
+# or
+yarn install
 ```
 
-3. Add the environment variables according to the `.env.example` file:
+3. **Set up environment variables**
 
-```
+```bash
 cp .env.example .env
 ```
 
-4. Run the application:
+Correctly set up the environment variables in the `.env` file as per the `.env.example` file.
 
-```
-npm run dev # or pnpm dev, yarn dev, etc.
+1. **Start the development server**
+
+```bash
+npm run dev
+# or
+pnpm dev
+# or
+yarn dev
 ```
 
-You can now access the application at `http://localhost:3000`.
+Visit `http://localhost:3000` to see the application running.
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/improvement`)
+3. Make your changes
+4. Commit your changes (`git commit -am 'Add new feature'`)
+5. Push to the branch (`git push origin feature/improvement`)
+6. Create a Pull Request
+
+See our [Contributing Guidelines](CONTRIBUTING.md) for more details.
+
+## 💡 Support
+
+- 🐛 [Issue Tracker](https://github.com/ChiragAgg5k/prabhawatt/issues)
+- 💬 [Discussions](https://github.com/ChiragAgg5k/prabhawatt/discussions)
+- 📩 [Email](mailto:chiragaggarwal5k@gmail.com)
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
