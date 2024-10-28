@@ -8,31 +8,12 @@ import TOURateHistoryCard from "@/components/dashboard/TOURateHistoryCard";
 import { useAuthContext } from "@/context/auth-context";
 import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
+import { calculateCurrentBatteryPower } from "@/lib/utils";
 import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
-function calculateCurrentBatteryPower(
-  energyData: EnergyData[],
-  userData: UserData | null,
-) {
-  let currentBatteryPower = 0;
-
-  for (let i = 0; i < energyData.length; i++) {
-    const current = energyData[i];
-    currentBatteryPower += current.SolarEnergy || 0;
-    currentBatteryPower -= current.Consumption;
-    currentBatteryPower = Math.max(currentBatteryPower, 0);
-    currentBatteryPower = Math.min(
-      currentBatteryPower,
-      userData ? parseFloat(userData.storageCapacity) : 0,
-    );
-  }
-
-  return currentBatteryPower;
-}
 
 export default function Dashboard() {
   const { user } = useAuthContext();
@@ -44,6 +25,9 @@ export default function Dashboard() {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
+
+  // Initialize with the current battery power from userData when available
+  const lastCalculatedBatteryPower = useRef<number>(0);
 
   // CSV processing function
   const processCSV = useCallback((str: string) => {
@@ -61,6 +45,76 @@ export default function Dashboard() {
       },
     });
   }, []);
+
+  // Initialize dashboard data and set initial battery power
+  useEffect(() => {
+    const initializeDashboard = async () => {
+      if (user) {
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data() as UserData;
+            setUserData(userData);
+            // Initialize the ref with the current battery power from Firestore
+            lastCalculatedBatteryPower.current =
+              userData.currentBatteryPower || 0;
+            const discomData = fetchDISCOMData(userData.electricityProvider);
+            if (discomData) {
+              setDiscomInfo(discomData);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    initializeDashboard();
+  }, [user]);
+
+  // Update battery power when energy data or user data changes
+  useEffect(() => {
+    const updateBatteryPower = async () => {
+      if (user && userData && energyData.length > 0) {
+        const newBatteryPower = calculateCurrentBatteryPower(
+          energyData,
+          userData,
+        );
+
+        // Only update if the value has changed and is different from current
+        if (
+          newBatteryPower !== lastCalculatedBatteryPower.current &&
+          newBatteryPower !== userData.currentBatteryPower
+        ) {
+          console.log("Updating battery power:", {
+            previous: lastCalculatedBatteryPower.current,
+            new: newBatteryPower,
+            storedInUserData: userData.currentBatteryPower,
+          });
+
+          lastCalculatedBatteryPower.current = newBatteryPower;
+
+          try {
+            await updateDoc(doc(db, "users", user.uid), {
+              currentBatteryPower: newBatteryPower,
+            });
+            toast.success("Your battery power has been updated successfully");
+          } catch (error) {
+            console.error("Error updating battery power:", error);
+            toast.error("Failed to update battery power");
+          }
+        }
+      }
+    };
+
+    updateBatteryPower();
+  }, [energyData, userData, user]);
 
   // File upload handler
   const handleFileUpload = useCallback(
@@ -103,67 +157,6 @@ export default function Dashboard() {
       });
     }
   }, []);
-
-  const prevBatteryPowerRef = useRef<number | undefined>(undefined);
-
-  // Calculate current battery power
-  useEffect(() => {
-    if (user && userData) {
-      const currentBatteryPower = calculateCurrentBatteryPower(
-        energyData,
-        userData,
-      );
-
-      if (
-        prevBatteryPowerRef.current !== currentBatteryPower &&
-        (userData.currentBatteryPower === undefined ||
-          userData.currentBatteryPower !== currentBatteryPower)
-      ) {
-        prevBatteryPowerRef.current = currentBatteryPower;
-
-        updateDoc(doc(db, "users", user.uid), {
-          currentBatteryPower: currentBatteryPower,
-        });
-
-        setUserData((prevData) => {
-          if (!prevData) return null;
-          return {
-            ...prevData,
-            currentBatteryPower: currentBatteryPower,
-          };
-        });
-
-        toast.success("Your battery power has been updated successfully");
-      }
-    }
-  }, [user, energyData]);
-
-  // Initialize dashboard data
-  useEffect(() => {
-    const initializeDashboard = async () => {
-      if (user) {
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data() as UserData;
-            setUserData(userData);
-            const discomData = fetchDISCOMData(userData.electricityProvider);
-            if (discomData) {
-              setDiscomInfo(discomData);
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    initializeDashboard();
-  }, [user]);
 
   // Fetch TOU history
   useEffect(() => {
@@ -214,7 +207,6 @@ export default function Dashboard() {
     <div className="flex flex-col min-h-screen bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          {/* Stats Cards Section */}
           <StatsCards
             userData={userData}
             totalSolarPower={totalSolarPower}
@@ -223,13 +215,11 @@ export default function Dashboard() {
             weatherData={weatherData}
           />
 
-          {/* Info Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DiscomInfoCard discomInfo={discomInfo} touHistory={touHistory} />
             <TOURateHistoryCard touHistory={touHistory} />
           </div>
 
-          {/* Energy Charts Section */}
           <EnergyCharts
             energyData={energyData}
             handleFileUpload={handleFileUpload}

@@ -9,20 +9,7 @@ import {
   UserData,
   WeatherData,
 } from "@/types/user";
-
-function groupDataByDay(energyData: EnergyData[]): Map<string, EnergyData[]> {
-  const dataByDay = new Map<string, EnergyData[]>();
-
-  energyData.forEach((data) => {
-    const date = new Date(data.SendDate).toLocaleDateString();
-    if (!dataByDay.has(date)) {
-      dataByDay.set(date, []);
-    }
-    dataByDay.get(date)?.push(data);
-  });
-
-  return dataByDay;
-}
+import { groupDataByDay } from "./utils";
 
 // Calculate executive summary without API call
 async function calculateExecutiveSummary(
@@ -152,11 +139,22 @@ async function generateTariffAnalysis(
     TIME OF USE PATTERNS:
     ${touData.map((t) => `- ${new Date(t.timestamp).toLocaleTimeString()}: ${t.rate} Rs/kWh`).join("\n    ")}
 
-    Analyze the data and return a JSON response in exactly this format:
+    Analyze the data and return a JSON response following these strict requirements:
+
+    1. Provide forecasted rates for each hour that MUST vary throughout the day:
+    - Early morning (00:00-05:59): Rates should be near off-peak (${offPeakRate.toFixed(2)} Rs/kWh)
+    - Morning peak (06:00-09:59): Rates should be near peak (${peakRate.toFixed(2)} Rs/kWh)
+    - Mid-day (10:00-16:59): Rates should be near average (${averageRate.toFixed(2)} Rs/kWh)
+    - Evening peak (17:00-21:59): Rates should be near peak (${peakRate.toFixed(2)} Rs/kWh)
+    - Night (22:00-23:59): Rates should be near off-peak (${offPeakRate.toFixed(2)} Rs/kWh)
+
+    2. Add random variations of ±10% to prevent constant rates
+
+    Return in exactly this format:
     {
       "forecasted_rates": [
         {
-          "time": "HH:MM",    // Provide exactly 24 entries, one for each hour of the day (00:00 to 23:00)
+          "time": "HH:MM",    // Exactly 24 entries from 00:00 to 23:00
           "rate": number      // Rate in Rs/kWh with 2 decimal places
         }
       ],
@@ -166,28 +164,33 @@ async function generateTariffAnalysis(
       ],
       "pattern_analysis": "string" // Single comprehensive analysis of daily and weekly patterns
     }
+    `;
 
-    Requirements:
-    1. forecasted_rates must contain exactly 24 hourly forecasts
-    2. Time format must be in 24-hour format (HH:MM)
-    3. Rates should consider historical patterns, DISCOM pricing, and time of day
-    4. Savings opportunities should be specific and actionable
-    5. Pattern analysis should cover daily trends and peak/off-peak insights
-    6. Rates should not be constant
-`;
+  try {
+    const aiResponse = await fetchAIResponse(aiPrompt);
 
-  const aiResponse = await fetchAIResponse(aiPrompt);
-  console.log(aiResponse);
-
-  return {
-    currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
-    averageRate: parseFloat(averageRate.toFixed(2)),
-    peakRate: parseFloat(peakRate.toFixed(2)),
-    offPeakRate: parseFloat(offPeakRate.toFixed(2)),
-    forecastedRates: aiResponse?.forecasted_rates || [],
-    savingsOpportunities: aiResponse?.savings_opportunities || [],
-    pattern_analysis: aiResponse.pattern_analysis || "",
-  };
+    return {
+      currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
+      averageRate: parseFloat(averageRate.toFixed(2)),
+      peakRate: parseFloat(peakRate.toFixed(2)),
+      offPeakRate: parseFloat(offPeakRate.toFixed(2)),
+      forecastedRates: aiResponse.forecasted_rates,
+      savingsOpportunities: aiResponse?.savings_opportunities || [],
+      pattern_analysis: aiResponse.pattern_analysis || "",
+    };
+  } catch (error) {
+    console.error("Error generating tariff analysis:", error);
+    return {
+      currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
+      averageRate: parseFloat(averageRate.toFixed(2)),
+      peakRate: parseFloat(peakRate.toFixed(2)),
+      offPeakRate: parseFloat(offPeakRate.toFixed(2)),
+      forecastedRates: [],
+      savingsOpportunities: [],
+      pattern_analysis:
+        "There was an error generating the tariff analysis. Please try again.",
+    };
+  }
 }
 
 // Generate consumption analytics

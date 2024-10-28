@@ -48,18 +48,21 @@ export default function Navbar() {
           <a
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="#benefits"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Benefits
           </a>
           <a
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="#why-choose"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Why Choose Us
           </a>
           <a
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="#get-started"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Get Started
           </a>
@@ -70,24 +73,28 @@ export default function Navbar() {
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/learn-more"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Learn More
           </Link>
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/dashboard"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Dashboard
           </Link>
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/trading"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Trading
           </Link>
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/settings"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Settings
           </Link>
@@ -97,12 +104,14 @@ export default function Navbar() {
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/learn-more"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Learn More
           </Link>
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/sign-in"
+            onClick={() => setIsOpen(false)} // Close sheet on click
           >
             <Button size="sm" variant="outline">
               Sign In

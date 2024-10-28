@@ -18,6 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://prabhawatt.vercel.app"),
   title: "Prabhawatt",
   description:
     "Illuminate Your Savings with PrabhaWatt: Where Solar Meets Smart",
