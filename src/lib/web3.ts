@@ -1,41 +1,31 @@
-// lib/web3.ts
 import contractABI from "@/data/contract-abi.json";
-import { UserData } from "@/types/user";
 import Web3 from "web3";
-import { AbiItem, fromWei, toWei } from "web3-utils";
+import { AbiItem, fromWei } from "web3-utils";
 
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
-// Custom error types matching the smart contract
-export enum EnergyTradingError {
-  Unauthorized = "Unauthorized",
-  ContractIsPaused = "ContractIsPaused",
-  AlreadyRegistered = "AlreadyRegistered",
-  NotRegistered = "NotRegistered",
-  InsufficientPayment = "InsufficientPayment",
-  InsufficientBalance = "InsufficientBalance",
-  InactiveOffer = "InactiveOffer",
-  InsufficientEnergy = "InsufficientEnergy",
-  InvalidAddress = "InvalidAddress",
+// Types matching the smart contract structures
+export interface UserDetails {
+  isRegistered: boolean;
+  availableEnergy: number;
+  userId: string;
+  name: string;
+  email: string;
+  registeredAt: number;
 }
 
-// Types for the contract responses
 export interface EnergyOffer {
   id: number;
   seller: string;
-  amount: string;
-  pricePerUnit: string;
-  timestamp: Date;
+  energyAmount: string;
+  tokenPrice: string;
   isActive: boolean;
 }
 
-export interface UserInfo {
-  energyTokenBalance: string;
-  solarCapacity: string;
-  storageCapacity: string;
-  hasSolarPanels: boolean;
-  hasBatteryStorage: boolean;
-  isRegistered: boolean;
+export interface RegisterUserData {
+  userId: string;
+  name: string;
+  email: string;
 }
 
 declare global {
@@ -85,7 +75,7 @@ export class EnergyTradingService {
       return accounts;
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      throw this.handleError(error);
+      throw error;
     }
   }
 
@@ -102,162 +92,126 @@ export class EnergyTradingService {
       return this.currentAccount;
     } catch (error) {
       console.error("Error changing wallet:", error);
-      throw this.handleError(error);
+      throw error;
     }
   }
 
-  async registerUser(userData: UserData): Promise<void> {
+  async registerUser(userData: RegisterUserData): Promise<void> {
     try {
       const accounts = await this.connectWallet();
-
-      // Convert capacities to wei (now using uint96)
-      const solarCapacityWei = toWei(
-        userData.solarCapacity.toString(),
-        "ether",
-      );
-      const storageCapacityWei = toWei(
-        userData.storageCapacity.toString(),
-        "ether",
-      );
-
       await this.contract.methods
-        .registerUser(
-          userData.hasSolarPanels,
-          userData.hasBatteryStorage,
-          solarCapacityWei,
-          storageCapacityWei,
-        )
+        .registerUser(userData.userId, userData.name, userData.email)
         .send({ from: accounts[0] });
     } catch (error) {
       console.error("Error registering user:", error);
-      throw this.handleError(error);
+      throw error;
     }
   }
 
-  async getUserInfo(address: string): Promise<UserInfo> {
+  async getUserDetails(address: string): Promise<UserDetails> {
     try {
-      const result = await this.contract.methods.getUserInfo(address).call();
-
+      const result = await this.contract.methods.getUserDetails(address).call();
       return {
-        energyTokenBalance: fromWei(result.energyTokenBalance, "ether"),
-        solarCapacity: fromWei(result.solarCapacity, "ether"),
-        storageCapacity: fromWei(result.storageCapacity, "ether"),
-        hasSolarPanels: result.hasSolarPanels,
-        hasBatteryStorage: result.hasBatteryStorage,
-        isRegistered: result.isRegistered,
+        isRegistered: result[0],
+        availableEnergy: Number(result[1]),
+        userId: result[2],
+        name: result[3],
+        email: result[4],
+        registeredAt: Number(result[5]),
       };
     } catch (error) {
-      console.error("Error getting user info:", error);
-      throw this.handleError(error);
+      console.error("Error getting user details:", error);
+      throw error;
     }
   }
 
-  async createEnergyOffer(amount: number, pricePerUnit: number): Promise<void> {
-    try {
-      const accounts = await this.connectWallet();
-
-      // Convert to wei (now using uint96)
-      const amountWei = toWei(amount.toString(), "ether");
-      const priceWei = toWei(pricePerUnit.toString(), "ether");
-
-      await this.contract.methods
-        .createEnergyOffer(amountWei, priceWei)
-        .send({ from: accounts[0] });
-    } catch (error) {
-      console.error("Error creating energy offer:", error);
-      throw this.handleError(error);
-    }
-  }
-
-  async purchaseEnergy(
-    offerId: number,
-    amount: number,
-    totalPrice: number,
+  async createEnergyOffer(
+    energyAmount: number,
+    tokenPrice: number,
   ): Promise<void> {
     try {
       const accounts = await this.connectWallet();
+      await this.contract.methods
+        .createEnergyOffer(energyAmount, tokenPrice)
+        .send({ from: accounts[0] });
+    } catch (error) {
+      console.error("Error creating energy offer:", error);
+      throw error;
+    }
+  }
 
-      // Convert to wei (now using uint96 for amount)
-      const amountWei = toWei(amount.toString(), "ether");
-      const totalPriceWei = toWei(totalPrice.toString(), "ether");
-
-      await this.contract.methods.purchaseEnergy(offerId, amountWei).send({
-        from: accounts[0],
-        value: totalPriceWei,
-      });
+  async purchaseEnergy(offerId: number): Promise<void> {
+    try {
+      const accounts = await this.connectWallet();
+      await this.contract.methods
+        .purchaseEnergy(offerId)
+        .send({ from: accounts[0] });
     } catch (error) {
       console.error("Error purchasing energy:", error);
-      throw this.handleError(error);
+      throw error;
     }
   }
 
   async getUserBalance(address: string): Promise<string> {
     try {
       const balance = await this.contract.methods
-        .getUserBalance(address)
+        .getUserTokenBalance(address)
         .call();
-
-      return balance.toString();
+      return fromWei(balance, "ether");
     } catch (error) {
       console.error("Error getting user balance:", error);
-      throw this.handleError(error);
+      throw error;
     }
   }
 
   async mintEnergyTokens(amount: number): Promise<void> {
     try {
       const accounts = await this.connectWallet();
+      const exchangeRate = 10000; // 1 ETH = 10000 Energy Tokens
+      const ethRequired = amount / exchangeRate; // This gives you the ETH required for the amount of tokens
 
-      const tokenAmount = Math.floor(amount).toString();
+      // Convert ETH to wei for the transaction
+      const weiValue = this.web3!.utils.toWei(ethRequired.toString(), "ether");
 
-      const paymentRequired = Math.floor(amount) * 0.001;
-      const paymentInWei = toWei(paymentRequired.toString(), "ether");
+      // Calculate the actual amount of tokens being minted
+      const tokensToMint = amount; // This is the amount of tokens you're looking to mint
 
-      await this.contract.methods.mintEnergyTokens(tokenAmount).send({
+      await this.contract.methods.purchaseTokens(tokensToMint).send({
         from: accounts[0],
-        value: paymentInWei,
+        value: weiValue,
       });
     } catch (error) {
       console.error("Error minting energy tokens:", error);
-      throw this.handleError(error);
+      throw error;
     }
   }
 
-  async getActiveOffers(): Promise<EnergyOffer[]> {
+  async getActiveOffers(): Promise<any[]> {
     try {
-      const activeOfferIds = await this.contract.methods
-        .getActiveOffers()
+      const totalOffers = await this.contract.methods
+        .getActiveOffersCount()
         .call();
-      const offers = await Promise.all(
-        activeOfferIds.map(async (id: number) => {
-          const offer = await this.contract.methods.energyOffers(id).call();
-          return {
-            id,
+      const offers = [];
+
+      for (let i = 0; i < totalOffers; i++) {
+        const offer = await this.contract.methods.energyOffers(i).call();
+        if (offer.isActive) {
+          offers.push({
+            id: i,
             seller: offer.seller,
-            amount: fromWei(offer.amount, "ether"),
-            pricePerUnit: fromWei(offer.pricePerUnit, "ether"),
-            timestamp: new Date(parseInt(offer.timestamp) * 1000),
+            amount: Number(offer.energyAmount),
+            pricePerUnit: Number(offer.tokenPrice),
             isActive: offer.isActive,
-          };
-        }),
-      );
+            timestamp: new Date(), // Since your contract doesn't store timestamp
+          });
+        }
+      }
+
       return offers;
     } catch (error) {
       console.error("Error getting active offers:", error);
-      throw this.handleError(error);
+      throw error;
     }
-  }
-
-  private handleError(error: any): Error {
-    // Check if it's a custom contract error
-    if (error.message.includes("execution reverted")) {
-      for (const errorType of Object.values(EnergyTradingError)) {
-        if (error.message.includes(errorType)) {
-          return new Error(errorType);
-        }
-      }
-    }
-    return error;
   }
 }
 

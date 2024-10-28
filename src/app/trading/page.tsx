@@ -14,18 +14,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuthContext } from "@/context/auth-context";
-import { db } from "@/lib/firebase";
 import { energyTradingService } from "@/lib/web3";
-import { UserData } from "@/types/user";
-import { doc, getDoc } from "firebase/firestore";
 import {
   Coins,
   Loader2,
   PlusCircle,
   ShoppingCart,
+  User,
   WalletIcon,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+
+interface UserDetails {
+  isRegistered: boolean;
+  availableEnergy: number;
+  userId: string;
+  name: string;
+  email: string;
+  registeredAt: number;
+}
 
 export default function Trading() {
   const [activeOffers, setActiveOffers] = useState([]);
@@ -35,6 +42,7 @@ export default function Trading() {
   const [isLoading, setIsLoading] = useState(false);
   const [mintAmount, setMintAmount] = useState("");
   const [userWallet, setUserWallet] = useState("");
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -43,7 +51,10 @@ export default function Trading() {
         const accounts = await energyTradingService.connectWallet();
         setUserWallet(accounts[0]);
 
-        await checkAndRegisterUser(accounts[0]);
+        if (accounts[0]) {
+          await checkAndRegisterUser(accounts[0]);
+          await loadUserDetails(accounts[0]);
+        }
 
         await loadOffers();
         await loadUserBalance();
@@ -55,25 +66,37 @@ export default function Trading() {
     initializeData();
   }, [user, userWallet]);
 
+  const loadUserDetails = async (walletAddress: string) => {
+    try {
+      const details = await energyTradingService.getUserDetails(walletAddress);
+      setUserDetails(details);
+    } catch (error) {
+      console.error("Error loading user details:", error);
+    }
+  };
+
   const checkAndRegisterUser = async (walletAddress: string) => {
     if (!user || !userWallet) return;
 
     try {
-      const userInfo = await energyTradingService.getUserInfo(walletAddress);
-      console.log("User info:", userInfo);
+      const userInfo = await energyTradingService.getUserDetails(walletAddress);
+
       if (userInfo.isRegistered) {
         return;
       }
 
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data() as UserData;
+      if (user && user.displayName && user.email) {
         setIsLoading(true);
 
         try {
-          await energyTradingService.registerUser(userData);
+          await energyTradingService.registerUser({
+            userId: user.uid,
+            name: user.displayName,
+            email: user.email,
+          });
+
+          // Reload user details after registration
+          await loadUserDetails(walletAddress);
         } catch (error) {
           console.error("Error registering user in smart contract:", error);
         } finally {
@@ -100,7 +123,7 @@ export default function Trading() {
     try {
       const accounts = await energyTradingService.connectWallet();
       const balance = await energyTradingService.getUserBalance(accounts[0]);
-      setUserBalance(Number(balance)); // Convert to number
+      setUserBalance(Number(balance));
     } catch (error) {
       console.error("Error loading balance:", error);
     }
@@ -127,8 +150,12 @@ export default function Trading() {
   const handleChangeWallet = async () => {
     setIsLoading(true);
     try {
-      await energyTradingService.changeWallet();
-      await loadUserBalance();
+      const newWallet = await energyTradingService.changeWallet();
+      if (newWallet) {
+        setUserWallet(newWallet);
+        await loadUserDetails(newWallet);
+        await loadUserBalance();
+      }
     } catch (error) {
       console.error("Error changing wallet:", error);
     } finally {
@@ -140,12 +167,7 @@ export default function Trading() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const mintAmountNum = parseFloat(mintAmount);
-      const tokenPrice = 0.001; // TOKEN_PRICE from smart contract (in ETH)
-      const totalCost = mintAmountNum * tokenPrice;
-
-      await energyTradingService.mintEnergyTokens(mintAmountNum);
-
+      await energyTradingService.mintEnergyTokens(parseFloat(mintAmount));
       await loadUserBalance();
       setMintAmount("");
     } catch (error) {
@@ -180,6 +202,43 @@ export default function Trading() {
           </Button>
         </div>
 
+        {userDetails && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <User className="mr-2 h-5 w-5" />
+                User Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Wallet Address
+                  </p>
+                  <p className="font-medium">{userWallet}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Name</p>
+                  <p className="font-medium">{userDetails.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{userDetails.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Registered On</p>
+                  <p className="font-medium">
+                    {new Date(
+                      userDetails.registeredAt * 1000,
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Alert>
           <AlertDescription className="text-lg">
             Your Energy Balance:{" "}
@@ -191,7 +250,7 @@ export default function Trading() {
         </Alert>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <Card className="">
+          <Card className="w-full">
             <CardHeader>
               <CardTitle>Mint Energy Tokens</CardTitle>
               <CardDescription>
@@ -248,7 +307,7 @@ export default function Trading() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price">Price per kWh (ETH)</Label>
+                    <Label htmlFor="price">Price per kWh (ET)</Label>
                     <Input
                       id="price"
                       type="number"
@@ -291,7 +350,7 @@ export default function Trading() {
                 <CardContent>
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">
-                      Price: {offer.pricePerUnit} ETH/kWh
+                      Price: {offer.pricePerUnit} ET/kWh
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Posted: {offer.timestamp.toLocaleString()}
@@ -301,13 +360,13 @@ export default function Trading() {
                 <CardFooter>
                   <Button
                     className="w-full"
-                    onClick={() =>
-                      energyTradingService.purchaseEnergy(
-                        offer.id,
-                        offer.amount,
-                        offer.amount * offer.pricePerUnit,
-                      )
-                    }
+                    // onClick={() =>
+                    //   energyTradingService.purchaseEnergy(
+                    //     offer.id,
+                    //     offer.amount,
+                    //     offer.amount * offer.pricePerUnit,
+                    //   )
+                    // }
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Purchase Energy

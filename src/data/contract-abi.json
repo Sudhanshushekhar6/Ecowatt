@@ -5,111 +5,26 @@
     "type": "constructor"
   },
   {
-    "inputs": [],
-    "name": "AlreadyRegistered",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ContractIsPaused",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InactiveOffer",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InsufficientBalance",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InsufficientEnergy",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InsufficientPayment",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InvalidParameters",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "NotRegistered",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "TransferFailed",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "Unauthorized",
-    "type": "error"
-  },
-  {
-    "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
         "internalType": "address",
-        "name": "by",
+        "name": "owner",
         "type": "address"
       }
     ],
-    "name": "ContractPaused",
-    "type": "event"
+    "name": "OwnableInvalidOwner",
+    "type": "error"
   },
   {
-    "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
         "internalType": "address",
-        "name": "by",
+        "name": "account",
         "type": "address"
       }
     ],
-    "name": "ContractUnpaused",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "offerId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "seller",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint96",
-        "name": "amount",
-        "type": "uint96"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint96",
-        "name": "pricePerUnit",
-        "type": "uint96"
-      }
-    ],
-    "name": "EnergyOffered",
-    "type": "event"
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
   },
   {
     "anonymous": false,
@@ -134,14 +49,8 @@
       },
       {
         "indexed": false,
-        "internalType": "uint96",
-        "name": "amount",
-        "type": "uint96"
-      },
-      {
-        "indexed": false,
         "internalType": "uint256",
-        "name": "totalPrice",
+        "name": "energyAmount",
         "type": "uint256"
       }
     ],
@@ -153,18 +62,30 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
         "internalType": "address",
-        "name": "user",
+        "name": "seller",
         "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "uint96",
-        "name": "amount",
-        "type": "uint96"
+        "internalType": "uint256",
+        "name": "energyAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenPrice",
+        "type": "uint256"
       }
     ],
-    "name": "EnergyTokensMinted",
+    "name": "OfferCreated",
     "type": "event"
   },
   {
@@ -173,36 +94,81 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "user",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "buyer",
         "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "uint96",
-        "name": "solarCapacity",
-        "type": "uint96"
+        "internalType": "uint256",
+        "name": "tokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokensPurchased",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "uint96",
-        "name": "storageCapacity",
-        "type": "uint96"
+        "internalType": "string",
+        "name": "userId",
+        "type": "string"
       }
     ],
     "name": "UserRegistered",
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "EXCHANGE_RATE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
-        "internalType": "uint96",
-        "name": "_amount",
-        "type": "uint96"
+        "internalType": "uint256",
+        "name": "_energyAmount",
+        "type": "uint256"
       },
       {
-        "internalType": "uint96",
-        "name": "_pricePerUnit",
-        "type": "uint96"
+        "internalType": "uint256",
+        "name": "_tokenPrice",
+        "type": "uint256"
       }
     ],
     "name": "createEnergyOffer",
@@ -211,13 +177,86 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "energyOffers",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "energyAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "getActiveOffers",
+    "name": "energyToken",
     "outputs": [
       {
-        "internalType": "uint256[]",
+        "internalType": "contract EnergyToken",
         "name": "",
-        "type": "uint256[]"
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getActiveOffersCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "count",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllUsers",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalUsers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -227,16 +266,41 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_user",
+        "name": "_userAddress",
         "type": "address"
       }
     ],
-    "name": "getUserBalance",
+    "name": "getUserDetails",
     "outputs": [
       {
-        "internalType": "uint96",
-        "name": "",
-        "type": "uint96"
+        "internalType": "bool",
+        "name": "isRegistered",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "availableEnergy",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "userId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "registeredAt",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -245,42 +309,42 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
+        "internalType": "string",
+        "name": "_userId",
+        "type": "string"
       }
     ],
-    "name": "getUserInfo",
+    "name": "getUserDetailsByUserId",
     "outputs": [
       {
-        "internalType": "uint96",
-        "name": "energyTokenBalance",
-        "type": "uint96"
-      },
-      {
-        "internalType": "uint96",
-        "name": "solarCapacity",
-        "type": "uint96"
-      },
-      {
-        "internalType": "uint96",
-        "name": "storageCapacity",
-        "type": "uint96"
-      },
-      {
-        "internalType": "bool",
-        "name": "hasSolarPanels",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "hasBatteryStorage",
-        "type": "bool"
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
       },
       {
         "internalType": "bool",
         "name": "isRegistered",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "availableEnergy",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "registeredAt",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -289,24 +353,17 @@
   {
     "inputs": [
       {
-        "internalType": "uint96",
-        "name": "_amount",
-        "type": "uint96"
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
       }
     ],
-    "name": "mintEnergyTokens",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "offerCount",
+    "name": "getUserTokenBalance",
     "outputs": [
       {
-        "internalType": "uint248",
+        "internalType": "uint256",
         "name": "",
-        "type": "uint248"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -326,39 +383,21 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "pause",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_offerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "purchaseEnergy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "paused",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_offerId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint96",
-        "name": "_amount",
-        "type": "uint96"
-      }
-    ],
-    "name": "purchaseEnergy",
+    "name": "purchaseTokens",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -366,24 +405,19 @@
   {
     "inputs": [
       {
-        "internalType": "bool",
-        "name": "_hasSolarPanels",
-        "type": "bool"
+        "internalType": "string",
+        "name": "_userId",
+        "type": "string"
       },
       {
-        "internalType": "bool",
-        "name": "_hasBatteryStorage",
-        "type": "bool"
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
       },
       {
-        "internalType": "uint96",
-        "name": "_solarCapacity",
-        "type": "uint96"
-      },
-      {
-        "internalType": "uint96",
-        "name": "_storageCapacity",
-        "type": "uint96"
+        "internalType": "string",
+        "name": "_email",
+        "type": "string"
       }
     ],
     "name": "registerUser",
@@ -392,17 +426,123 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "registeredAddresses",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "unpause",
+    "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "withdrawFunds",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_newAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateUserEnergy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "userIdToAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "users",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isRegistered",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "availableEnergy",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "userId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "registeredAt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]
