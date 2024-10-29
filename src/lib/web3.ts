@@ -7,7 +7,6 @@ const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 // Types matching the smart contract structures
 export interface UserDetails {
   isRegistered: boolean;
-  availableEnergy: number;
   userId: string;
   name: string;
   email: string;
@@ -113,11 +112,10 @@ export class EnergyTradingService {
       const result = await this.contract.methods.getUserDetails(address).call();
       return {
         isRegistered: result[0],
-        availableEnergy: Number(result[1]),
-        userId: result[2],
-        name: result[3],
-        email: result[4],
-        registeredAt: Number(result[5]),
+        userId: result[1],
+        name: result[2],
+        email: result[3],
+        registeredAt: Number(result[4]),
       };
     } catch (error) {
       console.error("Error getting user details:", error);

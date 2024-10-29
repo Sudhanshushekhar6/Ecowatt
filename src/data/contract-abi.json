@@ -278,11 +278,6 @@
         "type": "bool"
       },
       {
-        "internalType": "uint256",
-        "name": "availableEnergy",
-        "type": "uint256"
-      },
-      {
         "internalType": "string",
         "name": "userId",
         "type": "string"
@@ -325,11 +320,6 @@
         "internalType": "bool",
         "name": "isRegistered",
         "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "availableEnergy",
-        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -467,24 +457,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_newAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateUserEnergy",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "string",
         "name": "",
         "type": "string"
@@ -515,11 +487,6 @@
         "internalType": "bool",
         "name": "isRegistered",
         "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "availableEnergy",
-        "type": "uint256"
       },
       {
         "internalType": "string",

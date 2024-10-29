@@ -27,7 +27,6 @@ import React, { useEffect, useState } from "react";
 
 interface UserDetails {
   isRegistered: boolean;
-  availableEnergy: number;
   userId: string;
   name: string;
   email: string;
@@ -69,6 +68,7 @@ export default function Trading() {
   const loadUserDetails = async (walletAddress: string) => {
     try {
       const details = await energyTradingService.getUserDetails(walletAddress);
+      console.log(details);
       setUserDetails(details);
     } catch (error) {
       console.error("Error loading user details:", error);
@@ -250,7 +250,7 @@ export default function Trading() {
         </Alert>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <Card className="w-full">
+          <Card className="w-full md:w-1/2">
             <CardHeader>
               <CardTitle>Mint Energy Tokens</CardTitle>
               <CardDescription>
@@ -285,7 +285,7 @@ export default function Trading() {
             </CardContent>
           </Card>
 
-          <Card className="w-full flex-1">
+          <Card className="w-full md:w-1/2">
             <CardHeader>
               <CardTitle>Create New Offer</CardTitle>
               <CardDescription>
