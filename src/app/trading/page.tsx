@@ -14,7 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuthContext } from "@/context/auth-context";
+import { db } from "@/lib/firebase";
 import { energyTradingService } from "@/lib/web3";
+import { UserData } from "@/types/user";
+import { doc, getDoc } from "firebase/firestore";
 import {
   Coins,
   Loader2,
@@ -24,6 +27,7 @@ import {
   WalletIcon,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface UserDetails {
   isRegistered: boolean;
@@ -42,13 +46,23 @@ export default function Trading() {
   const [mintAmount, setMintAmount] = useState("");
   const [userWallet, setUserWallet] = useState("");
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [isWalletVisible, setIsWalletVisible] = useState(false);
   const { user } = useAuthContext();
+  const [userFirebaseData, setUserFirebaseData] = useState<UserData | null>(
+    null,
+  );
 
   useEffect(() => {
     const initializeData = async () => {
       try {
+        if (!user) return;
+
         const accounts = await energyTradingService.connectWallet();
+        const userDocRef = doc(db, "users", user.uid);
+        const userFirebaseData = await getDoc(userDocRef);
+
         setUserWallet(accounts[0]);
+        setUserFirebaseData(userFirebaseData.data() as UserData);
 
         if (accounts[0]) {
           await checkAndRegisterUser(accounts[0]);
@@ -216,7 +230,14 @@ export default function Trading() {
                   <p className="text-sm text-muted-foreground">
                     Wallet Address
                   </p>
-                  <p className="font-medium">{userWallet}</p>
+                  <p
+                    className="font-medium cursor-pointer"
+                    onClick={() => setIsWalletVisible(!isWalletVisible)}
+                  >
+                    {isWalletVisible
+                      ? userWallet
+                      : "*".repeat(userWallet.length)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Name</p>
@@ -239,15 +260,33 @@ export default function Trading() {
           </Card>
         )}
 
-        <Alert>
-          <AlertDescription className="text-lg">
-            Your Energy Balance:{" "}
-            <span className="font-bold">{userBalance} ET</span>
-            <span className="text-sm text-muted-foreground ml-2">
-              (Energy Tokens)
-            </span>
-          </AlertDescription>
-        </Alert>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <Alert>
+            <AlertDescription className="text-lg">
+              Your Current Battery Level:{" "}
+              <span className="font-bold">
+                {userFirebaseData ? userFirebaseData.currentBatteryPower : "-"}{" "}
+                kW
+              </span>
+              <span className="text-sm text-muted-foreground ml-2">
+                {userFirebaseData &&
+                userFirebaseData.currentBatteryPower?.toString() ===
+                  userFirebaseData.storageCapacity
+                  ? "(Full)"
+                  : ""}
+              </span>
+            </AlertDescription>
+          </Alert>
+          <Alert>
+            <AlertDescription className="text-lg">
+              Your Energy Balance:{" "}
+              <span className="font-bold">{userBalance} ET</span>
+              <span className="text-sm text-muted-foreground ml-2">
+                (Energy Tokens)
+              </span>
+            </AlertDescription>
+          </Alert>
+        </div>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <Card className="w-full md:w-1/2">
@@ -360,13 +399,16 @@ export default function Trading() {
                 <CardFooter>
                   <Button
                     className="w-full"
-                    // onClick={() =>
-                    //   energyTradingService.purchaseEnergy(
-                    //     offer.id,
-                    //     offer.amount,
-                    //     offer.amount * offer.pricePerUnit,
-                    //   )
-                    // }
+                    onClick={() =>
+                      // energyTradingService.purchaseEnergy(
+                      //   offer.id,
+                      //   offer.amount,
+                      //   offer.amount * offer.pricePerUnit,
+                      // )
+                      toast.success("Work in progress...", {
+                        description: "This feature is not available yet",
+                      })
+                    }
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Purchase Energy
