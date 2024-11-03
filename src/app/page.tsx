@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { PiggyBank, Smartphone, Sun } from "lucide-react";
+import { ArrowRightIcon, PiggyBank, Smartphone, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -53,13 +53,6 @@ export default function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button
-                  className="bg-green-600 text-white hover:bg-green-700"
-                  onClick={handleGetStarted}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." : "Get Started"}
-                </Button>
                 <Link href="/learn-more">
                   <Button
                     variant="outline"
@@ -68,6 +61,16 @@ export default function Home() {
                     Learn More
                   </Button>
                 </Link>
+                <Button
+                  variant={"expandIcon"}
+                  Icon={() => <ArrowRightIcon className="w-4 h-4 text-white" />}
+                  iconPlacement="right"
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  onClick={handleGetStarted}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Get Started"}
+                </Button>
               </div>
             </div>
           </div>
