@@ -1,11 +1,14 @@
 "use client";
 
+import { CircleDollarSignIcon } from "@/components/icons/circle-dollar-sign";
+import { SunIcon } from "@/components/icons/sun";
+import { UsersIcon } from "@/components/icons/users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { Leaf, PiggyBank, Smartphone, Sun } from "lucide-react";
+import { PiggyBank, Smartphone, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -79,7 +82,7 @@ export default function Home() {
             </h2>
             <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
               <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm">
-                <PiggyBank className="h-12 w-12 text-green-600" />
+                <CircleDollarSignIcon />
                 <h3 className="text-xl font-semibold text-gray-900">
                   Increased Savings
                 </h3>
@@ -88,7 +91,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm">
-                <Leaf className="h-12 w-12 text-green-600" />
+                <SunIcon />
                 <h3 className="text-xl font-semibold text-gray-900">
                   Sustainability
                 </h3>
@@ -97,7 +100,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm">
-                <Smartphone className="h-12 w-12 text-green-600" />
+                <UsersIcon />
                 <h3 className="text-xl font-semibold text-gray-900">
                   User Convenience
                 </h3>
