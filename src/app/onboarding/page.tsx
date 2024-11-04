@@ -135,7 +135,6 @@ export default function Onboarding() {
         }
         break;
       case 2:
-        // No required fields for step 2
         break;
       case 3:
         if (!formData.primaryGoal) {
@@ -227,6 +226,7 @@ export default function Onboarding() {
                     id="monthlyBill"
                     name="monthlyBill"
                     type="number"
+                    placeholder="Around ₹1200 - ₹1500 per person"
                     value={formData.monthlyBill}
                     onChange={handleInputChange}
                     required
@@ -264,6 +264,7 @@ export default function Onboarding() {
                         id="solarCapacity"
                         name="solarCapacity"
                         type="number"
+                        placeholder="Around 1 - 4kW"
                         value={formData.solarCapacity}
                         onChange={handleInputChange}
                         required
@@ -312,6 +313,7 @@ export default function Onboarding() {
                         <Input
                           id="storageCapacity"
                           name="storageCapacity"
+                          placeholder="Around 10kWh"
                           type="number"
                           value={formData.storageCapacity}
                           onChange={handleInputChange}

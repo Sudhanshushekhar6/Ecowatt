@@ -44,6 +44,7 @@ export default function SignUp() {
     e.preventDefault();
     setError("");
     try {
+      setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
