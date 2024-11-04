@@ -5,6 +5,7 @@ import EnergyCharts from "@/components/dashboard/EnergyCharts";
 import GenerateReportButton from "@/components/dashboard/GenerateReportButton";
 import StatsCards from "@/components/dashboard/StatsCards";
 import TOURateHistoryCard from "@/components/dashboard/TOURateHistoryCard";
+import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/auth-context";
 import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
@@ -166,6 +167,18 @@ export default function Dashboard() {
         const latestTou = touHistory[touHistory.length - 1];
         toast.success("Latest TOU rate fetched", {
           description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
+          action: (
+            <Button
+              onClick={() => {
+                toast.dismiss();
+              }}
+              className="ml-auto"
+              variant={"outline"}
+              size={"sm"}
+            >
+              Ok
+            </Button>
+          ),
         });
         setTOUHistory(touHistory);
       }

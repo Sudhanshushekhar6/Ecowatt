@@ -78,14 +78,21 @@ const GenerateReportButton = ({
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between w-full">
-        <Button
-          className="bg-green-600 text-white hover:bg-green-700"
-          onClick={handleGenerateReport}
-          disabled={isGenerating}
-        >
-          <BarChart3 className="mr-2 h-4 w-4" />
-          {isGenerating ? "Generating Report..." : "Generate Report"}
-        </Button>
+        <div>
+          <Button
+            className="bg-green-600 text-white hover:bg-green-700"
+            onClick={handleGenerateReport}
+            disabled={isGenerating || energyData.length === 0}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            {isGenerating ? "Generating Report..." : "Generate Report"}
+          </Button>
+          {energyData.length === 0 && (
+            <div className="text-sm text-gray-600 mt-2">
+              Please upload energy data to generate a report.
+            </div>
+          )}
+        </div>
 
         <Link href="/settings">
           <Button

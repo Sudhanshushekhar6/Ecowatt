@@ -34,6 +34,7 @@ import { toast } from "sonner";
 export default function Settings() {
   const { user } = useAuthContext();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     electricityProvider: "",
@@ -80,6 +81,7 @@ export default function Settings() {
   const handleSaveChanges = async () => {
     if (user) {
       try {
+        setLoading(true);
         await updateDoc(doc(db, "users", user.uid), formData);
         toast.success("User data updated successfully");
         router.push("/dashboard");
@@ -207,7 +209,12 @@ export default function Settings() {
                       name="monthlyBill"
                       type="number"
                       value={formData.monthlyBill}
-                      onChange={handleInputChange}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          monthlyBill: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -466,6 +473,7 @@ export default function Settings() {
             <Button
               onClick={handleSaveChanges}
               className="bg-green-600 hover:bg-green-700"
+              disabled={loading}
             >
               <SettingsIcon className="mr-2 h-4 w-4" /> Save Changes
             </Button>
