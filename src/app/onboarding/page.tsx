@@ -29,13 +29,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useAuthContext } from "@/context/auth-context";
 import discomData from "@/data/electricity-providers.json";
 import { db } from "@/lib/firebase";
+import autoAnimate from "@formkit/auto-animate";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { doc, setDoc } from "firebase/firestore";
 import { ChevronLeft, ChevronRight, Sun } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function Onboarding() {
@@ -62,9 +71,15 @@ export default function Onboarding() {
     reportFrequency: "",
   });
 
+  const [loading, setLoading] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { user } = useAuthContext(); // Get the current user
   const router = useRouter();
+  const step1Parent = useRef(null);
+
+  useEffect(() => {
+    step1Parent.current && autoAnimate(step1Parent.current);
+  }, [step1Parent]);
 
   useEffect(() => {
     discomData.DISCOMs.forEach((discom) => {
@@ -173,6 +188,7 @@ export default function Onboarding() {
     try {
       if (!user) throw new Error("User not authenticated");
 
+      setLoading(true);
       await setDoc(doc(db, "users", user.uid), {
         ...formData,
         createdAt: new Date(),
@@ -182,6 +198,7 @@ export default function Onboarding() {
       router.push("/dashboard");
     } catch (error) {
       console.error("Error saving data:", error);
+      setLoading(false);
       toast.error(
         "An error occurred while saving your data. Please try again.",
       );
@@ -190,328 +207,376 @@ export default function Onboarding() {
 
   return (
     <div className="flex items-center justify-center min-h-[92vh] bg-gray-100">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Welcome to PrabhaWatt</CardTitle>
-          <CardDescription>
-            {"Let's set up your energy profile"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={(e) => e.preventDefault()}>
-            {step === 1 && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Energy Profile</h2>
-                <div>
-                  <Label htmlFor="electricityProvider">
-                    * Current electricity provider
-                  </Label>
-                  <AutoCompleteInput
-                    data={discoms}
-                    className="w-full"
-                    value={formData.electricityProvider}
-                    setValue={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        electricityProvider: value,
-                      }))
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="monthlyBill">
-                    * Average monthly electricity bill (₹)
-                  </Label>
-                  <Input
-                    id="monthlyBill"
-                    name="monthlyBill"
-                    type="number"
-                    placeholder="Around ₹1200 - ₹1500 per person"
-                    value={formData.monthlyBill}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Do you have solar panels?</Label>
-                  <RadioGroup
-                    name="hasSolarPanels"
-                    value={formData.hasSolarPanels.toString()}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        hasSolarPanels: value === "true",
-                      }))
-                    }
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="true" id="solar-yes" />
-                      <Label htmlFor="solar-yes">Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="false" id="solar-no" />
-                      <Label htmlFor="solar-no">No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                {formData.hasSolarPanels && (
-                  <>
-                    <div>
-                      <Label htmlFor="solarCapacity">
-                        * Solar system capacity (kW)
-                      </Label>
-                      <Input
-                        id="solarCapacity"
-                        name="solarCapacity"
-                        type="number"
-                        placeholder="Around 1 - 4kW"
-                        value={formData.solarCapacity}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="installationDate">
-                        * Installation date
-                      </Label>
-                      <Input
-                        id="installationDate"
-                        name="installationDate"
-                        type="date"
-                        value={formData.installationDate}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label>Do you have battery storage?</Label>
-                      <RadioGroup
-                        name="hasBatteryStorage"
-                        value={formData.hasBatteryStorage.toString()}
-                        onValueChange={(value) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            hasBatteryStorage: value === "true",
-                          }))
-                        }
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="true" id="battery-yes" />
-                          <Label htmlFor="battery-yes">Yes</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="false" id="battery-no" />
-                          <Label htmlFor="battery-no">No</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    {formData.hasBatteryStorage && (
-                      <div>
-                        <Label htmlFor="storageCapacity">
-                          Storage capacity (kWh)
-                        </Label>
-                        <Input
-                          id="storageCapacity"
-                          name="storageCapacity"
-                          placeholder="Around 10kWh"
-                          type="number"
-                          value={formData.storageCapacity}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
-                  Smart Home Integration
-                </h2>
-                <p>Select the smart devices you own:</p>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="thermostat"
-                      checked={formData.smartDevices.thermostat}
-                      onCheckedChange={() =>
-                        handleSmartDeviceChange("thermostat")
-                      }
-                    />
-                    <Label htmlFor="thermostat">Smart thermostat</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="washingMachine"
-                      checked={formData.smartDevices.washingMachine}
-                      onCheckedChange={() =>
-                        handleSmartDeviceChange("washingMachine")
-                      }
-                    />
-                    <Label htmlFor="washingMachine">
-                      Smart washing machine
+      <TooltipProvider>
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle>Welcome to PrabhaWatt</CardTitle>
+            <CardDescription>
+              {"Let's set up your energy profile"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={(e) => e.preventDefault()}>
+              {step === 1 && (
+                <div className="space-y-4" ref={step1Parent}>
+                  <h2 className="text-xl font-semibold">Energy Profile</h2>
+                  <div className="flex w-full items-center justify-start">
+                    <Label htmlFor="electricityProvider">
+                      * Current electricity provider
                     </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="dishwasher"
-                      checked={formData.smartDevices.dishwasher}
-                      onCheckedChange={() =>
-                        handleSmartDeviceChange("dishwasher")
+                    <AutoCompleteInput
+                      data={discoms}
+                      className="w-full"
+                      value={formData.electricityProvider}
+                      setValue={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          electricityProvider: value,
+                        }))
                       }
                     />
-                    <Label htmlFor="dishwasher">Smart dishwasher</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="evCharger"
-                      checked={formData.smartDevices.evCharger}
-                      onCheckedChange={() =>
-                        handleSmartDeviceChange("evCharger")
-                      }
-                    />
-                    <Label htmlFor="evCharger">EV charger</Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <InfoCircledIcon className="ml-2" />
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-background text-foreground rounded-md shadow-lg max-w-xs">
+                        <p>
+                          Provided in Indid Climate and Energy Dashboard by NITI
+                          Aayog
+                        </p>
+                        <Link
+                          target="_blank"
+                          className="text-primary underline"
+                          rel="noreferrer"
+                          href={`https://iced.niti.gov.in/energy/electricity/distribution`}
+                        >
+                          https://iced.niti.gov.in/energy/electricity/distribution
+                        </Link>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <div>
-                    <Label htmlFor="otherDevices">
-                      Other devices (please specify)
+                    <Label htmlFor="monthlyBill">
+                      * Average monthly electricity bill (₹)
                     </Label>
                     <Input
-                      id="otherDevices"
-                      name="smartDevices.other"
-                      value={formData.smartDevices.other}
+                      id="monthlyBill"
+                      name="monthlyBill"
+                      type="number"
+                      placeholder="Around ₹1200 - ₹1500 per person"
+                      value={formData.monthlyBill}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
+                  <div>
+                    <Label>Do you have solar panels?</Label>
+                    <RadioGroup
+                      name="hasSolarPanels"
+                      value={formData.hasSolarPanels.toString()}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          hasSolarPanels: value === "true",
+                        }))
+                      }
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="true" id="solar-yes" />
+                        <Label htmlFor="solar-yes">Yes</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="false" id="solar-no" />
+                        <Label htmlFor="solar-no">No</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  {formData.hasSolarPanels && (
+                    <>
+                      <div>
+                        <Label htmlFor="solarCapacity">
+                          * Solar system capacity (kW)
+                        </Label>
+                        <Input
+                          id="solarCapacity"
+                          name="solarCapacity"
+                          type="number"
+                          placeholder="Around 1 - 4kW"
+                          value={formData.solarCapacity}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="installationDate">
+                          * Installation date
+                        </Label>
+                        <Input
+                          id="installationDate"
+                          name="installationDate"
+                          type="date"
+                          value={formData.installationDate}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label>Do you have battery storage?</Label>
+                        <RadioGroup
+                          name="hasBatteryStorage"
+                          value={formData.hasBatteryStorage.toString()}
+                          onValueChange={(value) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              hasBatteryStorage: value === "true",
+                            }))
+                          }
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="true" id="battery-yes" />
+                            <Label htmlFor="battery-yes">Yes</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="false" id="battery-no" />
+                            <Label htmlFor="battery-no">No</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                      {formData.hasBatteryStorage && (
+                        <div>
+                          <Label htmlFor="storageCapacity">
+                            Storage capacity (kWh)
+                          </Label>
+                          <Input
+                            id="storageCapacity"
+                            name="storageCapacity"
+                            placeholder="Around 10kWh"
+                            type="number"
+                            value={formData.storageCapacity}
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {step === 3 && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Energy Goals</h2>
-                <div>
-                  <Label>* Select your primary energy goal:</Label>
-                  <RadioGroup
-                    name="primaryGoal"
-                    value={formData.primaryGoal}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, primaryGoal: value }))
-                    }
-                    required
-                  >
+              {step === 2 && (
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">
+                    Smart Home Integration
+                  </h2>
+                  <p>Select the smart devices you own:</p>
+                  <div className="space-y-2">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="reduceBills" id="reduce-bills" />
-                      <Label htmlFor="reduce-bills">Reduce energy bills</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value="maximizeSolar"
-                        id="maximize-solar"
+                      <Checkbox
+                        id="thermostat"
+                        checked={formData.smartDevices.thermostat}
+                        onCheckedChange={() =>
+                          handleSmartDeviceChange("thermostat")
+                        }
                       />
-                      <Label htmlFor="maximize-solar">
-                        Maximize use of solar energy
-                      </Label>
+                      <Label htmlFor="thermostat">Smart thermostat</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="reduceCarbon" id="reduce-carbon" />
-                      <Label htmlFor="reduce-carbon">
-                        Reduce carbon footprint
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value="gridStability"
-                        id="grid-stability"
+                      <Checkbox
+                        id="washingMachine"
+                        checked={formData.smartDevices.washingMachine}
+                        onCheckedChange={() =>
+                          handleSmartDeviceChange("washingMachine")
+                        }
                       />
-                      <Label htmlFor="grid-stability">
-                        Optimize for grid stability
+                      <Label htmlFor="washingMachine">
+                        Smart washing machine
                       </Label>
                     </div>
-                  </RadioGroup>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="dishwasher"
+                        checked={formData.smartDevices.dishwasher}
+                        onCheckedChange={() =>
+                          handleSmartDeviceChange("dishwasher")
+                        }
+                      />
+                      <Label htmlFor="dishwasher">Smart dishwasher</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="evCharger"
+                        checked={formData.smartDevices.evCharger}
+                        onCheckedChange={() =>
+                          handleSmartDeviceChange("evCharger")
+                        }
+                      />
+                      <Label htmlFor="evCharger">EV charger</Label>
+                    </div>
+                    <div>
+                      <Label htmlFor="otherDevices">
+                        Other devices (please specify)
+                      </Label>
+                      <Input
+                        id="otherDevices"
+                        name="smartDevices.other"
+                        value={formData.smartDevices.other}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {step === 4 && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Preferences</h2>
-                <div>
-                  <Label htmlFor="notificationMethod">
-                    * Preferred notification method
-                  </Label>
-                  <Select
-                    name="notificationMethod"
-                    value={formData.notificationMethod}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notificationMethod: value,
-                      }))
-                    }
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select notification method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="push">Push notification</SelectItem>
-                      <SelectItem value="sms">SMS</SelectItem>
-                    </SelectContent>
-                  </Select>
+              {step === 3 && (
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Energy Goals</h2>
+                  <div>
+                    <Label>* Select your primary energy goal:</Label>
+                    <RadioGroup
+                      name="primaryGoal"
+                      value={formData.primaryGoal}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, primaryGoal: value }))
+                      }
+                      required
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="reduceBills" id="reduce-bills" />
+                        <Label htmlFor="reduce-bills">
+                          Reduce energy bills
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="maximizeSolar"
+                          id="maximize-solar"
+                        />
+                        <Label htmlFor="maximize-solar">
+                          Maximize use of solar energy
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="reduceCarbon"
+                          id="reduce-carbon"
+                        />
+                        <Label htmlFor="reduce-carbon">
+                          Reduce carbon footprint
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="gridStability"
+                          id="grid-stability"
+                        />
+                        <Label htmlFor="grid-stability">
+                          Optimize for grid stability
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="reportFrequency">
-                    * Frequency of reports
-                  </Label>
-                  <Select
-                    name="reportFrequency"
-                    value={formData.reportFrequency}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        reportFrequency: value,
-                      }))
-                    }
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select report frequency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Preferences</h2>
+                  <div>
+                    <Label htmlFor="notificationMethod">
+                      * Preferred notification method
+                    </Label>
+                    <Select
+                      name="notificationMethod"
+                      value={formData.notificationMethod}
+                      onValueChange={(value) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          notificationMethod: value,
+                        }));
+
+                        // Request notification permission if "push" is selected
+                        if (value === "push") {
+                          Notification.requestPermission().then(
+                            (permission) => {
+                              if (permission === "granted") {
+                                toast.success(
+                                  "Notification permission granted!",
+                                );
+                              } else {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  notificationMethod: "none",
+                                }));
+                                toast.error("Notification permission denied.");
+                              }
+                            },
+                          );
+                        }
+                      }}
+                      required
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select notification method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="email">Email</SelectItem>
+                        <SelectItem value="push">Push notification</SelectItem>
+                        <SelectItem value="sms">SMS</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="reportFrequency">
+                      * Frequency of reports
+                    </Label>
+                    <Select
+                      name="reportFrequency"
+                      value={formData.reportFrequency}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          reportFrequency: value,
+                        }))
+                      }
+                      required
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select report frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
+              )}
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            {step > 1 && (
+              <Button onClick={prevStep} variant="outline">
+                <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+              </Button>
             )}
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          {step > 1 && (
-            <Button onClick={prevStep} variant="outline">
-              <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-            </Button>
-          )}
-          {step < 4 ? (
-            <Button onClick={nextStep} className="ml-auto">
-              Next <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleFormSubmit}
-              className="ml-auto bg-green-600 hover:bg-green-700"
-            >
-              Complete Setup <Sun className="ml-2 h-4 w-4" />
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
+            {step < 4 ? (
+              <Button onClick={nextStep} className="ml-auto">
+                Next <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                onClick={handleFormSubmit}
+                disabled={loading}
+                className="ml-auto bg-green-600 hover:bg-green-700"
+              >
+                {loading ? "Loading..." : "Complete Setup"}{" "}
+                <Sun className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </CardFooter>
+        </Card>
+      </TooltipProvider>
 
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>

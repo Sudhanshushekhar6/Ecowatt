@@ -12,6 +12,7 @@ import { db } from "@/lib/firebase";
 import { calculateCurrentBatteryPower } from "@/lib/utils";
 import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import Link from "next/link";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -210,8 +211,17 @@ export default function Dashboard() {
 
   if (!user || !userData) {
     return (
-      <div className="flex items-center justify-center min-h-[90vh] text-sm text-muted-foreground">
-        No user data available.
+      <div className="flex items-center justify-center min-h-[90vh] flex-col text-sm text-muted-foreground">
+        <p className="text-center">
+          No user data available.
+          <br /> Perhaps you havn't completed the{" "}
+          <span className="font-bold">onboarding</span> process?
+        </p>
+        <Link href="/onboarding">
+          <Button className="mt-4" variant={"outline"}>
+            Go back to onboarding
+          </Button>
+        </Link>
       </div>
     );
   }
