@@ -29,6 +29,7 @@ const googleProvider = new GoogleAuthProvider();
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
   const { user } = useAuthContext();
@@ -41,6 +42,7 @@ export default function SignIn() {
     e.preventDefault();
     setError("");
     try {
+      setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("You have signed in successfully");
       router.push("/onboarding");
@@ -60,6 +62,8 @@ export default function SignIn() {
     } catch (error) {
       setError("Failed to sign in with Google. Please try again.");
       console.error("Google sign-in error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,9 +125,10 @@ export default function SignIn() {
               )}
               <Button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-green-600 hover:bg-green-700"
               >
-                Sign In
+                {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
             <div className="relative">

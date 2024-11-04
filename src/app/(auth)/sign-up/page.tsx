@@ -31,6 +31,7 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
   const { user } = useAuthContext();
@@ -54,12 +55,15 @@ export default function SignUp() {
     } catch (error) {
       setError("Failed to sign up. Please try again.");
       console.error("Sign-up error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleSignUp = async () => {
     setError("");
     try {
+      setLoading(true);
       await signInWithPopup(auth, googleProvider);
       toast.success("You have signed up successfully");
       router.push("/onboarding");
@@ -146,8 +150,9 @@ export default function SignUp() {
               <Button
                 type="submit"
                 className="w-full bg-green-600 hover:bg-green-700"
+                disabled={loading}
               >
-                Sign Up
+                {loading ? "Signing up..." : "Sign Up"}
               </Button>
             </form>
             <div className="relative">
