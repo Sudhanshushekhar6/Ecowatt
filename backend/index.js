@@ -25,12 +25,8 @@ const baseTouRates = {
     { startHour: 16, endHour: 20, baseRate: 8.0, variation: 0.7 },
     { startHour: 20, endHour: 24, baseRate: 5.2, variation: 0.4 },
   ],
-  INDUSTRIAL: [
-    { startHour: 0, endHour: 24, baseRate: 7.75, variation: 0.5 },
-  ],
-  NON_DOMESTIC: [
-    { startHour: 0, endHour: 24, baseRate: 8.5, variation: 0.6 },
-  ],
+  INDUSTRIAL: [{ startHour: 0, endHour: 24, baseRate: 7.75, variation: 0.5 }],
+  NON_DOMESTIC: [{ startHour: 0, endHour: 24, baseRate: 8.5, variation: 0.6 }],
 };
 
 const SEASON_MULTIPLIER = {
@@ -59,7 +55,8 @@ function getCurrentSeason() {
 function generateRandomVariation(baseVariation) {
   const u1 = Math.random();
   const u2 = Math.random();
-  const normalRandom = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+  const normalRandom =
+    Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
   return normalRandom * baseVariation;
 }
 
@@ -70,7 +67,7 @@ function getCurrentTOURate(category) {
   const currentSeason = getCurrentSeason();
 
   const currentRateConfig = baseTouRates[category].find(
-    (rate) => currentHour >= rate.startHour && currentHour < rate.endHour
+    (rate) => currentHour >= rate.startHour && currentHour < rate.endHour,
   );
   if (!currentRateConfig) return 5.0;
 
