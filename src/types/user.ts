@@ -12,6 +12,7 @@ export interface UserData {
 export interface TOUData {
   timestamp: string;
   rate: number;
+  category: "DOMESTIC" | "NON_DOMESTIC" | "INDUSTRIAL";
 }
 
 export interface WeatherData {

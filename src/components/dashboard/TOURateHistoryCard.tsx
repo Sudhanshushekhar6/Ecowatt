@@ -20,6 +20,7 @@ export default function TOURateHistoryCard({
 }: {
   touHistory: TOUData[];
 }) {
+  console.log(touHistory);
   return (
     <Card>
       <CardHeader>

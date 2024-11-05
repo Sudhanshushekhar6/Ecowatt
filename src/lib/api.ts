@@ -20,30 +20,20 @@ export async function fetchWeatherData(
   }
 }
 
-export async function fetchTOUData(): Promise<{
-  rate: number;
-  timestamp: string;
-}> {
-  try {
-    const response = await fetch("/api/tou");
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching TOU data:", error);
-    return { rate: 0, timestamp: new Date().toISOString() };
-  }
-}
-
 export async function fetchTOUHistory(): Promise<TOUData[]> {
   try {
     const touCollection = collection(db, "tou-rates");
     const q = query(touCollection, orderBy("timestamp", "desc"), limit(24));
     const querySnapshot = await getDocs(q);
-    const history = querySnapshot.docs.map((doc) => ({
+    let history = querySnapshot.docs.map((doc) => ({
       timestamp: doc.data().timestamp,
       rate: doc.data().rate,
+      category: doc.data().category,
     }));
-    return history.reverse(); // Reverse to show oldest first
+
+    history = history.filter((data) => data.category === "DOMESTIC");
+
+    return history.reverse();
   } catch (error) {
     console.error("Error fetching TOU history:", error);
     return [];
