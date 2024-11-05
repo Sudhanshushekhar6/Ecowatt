@@ -23,7 +23,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [energyData, setEnergyData] = useState<EnergyData[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [locationName, setLocationName] = useState<string>("");
   const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
@@ -152,9 +151,9 @@ export default function Dashboard() {
       navigator.geolocation.getCurrentPosition(async ({ coords }) => {
         const { latitude, longitude } = coords;
         const data = await fetchWeatherData(latitude, longitude);
+        console.log(data);
         if (data) {
           setWeatherData(data);
-          setLocationName(data.name);
         }
       });
     }
@@ -234,7 +233,6 @@ export default function Dashboard() {
             userData={userData}
             totalSolarPower={totalSolarPower}
             uniqueDays={uniqueDays}
-            locationName={locationName}
             weatherData={weatherData}
           />
 

@@ -75,7 +75,7 @@ const DiscomInfoCard = ({
                 <span>{discomInfo["AT&C Losses (%)"]}%</span>
               </div>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4 text-sm mt-4">
+            <div className="border border-gray-200 rounded-lg p-4 text-sm mt-8">
               <p>
                 Current Grid Electricity Rate (Avg + ToU-Tariff) = ₹
                 {discomInfo["Average Billing Rate (Rs./kWh)"]} + ₹

@@ -14,13 +14,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Alert } from "../ui/alert";
 
 export default function TOURateHistoryCard({
   touHistory,
 }: {
   touHistory: TOUData[];
 }) {
-  console.log(touHistory);
+  const lastTou = touHistory[touHistory.length - 1];
+
   return (
     <Card>
       <CardHeader>
@@ -28,7 +30,7 @@ export default function TOURateHistoryCard({
         <CardDescription>Last 24 hours</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={225}>
           <LineChart data={touHistory}>
             <XAxis
               dataKey="timestamp"
@@ -59,6 +61,34 @@ export default function TOURateHistoryCard({
             <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
           </LineChart>
         </ResponsiveContainer>
+        {lastTou.rate < 5 ? (
+          <Alert className="mt-4">
+            <p className="text-sm">
+              <span className="font-bold">Low TOU rates: </span> Consider
+              switching to Grid energy if you haven't already.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {(((5 - lastTou.rate) / 5) * 100).toFixed(2)}% lower than usual.
+            </p>
+          </Alert>
+        ) : lastTou.rate < 10 ? (
+          <Alert className="mt-4">
+            <p className="text-sm">
+              <span className="font-bold">Moderate TOU rates: </span> No
+              immediate action required.
+            </p>
+          </Alert>
+        ) : (
+          <Alert className="mt-4">
+            <p className="text-sm">
+              <span className="font-bold">High TOU rates: </span> Consider
+              switching to Solar energy if available.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {(((lastTou.rate - 10) / 5) * 100).toFixed(2)}% higher than usual.
+            </p>
+          </Alert>
+        )}
       </CardContent>
     </Card>
   );
