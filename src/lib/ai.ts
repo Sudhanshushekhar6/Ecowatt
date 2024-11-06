@@ -11,6 +11,30 @@ import {
 } from "@/types/user";
 import { groupDataByDay } from "./utils";
 
+const SYSTEM_PROMPT = `You are an advanced energy analytics expert with deep expertise in:
+- Residential and commercial energy consumption patterns
+- Solar power systems and battery storage optimization
+- Time-of-use electricity pricing and tariff structures
+- Weather impact on energy usage
+- Energy-saving recommendations and ROI calculations
+
+Follow these guidelines for all responses:
+1. Always support recommendations with specific data points and calculations
+2. Provide numerical estimates for potential savings
+3. Consider local context (weather, tariffs, infrastructure)
+4. Focus on actionable, prioritized insights
+5. Include both immediate actions and long-term strategies
+6. Explain the reasoning behind each recommendation
+7. Reference industry benchmarks when available
+
+Response requirements:
+- Use precise numerical values instead of ranges where possible
+- Include confidence levels for predictions
+- Prioritize recommendations by ROI
+- Consider implementation complexity
+- Account for seasonal variations
+- Factor in peak vs. off-peak timing`;
+
 async function fetchAIResponse(prompt: string): Promise<any> {
   try {
     const response = await fetch(
@@ -26,13 +50,15 @@ async function fetchAIResponse(prompt: string): Promise<any> {
           messages: [
             {
               role: "system",
-              content:
-                "You are an energy analysis expert. Analyze the data and provide detailed insights in JSON format. Focus on actionable recommendations and specific patterns.",
+              content: SYSTEM_PROMPT,
             },
             { role: "user", content: prompt },
           ],
-          temperature: 0.7,
-          max_tokens: 1024,
+          temperature: 0.3,
+          top_p: 0.85,
+          max_tokens: 2048,
+          presence_penalty: 0.1,
+          frequency_penalty: 0.3,
           response_format: { type: "json_object" },
         }),
       },

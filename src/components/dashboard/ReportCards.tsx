@@ -18,6 +18,7 @@ import {
   AlertCircle,
   Battery,
   BatteryLow,
+  BatteryWarning,
   CheckCircle,
   Clock,
   CloudRain,
@@ -36,6 +37,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  Tooltip as Tooltip2,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
   <Card className="w-full mb-6">
@@ -287,7 +294,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
         <CardTitle className="text-xl font-bold">Solar Analysis</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Daily Generation</p>
             <p className="text-xl font-bold">{data.dailyGeneration} kWh</p>
@@ -296,15 +303,36 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
             <p className="text-sm text-gray-600">Monthly Generation</p>
             <p className="text-xl font-bold">{data.monthlyGeneration} kWh</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">System Efficiency</p>
-            <p className="text-xl font-bold">{data.efficiency}%</p>
+          <div className="p-4 bg-gray-50 rounded-lg flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">System Efficiency</p>
+              <p className="text-xl font-bold">{data.efficiency}%</p>
+            </div>
+            {data.efficiency > 100 && (
+              <TooltipProvider>
+                <Tooltip2>
+                  <TooltipTrigger asChild>
+                    <BatteryWarning className="h-6 w-6 text-red-600 mr-2" />
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-background text-foreground rounded-md shadow-lg max-w-xs">
+                    There is some error in the system efficiency calculation.
+                    Please check the input data and adjust as needed.
+                  </TooltipContent>
+                </Tooltip2>
+              </TooltipProvider>
+            )}
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Monthly Savings</p>
             <p className="text-xl font-bold">₹{data.savingsFromSolar}</p>
           </div>
         </div>
+
+        <p className="text-sm text-muted-foreground mb-4">
+          These values are based on the current system configuration and may not
+          reflect the actual performance of your system. If any of the values
+          don't make sense, please check the input data and adjust as needed.
+        </p>
 
         <Tabs defaultValue="optimizations" className="w-full">
           <TabsList>
@@ -316,21 +344,27 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
           <TabsContent value="optimizations" className="space-y-2">
             {data.optimizations.map((opt, index) => (
               <Alert key={index}>
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription>{opt}</AlertDescription>
+                <AlertDescription className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                  {opt}
+                </AlertDescription>
               </Alert>
             ))}
             <Alert>
-              <CloudRain className="h-4 w-4" />
-              <AlertDescription>{data.weather_impact}</AlertDescription>
+              <AlertDescription className="flex items-center">
+                <CloudRain className="h-4 w-4 text-blue-600 mr-2" />
+                {data.weather_impact}
+              </AlertDescription>
             </Alert>
           </TabsContent>
 
           <TabsContent value="maintenance" className="space-y-2">
             {data.maintenance_tasks.map((task, index) => (
               <Alert key={index}>
-                <NotepadText className="h-4 w-4 text-blue-600" />
-                <AlertDescription>{task}</AlertDescription>
+                <AlertDescription className="flex items-center">
+                  <NotepadText className="h-4 w-4 text-black-600 mr-2" />
+                  {task}
+                </AlertDescription>
               </Alert>
             ))}
           </TabsContent>
@@ -338,8 +372,10 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
           <TabsContent value="storage" className="space-y-2">
             {data.storage_tips.map((tip, index) => (
               <Alert key={index}>
-                <BatteryLow className="h-4 w-4 text-red-600" />
-                <AlertDescription>{tip}</AlertDescription>
+                <AlertDescription className="flex items-center">
+                  <BatteryLow className="h-4 w-4 text-red-600 mr-2" />
+                  {tip}
+                </AlertDescription>
               </Alert>
             ))}
           </TabsContent>
