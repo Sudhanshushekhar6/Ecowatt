@@ -82,7 +82,6 @@ export default function Trading() {
   const loadUserDetails = async (walletAddress: string) => {
     try {
       const details = await energyTradingService.getUserDetails(walletAddress);
-      console.log(details);
       setUserDetails(details);
     } catch (error) {
       console.error("Error loading user details:", error);

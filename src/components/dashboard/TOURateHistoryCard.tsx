@@ -61,7 +61,7 @@ export default function TOURateHistoryCard({
             <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
           </LineChart>
         </ResponsiveContainer>
-        {lastTou.rate < 5 ? (
+        {lastTou && lastTou.rate < 5 ? (
           <Alert className="mt-4">
             <p className="text-sm">
               <span className="font-bold">Low TOU rates: </span> Consider
@@ -76,6 +76,10 @@ export default function TOURateHistoryCard({
             <p className="text-sm">
               <span className="font-bold">Moderate TOU rates: </span> No
               immediate action required.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Rates between ₹{(lastTou.rate - 2).toFixed(2)} and ₹
+              {lastTou.rate.toFixed(2)}
             </p>
           </Alert>
         ) : (

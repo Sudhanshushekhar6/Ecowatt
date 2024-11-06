@@ -15,6 +15,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
+import OneSignal from "react-onesignal";
 import { toast } from "sonner";
 
 export default function Dashboard() {
@@ -117,25 +118,6 @@ export default function Dashboard() {
     updateBatteryPower();
   }, [energyData, userData, user]);
 
-  // File upload handler
-  const handleFileUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        setFileName(file.name);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = e.target?.result;
-          if (typeof text === "string") {
-            processCSV(text);
-          }
-        };
-        reader.readAsText(file);
-      }
-    },
-    [processCSV],
-  );
-
   // Load stored energy data
   useEffect(() => {
     const storedData = localStorage.getItem("energyData");
@@ -151,7 +133,6 @@ export default function Dashboard() {
       navigator.geolocation.getCurrentPosition(async ({ coords }) => {
         const { latitude, longitude } = coords;
         const data = await fetchWeatherData(latitude, longitude);
-        console.log(data);
         if (data) {
           setWeatherData(data);
         }
@@ -188,6 +169,38 @@ export default function Dashboard() {
       isMounted = false;
     };
   }, []);
+
+  // Initialize OneSignal
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      OneSignal.init({
+        appId: process.env.NEXT_PUBLIC_ONE_SIGNAL_APP_ID!,
+        notifyButton: {
+          enable: true,
+        },
+        allowLocalhostAsSecureOrigin: true,
+      });
+    }
+  }, []);
+
+  // File upload handler
+  const handleFileUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setFileName(file.name);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result;
+          if (typeof text === "string") {
+            processCSV(text);
+          }
+        };
+        reader.readAsText(file);
+      }
+    },
+    [processCSV],
+  );
 
   // Calculate dashboard metrics
   const totalSolarPower = energyData.reduce(
