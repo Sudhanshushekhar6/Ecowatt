@@ -15,7 +15,6 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
-import OneSignal from "react-onesignal";
 import { toast } from "sonner";
 
 export default function Dashboard() {
@@ -168,19 +167,6 @@ export default function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
-
-  // Initialize OneSignal
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      OneSignal.init({
-        appId: process.env.NEXT_PUBLIC_ONE_SIGNAL_APP_ID!,
-        notifyButton: {
-          enable: true,
-        },
-        allowLocalhostAsSecureOrigin: true,
-      });
-    }
   }, []);
 
   // File upload handler
