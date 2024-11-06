@@ -25,7 +25,7 @@ const LocationWeatherDetails = ({ weatherData }: { weatherData: any }) => {
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex absolute top-[-10px] right-[-10px] items-center text-sm justify-end text-muted-foreground hover:text-foreground">
-          <div className="flex items-center justify-center gap-2 rounded-lg bg-white p-2 shadow-md">
+          <div className="flex items-center justify-center gap-2 rounded-lg bg-white p-2 shadow-md cursor-pointer">
             <MapPinHouse />
             <p>{weatherData ? weatherData.name : ""}</p>
           </div>
