@@ -27,7 +27,6 @@ import {
   WalletIcon,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface UserDetails {
   isRegistered: boolean;
@@ -402,16 +401,9 @@ export default function Trading() {
                 <CardFooter>
                   <Button
                     className="w-full"
-                    onClick={() =>
-                      // energyTradingService.purchaseEnergy(
-                      //   offer.id,
-                      //   offer.amount,
-                      //   offer.amount * offer.pricePerUnit,
-                      // )
-                      toast.success("Work in progress...", {
-                        description: "This feature is not available yet",
-                      })
-                    }
+                    onClick={() => {
+                      energyTradingService.purchaseEnergy(offer.id, 2);
+                    }}
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Purchase Energy

@@ -176,12 +176,16 @@ export class EnergyTradingService {
     }
   }
 
-  async purchaseEnergy(offerId: number): Promise<void> {
+  async purchaseEnergy(_offerId: number, amount: number): Promise<void> {
     try {
       const accounts = await this.connectWallet();
+      const weiValue = this.web3!.utils.toWei(amount.toString(), "ether");
+
       await this.contract.methods
-        .purchaseEnergy(offerId)
-        .send({ from: accounts[0] });
+        .purchaseEnergy(_offerId)
+        .send({ from: accounts[0], value: weiValue });
+
+      console.log("Energy purchased successfully");
     } catch (error) {
       console.error("Error purchasing energy:", error);
       throw error;
