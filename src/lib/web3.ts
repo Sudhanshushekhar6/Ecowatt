@@ -59,12 +59,9 @@ export class EnergyTradingService {
         this.currentAccount = accounts.length > 0 ? accounts[0] : null;
       });
 
-      window.ethereum.on("chainChanged", (chainId: string) => {
-        this.setContractByNetwork(chainId);
+      window.ethereum.on("chainChanged", async (chainId: string) => {
+        await this.setContractByNetwork(chainId);
       });
-
-      // Set the initial network based on the connected chain
-      this.setContractByNetwork(window.ethereum.chainId);
     } else {
       console.error("Web3 provider not found");
       this.web3 = null;
@@ -73,7 +70,20 @@ export class EnergyTradingService {
     }
   }
 
-  private setContractByNetwork(chainId: string) {
+  async initialize() {
+    if (this.web3 && typeof window.ethereum !== "undefined") {
+      try {
+        const chainId = await window.ethereum.request({
+          method: "eth_chainId",
+        });
+        await this.setContractByNetwork(chainId);
+      } catch (error) {
+        console.error("Error getting initial chain ID:", error);
+      }
+    }
+  }
+
+  private async setContractByNetwork(chainId: string) {
     if (this.web3 && chainId === networkChainIds.ethereum) {
       this.contract = new this.web3.eth.Contract(
         contractABI,
@@ -87,7 +97,7 @@ export class EnergyTradingService {
       );
       this.currentNetwork = "polygon";
     } else {
-      console.error("Unsupported network : ", chainId);
+      console.error("Unsupported network:", chainId);
       this.contract = null;
       this.currentNetwork = "unknown";
     }
@@ -242,3 +252,4 @@ export class EnergyTradingService {
 }
 
 export const energyTradingService = new EnergyTradingService();
+energyTradingService.initialize();
