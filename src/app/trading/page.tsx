@@ -196,7 +196,7 @@ export default function Trading() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Prabhwatt Market</h1>
+            <h1 className="text-3xl font-bold">Prabhawatt Market</h1>
             <p className="text-sm text-muted-foreground">
               Got too much Solar Power? Want to sell it? Prabhwatt Market is the
               place for you! List your solar power for sale and make a profit.
@@ -387,9 +387,12 @@ export default function Trading() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       Price: {offer.pricePerUnit} ET/kWh
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Total Cost: {offer.pricePerUnit * offer.amount} ET
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Posted: {offer.timestamp.toLocaleString()}

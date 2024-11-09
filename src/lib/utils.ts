@@ -7,9 +7,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function calculateCurrentBatteryPower(
-  energyData: EnergyData[],
+  energyData: EnergyData[] | null,
   userData: UserData | null,
 ) {
+  if (!energyData || !userData) return 0;
   let currentBatteryPower = 0;
 
   for (let i = 0; i < energyData.length; i++) {

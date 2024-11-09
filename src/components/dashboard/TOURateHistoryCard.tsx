@@ -79,9 +79,8 @@ export default function TOURateHistoryCard({
                 immediate action required.
               </p>
               <p className="text-sm text-muted-foreground">
-                Rates between ₹
-                {(lastTou.rate - 2 - Math.random() * 5).toFixed(2)} and ₹
-                {(lastTou.rate + 2 + Math.random() * 5).toFixed(2)} are normal.
+                Rates between ₹{(5 + Math.random()).toFixed(2)} and ₹
+                {(10 - Math.random()).toFixed(2)} are normal.
               </p>
             </Alert>
           ) : (
