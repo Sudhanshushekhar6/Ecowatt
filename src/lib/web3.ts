@@ -1,8 +1,16 @@
 import contractABI from "@/data/contract-abi.json";
 import Web3 from "web3";
-import { AbiItem, fromWei } from "web3-utils";
+import { fromWei } from "web3-utils";
 
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+const contractAddresses = {
+  ethereum: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_ETHEREUM,
+  polygon: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_POLYGON,
+};
+
+const networkChainIds = {
+  ethereum: "0x14a34", // Ethereum testnet (Sepolia)
+  polygon: "0x13882", // Polygon testnet (Amoy)
+};
 
 // Types matching the smart contract structures
 export interface UserDetails {
@@ -37,6 +45,7 @@ export class EnergyTradingService {
   private web3: Web3 | null;
   private contract: any;
   private currentAccount: string | null = null;
+  private currentNetwork: string = "unknown";
 
   constructor() {
     if (
@@ -44,24 +53,43 @@ export class EnergyTradingService {
       typeof window.ethereum !== "undefined"
     ) {
       this.web3 = new Web3(window.ethereum);
-      this.contract = new this.web3.eth.Contract(
-        contractABI as AbiItem[],
-        contractAddress,
-      );
 
-      // Listen for account changes
+      // Listen for account and chain changes
       window.ethereum.on("accountsChanged", (accounts: string[]) => {
         this.currentAccount = accounts.length > 0 ? accounts[0] : null;
       });
 
-      // Listen for chain changes
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
+      window.ethereum.on("chainChanged", (chainId: string) => {
+        this.setContractByNetwork(chainId);
       });
+
+      // Set the initial network based on the connected chain
+      this.setContractByNetwork(window.ethereum.chainId);
     } else {
       console.error("Web3 provider not found");
       this.web3 = null;
       this.contract = null;
+      this.currentNetwork = "unknown";
+    }
+  }
+
+  private setContractByNetwork(chainId: string) {
+    if (this.web3 && chainId === networkChainIds.ethereum) {
+      this.contract = new this.web3.eth.Contract(
+        contractABI,
+        contractAddresses.ethereum,
+      );
+      this.currentNetwork = "ethereum";
+    } else if (this.web3 && chainId === networkChainIds.polygon) {
+      this.contract = new this.web3.eth.Contract(
+        contractABI,
+        contractAddresses.polygon,
+      );
+      this.currentNetwork = "polygon";
+    } else {
+      console.error("Unsupported network : ", chainId);
+      this.contract = null;
+      this.currentNetwork = "unknown";
     }
   }
 

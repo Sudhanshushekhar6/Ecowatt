@@ -61,39 +61,41 @@ export default function TOURateHistoryCard({
             <Line type="stepAfter" dataKey="rate" stroke="#8884d8" />
           </LineChart>
         </ResponsiveContainer>
-        {lastTou && lastTou.rate < 5 ? (
-          <Alert className="mt-4">
-            <p className="text-sm">
-              <span className="font-bold">Low TOU rates: </span> Consider
-              switching to Grid energy if you haven't already.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {(((5 - lastTou.rate) / 5) * 100).toFixed(2)}% lower than usual.
-            </p>
-          </Alert>
-        ) : lastTou.rate < 10 ? (
-          <Alert className="mt-4">
-            <p className="text-sm">
-              <span className="font-bold">Moderate TOU rates: </span> No
-              immediate action required.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Rates between ₹{(lastTou.rate - 2 - Math.random() * 5).toFixed(2)}{" "}
-              and ₹{(lastTou.rate + 2 + Math.random() * 5).toFixed(2)} are
-              normal.
-            </p>
-          </Alert>
-        ) : (
-          <Alert className="mt-4">
-            <p className="text-sm">
-              <span className="font-bold">High TOU rates: </span> Consider
-              switching to Solar energy if available.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {(((lastTou.rate - 10) / 5) * 100).toFixed(2)}% higher than usual.
-            </p>
-          </Alert>
-        )}
+        {lastTou &&
+          (lastTou.rate < 5 ? (
+            <Alert className="mt-4">
+              <p className="text-sm">
+                <span className="font-bold">Low TOU rates: </span> Consider
+                switching to Grid energy if you haven't already.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {(((5 - lastTou.rate) / 5) * 100).toFixed(2)}% lower than usual.
+              </p>
+            </Alert>
+          ) : lastTou.rate < 10 ? (
+            <Alert className="mt-4">
+              <p className="text-sm">
+                <span className="font-bold">Moderate TOU rates: </span> No
+                immediate action required.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Rates between ₹
+                {(lastTou.rate - 2 - Math.random() * 5).toFixed(2)} and ₹
+                {(lastTou.rate + 2 + Math.random() * 5).toFixed(2)} are normal.
+              </p>
+            </Alert>
+          ) : (
+            <Alert className="mt-4">
+              <p className="text-sm">
+                <span className="font-bold">High TOU rates: </span> Consider
+                switching to Solar energy if available.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {(((lastTou.rate - 10) / 5) * 100).toFixed(2)}% higher than
+                usual.
+              </p>
+            </Alert>
+          ))}
       </CardContent>
     </Card>
   );

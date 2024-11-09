@@ -62,6 +62,7 @@ export default function Trading() {
         const userFirebaseData = await getDoc(userDocRef);
 
         setUserWallet(accounts[0]);
+        console.log(userFirebaseData.data());
         setUserFirebaseData(userFirebaseData.data() as UserData);
 
         if (accounts[0]) {
