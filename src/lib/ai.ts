@@ -9,7 +9,82 @@ import {
   UserData,
   WeatherData,
 } from "@/types/user";
+import Instructor from "@instructor-ai/instructor";
+import Groq from "groq-sdk";
+import { z } from "zod";
 import { groupDataByDay } from "./utils";
+
+const groqClient = new Groq({
+  apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
+
+const client = Instructor({
+  client: groqClient,
+  mode: "FUNCTIONS",
+});
+
+const executiveSummarySchema = z.object({
+  recommendations: z.array(
+    z.object({
+      text: z.string(),
+      priority: z.enum(["high", "medium", "low"]),
+      estimatedImpact: z.string(),
+      potentialMonthlySavings: z.number().optional(),
+      implementationEffort: z.enum(["low", "medium", "high"]).optional(),
+    }),
+  ),
+});
+
+const tariffAnalysisSchema = z.object({
+  forecasted_rates: z.array(
+    z.object({
+      time: z.string(),
+      rate: z.number(),
+      variationPercentage: z.number().optional(),
+    }),
+  ),
+  savings_opportunities: z.array(z.string()),
+  pattern_analysis: z.string(),
+  peak_to_off_peak_ratio: z.number().optional(),
+});
+
+const consumptionAnalysisSchema = z.object({
+  totalConsumption: z.number(),
+  averageDailyConsumption: z.number(),
+  peakConsumptionTime: z.string(),
+  peakConsumptionValue: z.number(),
+  consumptionByTimeOfDay: z.array(
+    z.object({
+      hour: z.number(),
+      average: z.number(),
+      varianceFromMean: z.number().optional(),
+    }),
+  ),
+  unusualPatterns: z.array(z.string()),
+  weatherImpact: z.string(),
+  weatherCorrectedConsumption: z.number().optional(),
+  optimizationOpportunities: z.array(z.string()),
+  potentialAnnualSavings: z.number().optional(),
+  timeOfDayRecommendations: z.array(z.string()),
+});
+
+const solarAnalysisSchema = z.object({
+  optimizations: z.array(z.string()),
+  maintenance_tasks: z.array(z.string()),
+  weather_impact: z.string(),
+  storage_tips: z.array(z.string()),
+  degradationRate: z.number().optional(),
+  potentialUpgradeBenefits: z
+    .array(
+      z.object({
+        type: z.string(),
+        estimatedAnnualSavings: z.number(),
+        implementationCost: z.number().optional(),
+      }),
+    )
+    .optional(),
+});
 
 const SYSTEM_PROMPT = `You are an advanced energy analytics expert with deep expertise in:
 - Residential and commercial energy consumption patterns
@@ -35,42 +110,24 @@ Response requirements:
 - Account for seasonal variations
 - Factor in peak vs. off-peak timing`;
 
-async function fetchAIResponse(prompt: string): Promise<any> {
+async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
   try {
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`,
+    const response = await client.chat.completions.create({
+      model: "llama3-groq-70b-8192-tool-use-preview",
+      max_tokens: 4096,
+      temperature: 0.7,
+      top_p: 0.9,
+      response_model: { schema: schema, name: "response" },
+      messages: [
+        {
+          role: "system",
+          content: SYSTEM_PROMPT,
         },
-        body: JSON.stringify({
-          model: "llama3-groq-70b-8192-tool-use-preview",
-          messages: [
-            {
-              role: "system",
-              content: SYSTEM_PROMPT,
-            },
-            { role: "user", content: prompt },
-          ],
-          temperature: 0.3,
-          top_p: 0.85,
-          max_tokens: 2048,
-          presence_penalty: 0.1,
-          frequency_penalty: 0.3,
-          response_format: { type: "json_object" },
-        }),
-      },
-    );
+        { role: "user", content: prompt },
+      ],
+    });
 
-    if (!response.ok) {
-      console.log(response);
-      throw new Error(`API call failed: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return JSON.parse(data.choices[0].message.content);
+    return response;
   } catch (error) {
     console.error("AI API call failed:", error);
     return null;
@@ -138,20 +195,9 @@ async function calculateExecutiveSummary(
     3. Account for current weather conditions
     4. Can be implemented immediately
     5. Have measurable impact on energy costs
-
-    Format the response as JSON with structure:
-    {
-      "recommendations": [
-        {
-          "text": "recommendation text",
-          "priority": "high/medium/low",
-          "estimatedImpact": "percentage or kWh value"
-        }
-      ]
-    }
   `;
 
-  const aiResponse = await fetchAIResponse(aiPrompt);
+  const aiResponse = await fetchAIResponse(aiPrompt, executiveSummarySchema);
 
   const recommendations: {
     text: string;
@@ -213,25 +259,10 @@ async function generateTariffAnalysis(
     - Night (22:00-23:59): Rates should be near off-peak (${offPeakRate.toFixed(2)} Rs/kWh)
 
     2. Add random variations of ±10% to prevent constant rates
-
-    Return in exactly this format:
-    {
-      "forecasted_rates": [
-        {
-          "time": "HH:MM",    // Exactly 24 entries from 00:00 to 23:00
-          "rate": number      // Rate in Rs/kWh with 2 decimal places
-        }
-      ],
-      "savings_opportunities": [
-        "detailed opportunity 1",  // Each opportunity should be a clear, actionable recommendation
-        "detailed opportunity 2"   // Include timing, expected savings, and specific actions
-      ],
-      "pattern_analysis": "string" // Single comprehensive analysis of daily and weekly patterns
-    }
     `;
 
   try {
-    const aiResponse = await fetchAIResponse(aiPrompt);
+    const aiResponse = await fetchAIResponse(aiPrompt, tariffAnalysisSchema);
 
     return {
       currentRate: parseFloat(discomData["Average Billing Rate (Rs./kWh)"]),
@@ -320,33 +351,6 @@ async function generateConsumptionAnalytics(
 
     Analyze the data and provide insights in the following JSON structure. Ensure all numbers are provided as numbers, not strings:
 
-    {
-      "totalConsumption": [total consumption in kWh as number],
-      "averageDailyConsumption": [daily average in kWh as number],
-      "peakConsumptionTime": [peak time in format "M/D/YYYY HH:mm"],
-      "peakConsumptionValue": [peak consumption value in kW as number],
-      "consumptionByTimeOfDay": [
-        {
-          "hour": [hour as number 0-23],
-          "average": [average consumption for that hour as number]
-        },
-        ...
-      ],
-      "unusualPatterns": [
-        "Description of unusual pattern 1",
-        "Description of unusual pattern 2"
-      ],
-      "weatherImpact": "Comprehensive analysis of weather impact on consumption",
-      "optimizationOpportunities": [
-        "Specific optimization suggestion 1",
-        "Specific optimization suggestion 2"
-      ],
-      "timeOfDayRecommendations": [
-        "Time-specific recommendation 1",
-        "Time-specific recommendation 2"
-      ]
-    }
-
     Important formatting rules:
     1. Ensure the response is valid JSON
     2. All number values should be actual numbers, not strings
@@ -358,7 +362,7 @@ async function generateConsumptionAnalytics(
     8. Recommendations should be specific and practical
 `;
 
-  const aiResponse = await fetchAIResponse(aiPrompt); // Use insights in future updates
+  const aiResponse = await fetchAIResponse(aiPrompt, consumptionAnalysisSchema); // Use insights in future updates
 
   return {
     totalConsumption: parseFloat(totalConsumption.toFixed(2)),
@@ -426,17 +430,9 @@ async function generateSolarAnalysis(
     2. Required maintenance tasks
     3. Analysis of weather impact on generation
     4. Battery storage optimization tips (if applicable)
-
-    Format as JSON with structure:
-    {
-      "optimizations": ["detailed recommendation 1", "detailed recommendation 2"],
-      "maintenance_tasks": ["task 1", "task 2"],
-      "weather_impact": "string",
-      "storage_tips": ["tip 1", "tip 2"]
-    }
   `;
 
-  const aiResponse = await fetchAIResponse(aiPrompt);
+  const aiResponse = await fetchAIResponse(aiPrompt, solarAnalysisSchema);
 
   return {
     dailyGeneration: parseFloat(dailyGeneration.toFixed(2)),
