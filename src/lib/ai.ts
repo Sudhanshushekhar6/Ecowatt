@@ -113,7 +113,7 @@ Response requirements:
 async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
   try {
     const response = await client.chat.completions.create({
-      model: "llama3-groq-70b-8192-tool-use-preview",
+      model: "llama-3.2-90b-text-preview",
       max_tokens: 4096,
       temperature: 0.7,
       top_p: 0.9,

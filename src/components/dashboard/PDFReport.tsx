@@ -3,6 +3,7 @@ import {
   ExecutiveSummary,
   SolarAnalysis,
   TariffAnalysis,
+  UserData,
 } from "@/types/user";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { User } from "firebase/auth";
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
 
 interface PDFReportProps {
   user: User;
+  userData: UserData;
   executiveSummary: ExecutiveSummary;
   tariffAnalysis: TariffAnalysis;
   consumptionAnalytics: ConsumptionAnalytics;
@@ -101,6 +103,7 @@ interface PDFReportProps {
 
 const PDFReport = ({
   user,
+  userData,
   executiveSummary,
   tariffAnalysis,
   consumptionAnalytics,
@@ -110,6 +113,52 @@ const PDFReport = ({
     <Page size="A4" style={styles.page}>
       {/* Header */}
       <Text style={styles.title}>Energy Report for {user.displayName}</Text>
+
+      {/* User Profile Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>User Profile</Text>
+        <View style={styles.grid}>
+          <View style={styles.gridItem}>
+            <Text style={styles.label}>Electricity Provider</Text>
+            <Text style={styles.value}>{userData.electricityProvider}</Text>
+          </View>
+          <View style={styles.gridItem}>
+            <Text style={styles.label}>Monthly Bill</Text>
+            <Text style={styles.value}>
+              ₹{userData.monthlyBill.toLocaleString()}
+            </Text>
+          </View>
+          <View style={styles.gridItem}>
+            <Text style={styles.label}>Solar Panels</Text>
+            <Text style={styles.value}>
+              {userData.hasSolarPanels ? "Installed" : "Not Installed"}
+            </Text>
+            {userData.hasSolarPanels && (
+              <Text style={styles.smallText}>
+                Capacity: {userData.solarCapacity} kW
+              </Text>
+            )}
+          </View>
+          <View style={styles.gridItem}>
+            <Text style={styles.label}>Battery Storage</Text>
+            <Text style={styles.value}>
+              {userData.hasBatteryStorage ? "Installed" : "Not Installed"}
+            </Text>
+            {userData.hasBatteryStorage && (
+              <>
+                <Text style={styles.smallText}>
+                  Capacity: {userData.storageCapacity}
+                </Text>
+                {userData.currentBatteryPower !== undefined && (
+                  <Text style={styles.smallText}>
+                    Current Power: {userData.currentBatteryPower} kWh
+                  </Text>
+                )}
+              </>
+            )}
+          </View>
+        </View>
+      </View>
 
       {/* Executive Summary Section */}
       <View style={styles.section}>
@@ -173,6 +222,7 @@ const PDFReport = ({
         </View>
       </View>
 
+      {/* Rest of the previous implementation remains the same */}
       {/* Tariff Analysis Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tariff Analysis</Text>
@@ -275,6 +325,23 @@ const PDFReport = ({
             <Text style={styles.listItem}>
               {consumptionAnalytics.weatherImpact}
             </Text>
+          </>
+        )}
+
+        {consumptionAnalytics.optimizationOpportunities && (
+          <>
+            <Text style={styles.subSectionTitle}>
+              Optimization Opportunities
+            </Text>
+            <View style={styles.list}>
+              {consumptionAnalytics.optimizationOpportunities.map(
+                (opportunity, index) => (
+                  <Text key={index} style={styles.listItem}>
+                    • {opportunity}
+                  </Text>
+                ),
+              )}
+            </View>
           </>
         )}
 

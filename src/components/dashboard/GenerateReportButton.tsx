@@ -125,6 +125,7 @@ const GenerateReportButton = ({
               document={
                 <PDFReport
                   user={user}
+                  userData={userData}
                   executiveSummary={report.executiveSummary}
                   tariffAnalysis={report.tariffAnalysis}
                   consumptionAnalytics={report.consumptionAnalytics}
