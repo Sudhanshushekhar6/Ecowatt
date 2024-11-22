@@ -1,11 +1,25 @@
 // types/user.ts
+
+export interface SmartDevices {
+  thermostat: boolean;
+  washingMachine: boolean;
+  dishwasher: boolean;
+  evCharger: boolean;
+  other: string;
+}
+
 export interface UserData {
-  hasSolarPanels: boolean;
-  hasBatteryStorage: boolean;
-  solarCapacity: number;
-  storageCapacity: string;
-  monthlyBill: number;
   electricityProvider: string;
+  monthlyBill: number;
+  hasSolarPanels: boolean;
+  solarCapacity: number | null;
+  installationDate: string | null;
+  hasBatteryStorage: boolean;
+  storageCapacity: string;
+  smartDevices: SmartDevices;
+  primaryGoal: string | null;
+  notificationMethod: "email" | "push" | "sms" | "none" | null;
+  reportFrequency: "daily" | "weekly" | "monthly" | null;
   currentBatteryPower?: number;
 }
 
@@ -20,12 +34,17 @@ export interface WeatherData {
   main: {
     temp: number;
     humidity: number;
+    feels_like: number;
   };
   weather: Array<{
     main: string;
     description: string;
     icon: string;
   }>;
+  wind: {
+    speed: number;
+  };
+  visibility: number;
 }
 
 export interface Discom {

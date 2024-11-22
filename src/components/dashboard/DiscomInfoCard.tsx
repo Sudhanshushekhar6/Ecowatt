@@ -43,7 +43,7 @@ const DiscomInfoCard = ({
   return (
     <Card className="w-full text-sm">
       <CardHeader>
-        <CardTitle className="text-2xl text-lg font-bold">
+        <CardTitle className="text-2xl text-base font-bold">
           {discomInfo.DISCOM}
         </CardTitle>
         <CardDescription>{discomInfo.State}</CardDescription>
