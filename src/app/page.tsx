@@ -6,6 +6,7 @@ import { UsersIcon } from "@/components/icons/users";
 import { SparkleText } from "@/components/landing/SparkleText";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import WordPullUp from "@/components/ui/word-pull-up";
 import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -43,9 +44,10 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Illuminate Your Savings with
-                </h1>
+                <WordPullUp
+                  className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl/none max-w-[800px]"
+                  words="Illuminate Your Savings with Prabhawatt"
+                />
                 <SparkleText />
                 <p className="mx-auto max-w-[700px] text-gray-600 md:text-xl">
                   Your all-in-one solution for optimizing solar energy usage,
@@ -85,7 +87,7 @@ export default function Home() {
               Key Benefits
             </h2>
             <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
-              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm">
+              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-shadow">
                 <CircleDollarSignIcon />
                 <h3 className="text-xl font-semibold text-gray-900">
                   Increased Savings
@@ -94,7 +96,7 @@ export default function Home() {
                   Optimized energy usage leads to lower electricity bills.
                 </p>
               </div>
-              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm">
+              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-shadow">
                 <SunIcon />
                 <h3 className="text-xl font-semibold text-gray-900">
                   Sustainability
@@ -103,7 +105,7 @@ export default function Home() {
                   Efficient use of solar energy reduces carbon footprint.
                 </p>
               </div>
-              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm">
+              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-shadow">
                 <UsersIcon />
                 <h3 className="text-xl font-semibold text-gray-900">
                   User Convenience
@@ -145,13 +147,14 @@ export default function Home() {
                   </li>
                 </ul>
               </div>
-              <div className="flex items-center justify-center">
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-200" />
                 <Image
                   alt="Solar panels"
-                  className="aspect-video overflow-hidden rounded-lg object-cover object-center shadow-md"
-                  height="310"
+                  className="relative max-h-[280px] rounded-2xl shadow-2xl object-cover object-center aspect-[4/3] w-full"
+                  height="400"
                   src="/solar.jpg"
-                  width="550"
+                  width="600"
                 />
               </div>
             </div>
