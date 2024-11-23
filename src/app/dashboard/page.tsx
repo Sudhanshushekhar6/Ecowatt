@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
+  const [dataPoints, setDataPoints] = useState<number>(1000);
 
   // Initialize with the current battery power from userData when available
   const lastCalculatedBatteryPower = useRef<number>(0);
@@ -241,9 +242,10 @@ export default function Dashboard() {
           </div>
 
           <EnergyCharts
-            energyData={energyData}
+            energyData={energyData.slice(0, dataPoints)}
             handleFileUpload={handleFileUpload}
             fileName={fileName}
+            setDataPoints={setDataPoints}
           />
 
           <div className="flex mt-6 justify-between items-center">

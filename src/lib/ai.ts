@@ -29,10 +29,10 @@ const executiveSummarySchema = z.object({
   recommendations: z.array(
     z.object({
       text: z.string(),
-      priority: z.enum(["high", "medium", "low"]).optional(),
+      priority: z.enum(["high", "medium", "low"]),
       estimatedImpact: z.string(),
-      potentialMonthlySavings: z.string().optional(),
-      implementationEffort: z.enum(["low", "medium", "high"]).optional(),
+      potentialMonthlySavings: z.string(),
+      implementationEffort: z.enum(["low", "medium", "high"]),
     }),
   ),
 });
@@ -42,12 +42,12 @@ const tariffAnalysisSchema = z.object({
     z.object({
       time: z.string(),
       rate: z.number(),
-      variationPercentage: z.number().optional(),
+      variationPercentage: z.number(),
     }),
   ),
   savings_opportunities: z.array(z.string()),
   pattern_analysis: z.string(),
-  peak_to_off_peak_ratio: z.number().optional(),
+  peak_to_off_peak_ratio: z.number(),
 });
 
 const consumptionAnalysisSchema = z.object({
@@ -59,14 +59,14 @@ const consumptionAnalysisSchema = z.object({
     z.object({
       hour: z.number(),
       average: z.number(),
-      varianceFromMean: z.number().optional(),
+      varianceFromMean: z.number(),
     }),
   ),
   unusualPatterns: z.array(z.string()),
   weatherImpact: z.string(),
-  weatherCorrectedConsumption: z.number().optional(),
+  weatherCorrectedConsumption: z.number(),
   optimizationOpportunities: z.array(z.string()),
-  potentialAnnualSavings: z.number().optional(),
+  potentialAnnualSavings: z.number(),
   timeOfDayRecommendations: z.array(z.string()),
 });
 
@@ -75,13 +75,13 @@ const solarAnalysisSchema = z.object({
   maintenance_tasks: z.array(z.string()),
   weather_impact: z.string(),
   storage_tips: z.array(z.string()),
-  degradationRate: z.number().optional(),
+  degradationRate: z.number(),
   potentialUpgradeBenefits: z
     .array(
       z.object({
         type: z.string(),
         estimatedAnnualSavings: z.number(),
-        implementationCost: z.number().optional(),
+        implementationCost: z.number(),
       }),
     )
     .optional(),
@@ -133,7 +133,7 @@ async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
   try {
     const response = await client.chat.completions.create({
       model: "llama-3.2-90b-text-preview",
-      max_tokens: 4096,
+      max_tokens: 8192,
       temperature: 0.7,
       top_p: 0.9,
       response_model: { schema: schema, name: "response" },
@@ -186,7 +186,6 @@ async function calculateExecutiveSummary(
     ? solarGeneration * averageRate
     : 0;
 
-  // Get AI recommendations based on all available data
   const aiPrompt = `
     Analyze household energy metrics and provide actionable recommendations:
 

@@ -53,6 +53,10 @@ const LocationWeatherDetails = ({
           </DialogTitle>
         </DialogHeader>
         <DialogDescription>
+          <p>
+            Weather conditions greatly affect energy consumption and tariff
+            rates.
+          </p>
           <div className="grid grid-cols-2 gap-6 mt-4">
             {[
               { label: "Temperature", value: `${weatherData.main.temp}°C` },
@@ -175,7 +179,7 @@ const SmartDevicesDialog = ({
                   key={index}
                   className={`p-4 rounded-lg border ${
                     device.enabled
-                      ? "bg-green-50 border-green-200"
+                      ? "bg-green-50 border-green-300"
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
@@ -185,7 +189,7 @@ const SmartDevicesDialog = ({
                         className={`w-5 h-5 ${device.enabled ? "text-green-600" : "text-gray-400"}`}
                       />
                       <span
-                        className={`font-medium ${device.enabled ? "" : "text-gray-500"}`}
+                        className={`font-medium font-semibold ${device.enabled ? "" : "text-gray-500"}`}
                       >
                         {device.name}
                       </span>
@@ -225,12 +229,6 @@ const SmartDevicesDialog = ({
                           <p className="font-medium">₹{device.costPerMonth}</p>
                         </div>
                       </div>
-                      <div className="mt-2 text-xs bg-green-100/50 p-2 rounded">
-                        <p className="font-medium text-green-800">
-                          Energy Saving Tip:
-                        </p>
-                        <p className="text-green-700 mt-1">{device.tip}</p>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -238,8 +236,10 @@ const SmartDevicesDialog = ({
             </div>
 
             {/* Summary Section */}
-            <div className="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-200">
-              <h4 className="font-medium mb-3">Combined Energy Analysis</h4>
+            <div className="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-300">
+              <h4 className="font-medium font-semibold mb-3">
+                Combined Energy Analysis
+              </h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-white rounded-lg">
                   <p className="text-sm text-gray-600">Active Devices</p>
@@ -266,7 +266,9 @@ const SmartDevicesDialog = ({
 
             {smartDevices.other && (
               <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                <p className="font-medium mb-2">Other Connected Devices</p>
+                <p className="font-medium mb-2 font-semibold">
+                  Other Connected Devices
+                </p>
                 <p className="text-sm text-gray-600">{smartDevices.other}</p>
               </div>
             )}
@@ -369,7 +371,8 @@ export default function StatsCards({
       title: "Smart Home Setup",
       value:
         Object.values(userData.smartDevices).filter((v) => v === true).length +
-        " Devices",
+        userData.smartDevices.other.split(",").length +
+        " Device(s)",
       subtitle: "Connected smart devices",
       icon: Laptop,
       additionalInfo: (

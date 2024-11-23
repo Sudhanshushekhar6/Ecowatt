@@ -60,6 +60,20 @@ export default function Settings() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+
+    // Handle nested smartDevices.other field
+    if (name === "other") {
+      setFormData((prevData) => ({
+        ...prevData,
+        smartDevices: {
+          ...prevData.smartDevices,
+          other: value,
+        },
+      }));
+      return;
+    }
+
+    // Handle other fields
     setFormData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
@@ -355,7 +369,7 @@ export default function Settings() {
                       </Label>
                       <Input
                         id="otherDevices"
-                        name="smartDevices.other"
+                        name="other"
                         value={formData.smartDevices.other}
                         onChange={handleInputChange}
                       />

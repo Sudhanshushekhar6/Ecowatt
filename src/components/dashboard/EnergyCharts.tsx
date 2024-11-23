@@ -21,6 +21,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface EnergyChartsProps {
   energyData: Array<{
@@ -31,18 +38,19 @@ interface EnergyChartsProps {
   }>;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   fileName: string | null;
+  setDataPoints: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function EnergyCharts({
   energyData,
   handleFileUpload,
   fileName,
+  setDataPoints,
 }: EnergyChartsProps) {
   return (
     <Tabs defaultValue="power-consumption">
       <TabsList>
         <TabsTrigger value="power-consumption">
-          {/* Short form for smaller screens */}
           <span className="hidden md:inline">
             Power Consumption vs. Solar Generation
           </span>
@@ -64,16 +72,35 @@ export default function EnergyCharts({
         <Card>
           <CardHeader>
             <CardTitle>Power Consumption vs. Solar Generation</CardTitle>
-            <CardDescription className="flex items-center justify-between">
+            <CardDescription className="flex items-center justify-between flex-col md:flex-row">
               <p>Comparison of consumption and solar generation</p>
-              <Input
-                type="file"
-                accept=".csv"
-                onChange={handleFileUpload}
-                className="w-fit"
-                id="energy-data-file"
-                value={fileName ? undefined : ""}
-              />
+              <div className="flex items-center gap-2 flex-col sm:flex-row">
+                <Input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="w-fit"
+                  id="energy-data-file"
+                  value={fileName ? undefined : ""}
+                />
+                <Select
+                  onValueChange={(value: string) => {
+                    const numValue = parseInt(value, 10);
+                    setDataPoints(numValue);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select data points" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="500">500</SelectItem>
+                    <SelectItem value="1000">1000</SelectItem>
+                    <SelectItem value="1500">1500</SelectItem>
+                    <SelectItem value="2000">2000</SelectItem>
+                    <SelectItem value="5000">5000</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardDescription>
           </CardHeader>
           <CardContent>

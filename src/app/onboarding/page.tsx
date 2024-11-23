@@ -205,6 +205,25 @@ export default function Onboarding() {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[90vh] flex-col text-sm text-muted-foreground">
+        <p className="text-center">
+          User not found.
+          <br /> Perhaps you havn't <span className="font-bold">
+            signed up
+          </span>{" "}
+          yet?
+        </p>
+        <Link href="/sign-up">
+          <Button className="mt-4" variant={"outline"}>
+            Go to Sign Up Page
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-[92vh] bg-gray-100">
       <TooltipProvider>

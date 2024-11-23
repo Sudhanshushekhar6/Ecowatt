@@ -507,7 +507,7 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
           {data.peakUsageWarnings.map((warning, index) => (
             <Alert key={index}>
               <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
-              <AlertDescription>{warning}</AlertDescription>
+              <AlertDescription className="mt-1">{warning}</AlertDescription>
             </Alert>
           ))}
         </TabsContent>
