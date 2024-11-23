@@ -81,7 +81,7 @@ export default function Home() {
           className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 flex flex-col items-center justify-center"
         >
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl text-center mb-12">
+            <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-4xl text-center mb-12">
               Key Benefits
             </h2>
             <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
@@ -122,7 +122,7 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-10 lg:grid-cols-2">
               <div className="space-y-4">
-                <h2 className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl">
+                <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-4xl">
                   Why Choose PrabhaWatt?
                 </h2>
                 <p className="max-w-[600px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">

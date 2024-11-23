@@ -119,3 +119,19 @@ export interface SolarAnalysis {
   weather_impact: string;
   storage_tips: string[];
 }
+
+export interface SmartDevicesAnalysis {
+  deviceSchedules: {
+    deviceName: string;
+    optimalHours: number[];
+    expectedSavings: number;
+    currentUsagePattern: string;
+    recommendedPattern: string;
+    reasonForRecommendation: string;
+  }[];
+  totalPotentialSavings: number;
+  generalRecommendations: string[];
+  automationOpportunities: string[];
+  peakUsageWarnings: string[];
+  deviceIntegrationTips: string[];
+}

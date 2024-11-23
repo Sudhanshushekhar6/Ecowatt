@@ -3,6 +3,7 @@ import {
   Discom,
   EnergyData,
   ExecutiveSummary,
+  SmartDevicesAnalysis,
   SolarAnalysis,
   TariffAnalysis,
   TOUData,
@@ -28,7 +29,7 @@ const executiveSummarySchema = z.object({
   recommendations: z.array(
     z.object({
       text: z.string(),
-      priority: z.enum(["high", "medium", "low"]),
+      priority: z.enum(["high", "medium", "low"]).optional(),
       estimatedImpact: z.string(),
       potentialMonthlySavings: z.string().optional(),
       implementationEffort: z.enum(["low", "medium", "high"]).optional(),
@@ -84,6 +85,24 @@ const solarAnalysisSchema = z.object({
       }),
     )
     .optional(),
+});
+
+const deviceScheduleSchema = z.object({
+  deviceName: z.string(),
+  optimalHours: z.array(z.number()),
+  expectedSavings: z.number(),
+  currentUsagePattern: z.string(),
+  recommendedPattern: z.string(),
+  reasonForRecommendation: z.string(),
+});
+
+const smartDevicesAnalysisSchema = z.object({
+  deviceSchedules: z.array(deviceScheduleSchema),
+  totalPotentialSavings: z.number(),
+  generalRecommendations: z.array(z.string()),
+  automationOpportunities: z.array(z.string()),
+  peakUsageWarnings: z.array(z.string()),
+  deviceIntegrationTips: z.array(z.string()),
 });
 
 const SYSTEM_PROMPT = `You are an advanced energy analytics expert with deep expertise in:
@@ -381,8 +400,20 @@ async function generateSolarAnalysis(
   energyData: EnergyData[],
   userData: UserData,
   weatherData: WeatherData,
-): Promise<SolarAnalysis | null> {
-  if (!userData.hasSolarPanels) return null;
+): Promise<SolarAnalysis> {
+  if (!userData.hasSolarPanels)
+    return {
+      dailyGeneration: 0,
+      monthlyGeneration: 0,
+      efficiency: 0,
+      savingsFromSolar: 0,
+      optimizations: [],
+      maintenance_tasks: [],
+      weather_impact: "",
+      storage_tips: [
+        "Uh... You don't have a solar panel. Consider installing one.",
+      ],
+    };
 
   const dataByDay = groupDataByDay(energyData);
   const days = Array.from(dataByDay.keys()).sort();
@@ -459,6 +490,85 @@ async function generateSolarAnalysis(
   };
 }
 
+async function generateSmartDevicesAnalysis(
+  userData: UserData,
+  touData: TOUData[],
+  energyData: EnergyData[],
+  weatherData: WeatherData,
+): Promise<SmartDevicesAnalysis> {
+  const smartDevices = userData.smartDevices;
+  const activeDevices = Object.entries(smartDevices)
+    .filter(([key, value]) => value === true && key !== "other")
+    .map(([key]) => key);
+
+  // Get the lowest rate hours from TOU data
+  const ratesByHour = touData.reduce(
+    (acc, data) => {
+      const hour = new Date(data.timestamp).getHours();
+      acc[hour] = data.rate;
+      return acc;
+    },
+    {} as Record<number, number>,
+  );
+
+  const sortedHoursByRate = Object.entries(ratesByHour)
+    .sort(([, a], [, b]) => a - b)
+    .map(([hour]) => parseInt(hour));
+
+  // AI prompt to analyze device usage patterns
+  const aiPrompt = `
+    Analyze smart device usage patterns and provide scheduling recommendations:
+
+    ACTIVE DEVICES:
+    ${activeDevices.map((device) => `- ${device}`).join("\n    ")}
+    ${smartDevices.other ? `- Other devices: ${smartDevices.other}` : ""}
+
+    ELECTRICITY RATES BY HOUR:
+    ${Object.entries(ratesByHour)
+      .map(([hour, rate]) => `- Hour ${hour}: ${rate.toFixed(2)} Rs/kWh`)
+      .join("\n    ")}
+
+    USER CONTEXT:
+    - Monthly bill: ${userData.monthlyBill} Rs
+    - Primary goal: ${userData.primaryGoal || "Not specified"}
+    - Has solar: ${userData.hasSolarPanels ? "Yes" : "No"}
+    - Has battery: ${userData.hasBatteryStorage ? "Yes" : "No"}
+
+    WEATHER CONDITIONS:
+    - Temperature: ${weatherData.main.temp}°C
+    - Weather: ${weatherData.weather[0].main}
+    - Description: ${weatherData.weather[0].description}
+
+    For each device, provide:
+    1. Optimal operating hours based on electricity rates
+    2. Expected savings from schedule optimization
+    3. Current usage patterns from energy data
+    4. Recommended usage patterns
+    5. Reasoning for recommendations
+    
+    Consider:
+    - Peak vs. off-peak rates
+    - Weather impact on device efficiency
+    - Solar generation times (if applicable)
+    - Battery storage availability (if applicable)
+    - Integration opportunities between devices
+  `;
+
+  const aiResponse = await fetchAIResponse(
+    aiPrompt,
+    smartDevicesAnalysisSchema,
+  );
+
+  return {
+    deviceSchedules: aiResponse.deviceSchedules,
+    totalPotentialSavings: aiResponse.totalPotentialSavings,
+    generalRecommendations: aiResponse.generalRecommendations,
+    automationOpportunities: aiResponse.automationOpportunities,
+    peakUsageWarnings: aiResponse.peakUsageWarnings,
+    deviceIntegrationTips: aiResponse.deviceIntegrationTips,
+  };
+}
+
 export async function generateReport(
   userData: UserData,
   touData: TOUData[],
@@ -469,7 +579,8 @@ export async function generateReport(
   executiveSummary: ExecutiveSummary;
   tariffAnalysis: TariffAnalysis;
   consumptionAnalytics: ConsumptionAnalytics;
-  solarAnalysis: SolarAnalysis | null;
+  solarAnalysis: SolarAnalysis;
+  smartDevicesAnalysis: SmartDevicesAnalysis;
 }> {
   try {
     const sortedEnergyData = [...energyData].sort(
@@ -481,6 +592,7 @@ export async function generateReport(
       tariffAnalysis,
       consumptionAnalytics,
       solarAnalysis,
+      smartDevicesAnalysis,
     ] = await Promise.all([
       calculateExecutiveSummary(
         sortedEnergyData,
@@ -490,9 +602,13 @@ export async function generateReport(
       ),
       generateTariffAnalysis(touData, discomData),
       generateConsumptionAnalytics(sortedEnergyData, weatherData),
-      userData.hasSolarPanels
-        ? generateSolarAnalysis(sortedEnergyData, userData, weatherData)
-        : Promise.resolve(null),
+      generateSolarAnalysis(sortedEnergyData, userData, weatherData),
+      generateSmartDevicesAnalysis(
+        userData,
+        touData,
+        sortedEnergyData,
+        weatherData,
+      ),
     ]);
 
     return {
@@ -500,6 +616,7 @@ export async function generateReport(
       tariffAnalysis,
       consumptionAnalytics,
       solarAnalysis,
+      smartDevicesAnalysis,
     };
   } catch (error) {
     console.error("Error generating report:", error);

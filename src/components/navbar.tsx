@@ -43,7 +43,7 @@ export default function Navbar() {
 
   const NavLinks = () => (
     <>
-      {isLandingPage && (
+      {/* {isLandingPage && (
         <>
           <a
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
@@ -67,7 +67,7 @@ export default function Navbar() {
             Get Started
           </a>
         </>
-      )}
+      )} */}
       {user ? (
         <>
           <Link
@@ -84,13 +84,13 @@ export default function Navbar() {
           >
             Dashboard
           </Link>
-          <Link
+          {/* <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/trading"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Trading
-          </Link>
+          </Link> */}
           <Link
             className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
             href="/settings"

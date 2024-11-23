@@ -4,6 +4,7 @@ import {
   Discom,
   EnergyData,
   ExecutiveSummary,
+  SmartDevicesAnalysis,
   SolarAnalysis,
   TariffAnalysis,
   TOUData,
@@ -21,6 +22,7 @@ import PDFReport from "./PDFReport";
 import {
   ConsumptionAnalyticsCard,
   ExecutiveSummaryCard,
+  SmartDevicesAnalysisCard,
   SolarAnalysisCard,
   TariffAnalysisCard,
 } from "./ReportCards";
@@ -44,10 +46,11 @@ const GenerateReportButton = ({
     executiveSummary: ExecutiveSummary;
     tariffAnalysis: TariffAnalysis;
     consumptionAnalytics: ConsumptionAnalytics;
-    solarAnalysis: SolarAnalysis | null;
-  } | null>(null); // Update state type to match the report structure
+    solarAnalysis: SolarAnalysis;
+    smartDevicesAnalysis: SmartDevicesAnalysis;
+  } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Update state type to allow string
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerateReport = async () => {
     if (!weatherData || !userData || !discomInfo) {
@@ -116,9 +119,8 @@ const GenerateReportButton = ({
           <ExecutiveSummaryCard data={report.executiveSummary} />
           <TariffAnalysisCard data={report.tariffAnalysis} />
           <ConsumptionAnalyticsCard data={report.consumptionAnalytics} />
-          {report.solarAnalysis && (
-            <SolarAnalysisCard data={report.solarAnalysis} />
-          )}
+          <SolarAnalysisCard data={report.solarAnalysis} />
+          <SmartDevicesAnalysisCard data={report.smartDevicesAnalysis} />
 
           <div className="flex justify-end">
             <PDFDownloadLink

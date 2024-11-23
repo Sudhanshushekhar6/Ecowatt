@@ -11,19 +11,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ConsumptionAnalytics,
   ExecutiveSummary,
+  SmartDevicesAnalysis,
   SolarAnalysis,
   TariffAnalysis,
 } from "@/types/user";
 import {
   AlertCircle,
+  AlertTriangle,
   Battery,
   BatteryLow,
   BatteryWarning,
+  BellRing,
   CheckCircle,
   Clock,
   CloudRain,
   NotepadText,
+  PlugZap,
+  Settings,
+  Smartphone,
   Sun,
+  Timer,
   TrendingDown,
   TrendingUp,
   Zap,
@@ -385,9 +392,134 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
   );
 };
 
+const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
+  <Card className="w-full mb-6">
+    <CardHeader>
+      <CardTitle className="text-xl font-bold flex items-center gap-2">
+        Smart Devices Analysis
+        <Smartphone className="h-5 w-5 text-blue-500" />
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="p-4 rounded-lg bg-gray-50 mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-gray-600">Total Potential Savings</span>
+          <Zap className="h-5 w-5 text-green-500" />
+        </div>
+        <p className="text-2xl font-bold">
+          ₹{data.totalPotentialSavings.toLocaleString()}
+        </p>
+      </div>
+
+      <Tabs defaultValue="devices" className="w-full">
+        <TabsList>
+          <TabsTrigger value="devices">Device Schedules</TabsTrigger>
+          <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+          <TabsTrigger value="warnings">Warnings</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="devices" className="space-y-4">
+          {data.deviceSchedules.map((device, index) => (
+            <Alert key={index} className="relative">
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PlugZap className="h-4 w-4 text-blue-500" />
+                    <h4 className="font-semibold">{device.deviceName}</h4>
+                  </div>
+                  <Badge variant="secondary">
+                    ₹{device.expectedSavings.toLocaleString()} potential savings
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <p className="text-sm text-gray-600">Current Usage:</p>
+                    <p className="text-sm">{device.currentUsagePattern}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Recommended Usage:</p>
+                    <p className="text-sm">{device.recommendedPattern}</p>
+                  </div>
+                </div>
+
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600">Optimal Hours:</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {device.optimalHours.map((hour) => (
+                      <Badge key={hour} variant="outline">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {hour}:00
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-500 mt-2">
+                  {device.reasonForRecommendation}
+                </p>
+              </div>
+            </Alert>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="recommendations" className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                General Recommendations
+              </h3>
+              {data.generalRecommendations.map((rec, index) => (
+                <Alert key={index}>
+                  <AlertDescription>{rec}</AlertDescription>
+                </Alert>
+              ))}
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <Timer className="h-4 w-4" />
+                Automation Opportunities
+              </h3>
+              {data.automationOpportunities.map((opp, index) => (
+                <Alert key={index}>
+                  <AlertDescription>{opp}</AlertDescription>
+                </Alert>
+              ))}
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <BellRing className="h-4 w-4" />
+                Integration Tips
+              </h3>
+              {data.deviceIntegrationTips.map((tip, index) => (
+                <Alert key={index}>
+                  <AlertDescription>{tip}</AlertDescription>
+                </Alert>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="warnings" className="space-y-4">
+          {data.peakUsageWarnings.map((warning, index) => (
+            <Alert key={index}>
+              <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+              <AlertDescription>{warning}</AlertDescription>
+            </Alert>
+          ))}
+        </TabsContent>
+      </Tabs>
+    </CardContent>
+  </Card>
+);
+
 export {
   ConsumptionAnalyticsCard,
   ExecutiveSummaryCard,
+  SmartDevicesAnalysisCard,
   SolarAnalysisCard,
   TariffAnalysisCard,
 };
