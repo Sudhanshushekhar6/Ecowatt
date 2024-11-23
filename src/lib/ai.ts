@@ -30,7 +30,7 @@ const executiveSummarySchema = z.object({
       text: z.string(),
       priority: z.enum(["high", "medium", "low"]),
       estimatedImpact: z.string(),
-      potentialMonthlySavings: z.number().optional(),
+      potentialMonthlySavings: z.string().optional(),
       implementationEffort: z.enum(["low", "medium", "high"]).optional(),
     }),
   ),

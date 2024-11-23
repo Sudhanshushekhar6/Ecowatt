@@ -6,53 +6,53 @@
 
 PrabhaWatt is an intelligent solar energy optimization platform designed to revolutionize how users manage and maximize their solar energy usage. By combining real-time monitoring, advanced analytics, and machine learning, we help users reduce electricity bills while contributing to a sustainable future.
 
-🌐 **[Live Demo](https://prabhawatt.vercel.app/)** | 📊 **[Sample Energy Data](./assets/Energy%20data.csv)**
+**[Live Demo](https://prabhawatt.vercel.app/)** | **[Sample Energy Data](./assets/Energy%20data.csv)**
 
 ![PrabhaWatt Dashboard Preview](./public/preview.png)
 
-## 📑 Table of Contents
+## Table of Contents
 
 - [PrabhaWatt - Solar Energy Optimization Platform](#prabhawatt---solar-energy-optimization-platform)
-  - [📑 Table of Contents](#-table-of-contents)
-  - [✨ Features](#-features)
-  - [🛠 Technology Stack](#-technology-stack)
-  - [🚀 Getting Started](#-getting-started)
-  - [🤝 Contributing](#-contributing)
-  - [💡 Support](#-support)
-  - [📄 License](#-license)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Technology Stack](#technology-stack)
+  - [Getting Started](#getting-started)
+  - [Contributing](#contributing)
+  - [Support](#support)
+  - [License](#license)
 
-## ✨ Features
+## Features
 
-- **📊 Real-Time Monitoring**
+- **Real-Time Monitoring**
 
   - Live energy consumption tracking
   - Dynamic tariff rate updates
   - Solar generation monitoring
 
-- **🤖 Smart Analytics**
+- **Smart Analytics**
 
   - Machine learning-powered consumption forecasting
   - Usage pattern analysis
   - Cost optimization recommendations
 
-- **⚡ Energy Management**
+- **Energy Management**
 
   - Intelligent load scheduling
   - Solar energy utilization optimization
   - Automated device control
 
-- **💰 Financial Tools**
+- **Financial Tools**
 
   - Cost-benefit analysis
   - ROI calculator
   - Bill prediction
 
-- **📱 User Experience**
+- **User Experience**
   - Responsive web interface
   - Real-time notifications
   - Custom alerts and reminders
 
-## 🛠 Technology Stack
+## Technology Stack
 
 - **Frontend**: Next.js, TailwindCSS, ShadcnUI
 - **Backend**: Next.js API Routes, Node.js, Firebase
@@ -60,7 +60,7 @@ PrabhaWatt is an intelligent solar energy optimization platform designed to revo
 - **Database**: Firebase
 - **APIs**: RESTful architecture
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Clone the repository**
 
@@ -99,7 +99,7 @@ yarn dev
 
 Visit `http://localhost:3000` to see the application running.
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -112,12 +112,12 @@ We welcome contributions! Please follow these steps:
 
 See our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
-## 💡 Support
+## Support
 
-- 🐛 [Issue Tracker](https://github.com/ChiragAgg5k/prabhawatt/issues)
-- 💬 [Discussions](https://github.com/ChiragAgg5k/prabhawatt/discussions)
-- 📩 [Email](mailto:chiragaggarwal5k@gmail.com)
+- [Issue Tracker](https://github.com/ChiragAgg5k/prabhawatt/issues)
+- [Discussions](https://github.com/ChiragAgg5k/prabhawatt/discussions)
+- [Email](mailto:chiragaggarwal5k@gmail.com)
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
