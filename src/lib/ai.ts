@@ -394,7 +394,9 @@ async function generateSolarAnalysis(
   );
 
   const monthlyGeneration = dailyGeneration * 30;
-  const theoreticalDaily = userData.solarCapacity ? userData.solarCapacity * 5.5 : 1;
+  const theoreticalDaily = userData.solarCapacity
+    ? userData.solarCapacity * 5.5
+    : 1;
   const efficiency = (dailyGeneration / theoreticalDaily) * 100;
   const savingsFromSolar =
     (dailyGeneration * parseFloat(userData.monthlyBill.toString())) / 30;

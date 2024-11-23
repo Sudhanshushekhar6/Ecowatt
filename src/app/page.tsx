@@ -3,6 +3,7 @@
 import { CircleDollarSignIcon } from "@/components/icons/circle-dollar-sign";
 import { SunIcon } from "@/components/icons/sun";
 import { UsersIcon } from "@/components/icons/users";
+import { SparkleText } from "@/components/landing/SparkleText";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/context/auth-context";
@@ -44,8 +45,8 @@ export default function Home() {
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Illuminate Your Savings with
-                  <br /> PrabhaWatt
                 </h1>
+                <SparkleText />
                 <p className="mx-auto max-w-[700px] text-gray-600 md:text-xl">
                   Your all-in-one solution for optimizing solar energy usage,
                   reducing electricity bills, and contributing to a greener

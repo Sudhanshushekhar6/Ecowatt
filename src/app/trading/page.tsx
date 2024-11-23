@@ -264,7 +264,9 @@ export default function Trading() {
             <AlertDescription className="text-lg">
               Your Current Battery Level:{" "}
               <span className="font-bold">
-                {userFirebaseData ? Number(userFirebaseData.currentBatteryPower) : "-"}{" "}
+                {userFirebaseData
+                  ? Number(userFirebaseData.currentBatteryPower)
+                  : "-"}{" "}
                 kW
               </span>
               <span className="text-sm text-muted-foreground ml-2">
