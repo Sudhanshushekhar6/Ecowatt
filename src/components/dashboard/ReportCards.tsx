@@ -202,6 +202,10 @@ const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
   <Card className="w-full mb-6">
     <CardHeader>
       <CardTitle className="text-xl font-bold">Consumption Analytics</CardTitle>
+      <CardDescription>
+        Get a detailed overview of your energy consumption and consumption
+        trends over time.
+      </CardDescription>
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

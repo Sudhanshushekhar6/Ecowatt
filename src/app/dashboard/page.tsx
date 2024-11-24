@@ -1,5 +1,6 @@
 "use client";
 
+import DemoDataButton from "@/components/dashboard/DemoData";
 import DiscomInfoCard from "@/components/dashboard/DiscomInfoCard";
 import EnergyCharts from "@/components/dashboard/EnergyCharts";
 import GenerateReportButton from "@/components/dashboard/GenerateReportButton";
@@ -247,6 +248,10 @@ export default function Dashboard() {
             fileName={fileName}
             setDataPoints={setDataPoints}
           />
+
+          {energyData.length === 0 && (
+            <DemoDataButton onLoadDemoData={processCSV} />
+          )}
 
           <div className="flex mt-6 justify-between items-center">
             <GenerateReportButton

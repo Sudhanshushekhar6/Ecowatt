@@ -1,4 +1,3 @@
-// components/dashboard/EnergyCharts.tsx
 import {
   Card,
   CardContent,
