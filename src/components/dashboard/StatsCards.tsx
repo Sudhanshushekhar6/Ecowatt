@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { SmartDevices, UserData, WeatherData } from "@/types/user";
 import { useCopilotReadable } from "@copilotkit/react-core";

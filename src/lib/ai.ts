@@ -513,7 +513,6 @@ async function generateSmartDevicesAnalysis(
     .sort(([, a], [, b]) => a - b)
     .map(([hour]) => parseInt(hour));
 
-  // AI prompt to analyze device usage patterns
   const aiPrompt = `
     Analyze smart device usage patterns and provide scheduling recommendations:
 

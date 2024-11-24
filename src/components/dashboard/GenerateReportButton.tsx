@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { generateReport } from "@/lib/ai";
 import {
   ConsumptionAnalytics,
   Discom,
@@ -11,22 +12,22 @@ import {
   UserData,
   WeatherData,
 } from "@/types/user";
+import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { User } from "firebase/auth";
 import { AlertCircle, BarChart3, Download, Settings } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-import { generateReport } from "@/lib/ai";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PDFReport from "./PDFReport";
-import {
-  ConsumptionAnalyticsCard,
-  ExecutiveSummaryCard,
-  SmartDevicesAnalysisCard,
-  SolarAnalysisCard,
-  TariffAnalysisCard,
-} from "./ReportCards";
+import { ExecutiveSummaryCard } from "./ReportCards";
+
+interface Report {
+  executiveSummary: ExecutiveSummary;
+  tariffAnalysis: TariffAnalysis;
+  consumptionAnalytics: ConsumptionAnalytics;
+  solarAnalysis: SolarAnalysis;
+  smartDevicesAnalysis: SmartDevicesAnalysis;
+}
 
 const GenerateReportButton = ({
   user,
@@ -43,15 +44,34 @@ const GenerateReportButton = ({
   discomInfo: Discom | null;
   touHistory: TOUData[];
 }) => {
-  const [report, setReport] = useState<{
-    executiveSummary: ExecutiveSummary;
-    tariffAnalysis: TariffAnalysis;
-    consumptionAnalytics: ConsumptionAnalytics;
-    solarAnalysis: SolarAnalysis;
-    smartDevicesAnalysis: SmartDevicesAnalysis;
-  } | null>(null);
+  const [report, setReport] = useState<Report | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const defaultWeatherData = useCallback(
+    () => ({
+      name: "Unknown",
+      main: {
+        temp: 0,
+        humidity: 0,
+        feels_like: 0,
+      },
+      weather: [
+        {
+          main: "Clear",
+          description: "Clear skies",
+          icon: "01d",
+        },
+      ],
+      wind: {
+        speed: 0,
+      },
+      visibility: 0,
+    }),
+    [],
+  );
 
   const handleGenerateReport = async () => {
     if (!userData || !discomInfo) {
@@ -59,47 +79,89 @@ const GenerateReportButton = ({
       return;
     }
 
-    if (!weatherData) {
-      weatherData = {
-        name: "Unknown",
-        main: {
-          temp: 0,
-          humidity: 0,
-          feels_like: 0,
-        },
-        weather: [
-          {
-            main: "Clear",
-            description: "Clear skies",
-            icon: "01d",
-          },
-        ],
-        wind: {
-          speed: 0,
-        },
-        visibility: 0,
-      };
+    // Cancel any pending report generation
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
+
+    // Create new AbortController for this operation
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
 
     setIsGenerating(true);
     setError(null);
 
     try {
-      const generatedReport = await generateReport(
-        userData,
-        touHistory,
-        weatherData,
-        discomInfo,
-        energyData,
-      );
-      setReport(generatedReport);
+      const reportChunks = await Promise.all([
+        generateReportChunk("executiveSummary", signal),
+        generateReportChunk("tariffAnalysis", signal),
+        generateReportChunk("consumptionAnalytics", signal),
+        generateReportChunk("solarAnalysis", signal),
+        generateReportChunk("smartDevicesAnalysis", signal),
+      ]);
+
+      if (signal.aborted) {
+        return;
+      }
+
+      const [
+        executiveSummary,
+        tariffAnalysis,
+        consumptionAnalytics,
+        solarAnalysis,
+        smartDevicesAnalysis,
+      ] = reportChunks;
+
+      setReport({
+        executiveSummary: executiveSummary as ExecutiveSummary,
+        tariffAnalysis: tariffAnalysis as TariffAnalysis,
+        consumptionAnalytics: consumptionAnalytics as ConsumptionAnalytics,
+        solarAnalysis: solarAnalysis as SolarAnalysis,
+        smartDevicesAnalysis: smartDevicesAnalysis as SmartDevicesAnalysis,
+      });
     } catch (error) {
-      console.error("Error generating report:", error);
-      setError("Failed to generate report. Please try again later.");
+      if (!signal.aborted) {
+        console.error("Error generating report:", error);
+        setError("Failed to generate report. Please try again later.");
+      }
     } finally {
-      setIsGenerating(false);
+      if (!signal.aborted) {
+        setIsGenerating(false);
+        abortControllerRef.current = null;
+      }
     }
   };
+
+  const generateReportChunk = async (
+    section: keyof Report,
+    signal: AbortSignal,
+  ) => {
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        if (signal.aborted) {
+          return;
+        }
+
+        const generatedReport = await generateReport(
+          userData,
+          touHistory,
+          weatherData || defaultWeatherData(),
+          discomInfo!,
+          energyData,
+        );
+
+        resolve(generatedReport[section]);
+      }, 0);
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   useCopilotReadable({
     description:
@@ -113,6 +175,20 @@ const GenerateReportButton = ({
       "Generate an analysis report based on the user's data and generate recommendations for improvement.",
     handler: handleGenerateReport,
   });
+
+  const reportCards = useMemo(() => {
+    if (!report) return null;
+
+    return (
+      <div className="space-y-6">
+        <ExecutiveSummaryCard data={report.executiveSummary} />
+        {/* <TariffAnalysisCard data={report.tariffAnalysis} />
+        <ConsumptionAnalyticsCard data={report.consumptionAnalytics} />
+        <SolarAnalysisCard data={report.solarAnalysis} />
+        <SmartDevicesAnalysisCard data={report.smartDevicesAnalysis} /> */}
+      </div>
+    );
+  }, [report]);
 
   return (
     <div className="w-full space-y-6">
@@ -150,37 +226,31 @@ const GenerateReportButton = ({
         </div>
       )}
 
-      {report && (
-        <div className="space-y-6">
-          <ExecutiveSummaryCard data={report.executiveSummary} />
-          <TariffAnalysisCard data={report.tariffAnalysis} />
-          <ConsumptionAnalyticsCard data={report.consumptionAnalytics} />
-          <SolarAnalysisCard data={report.solarAnalysis} />
-          <SmartDevicesAnalysisCard data={report.smartDevicesAnalysis} />
+      {reportCards}
 
-          <div className="flex justify-end">
-            <PDFDownloadLink
-              document={
-                <PDFReport
-                  user={user}
-                  userData={userData}
-                  executiveSummary={report.executiveSummary}
-                  tariffAnalysis={report.tariffAnalysis}
-                  consumptionAnalytics={report.consumptionAnalytics}
-                  solarAnalysis={report.solarAnalysis}
-                />
-              }
-              fileName="energy_report.pdf"
-            >
-              {/* @ts-ignore */}
-              {({ loading }) => (
-                <Button disabled={loading} variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  {loading ? "Preparing PDF..." : "Download PDF Report"}
-                </Button>
-              )}
-            </PDFDownloadLink>
-          </div>
+      {report && (
+        <div className="flex justify-end">
+          <PDFDownloadLink
+            document={
+              <PDFReport
+                user={user}
+                userData={userData}
+                executiveSummary={report.executiveSummary}
+                tariffAnalysis={report.tariffAnalysis}
+                consumptionAnalytics={report.consumptionAnalytics}
+                solarAnalysis={report.solarAnalysis}
+              />
+            }
+            fileName="energy_report.pdf"
+          >
+            {/* @ts-ignore */}
+            {({ loading }) => (
+              <Button disabled={loading} variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                {loading ? "Preparing PDF..." : "Download PDF Report"}
+              </Button>
+            )}
+          </PDFDownloadLink>
         </div>
       )}
     </div>
