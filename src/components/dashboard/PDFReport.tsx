@@ -236,7 +236,7 @@ const PDFReport = ({
         </View>
 
         <Text style={styles.subSectionTitle}>Pattern Analysis</Text>
-        <Text style={styles.listItem}>{tariffAnalysis.pattern_analysis}</Text>
+        <Text style={styles.listItem}>{tariffAnalysis.patternAnalysis}</Text>
 
         <Text style={styles.subSectionTitle}>Forecasted Rates</Text>
         <View style={styles.list}>

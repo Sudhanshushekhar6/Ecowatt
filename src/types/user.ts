@@ -91,7 +91,7 @@ export interface TariffAnalysis {
     rate: number;
   }>;
   savingsOpportunities: string[];
-  pattern_analysis: string;
+  patternAnalysis: string;
 }
 
 export interface ConsumptionAnalytics {

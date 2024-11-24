@@ -19,7 +19,7 @@ import { AlertCircle, BarChart3, Download, Settings } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PDFReport from "./PDFReport";
-import { ExecutiveSummaryCard } from "./ReportCards";
+import { ConsumptionAnalyticsCard, ExecutiveSummaryCard, SmartDevicesAnalysisCard, SolarAnalysisCard, TariffAnalysisCard } from "./ReportCards";
 
 interface Report {
   executiveSummary: ExecutiveSummary;
@@ -182,10 +182,10 @@ const GenerateReportButton = ({
     return (
       <div className="space-y-6">
         <ExecutiveSummaryCard data={report.executiveSummary} />
-        {/* <TariffAnalysisCard data={report.tariffAnalysis} />
+        <TariffAnalysisCard data={report.tariffAnalysis} />
         <ConsumptionAnalyticsCard data={report.consumptionAnalytics} />
         <SolarAnalysisCard data={report.solarAnalysis} />
-        <SmartDevicesAnalysisCard data={report.smartDevicesAnalysis} /> */}
+        <SmartDevicesAnalysisCard data={report.smartDevicesAnalysis} />
       </div>
     );
   }, [report]);

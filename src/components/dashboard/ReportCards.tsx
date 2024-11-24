@@ -140,7 +140,7 @@ const TariffAnalysisCard = ({ data }: { data: TariffAnalysis }) => (
   <Card className="w-full mb-6">
     <CardHeader>
       <CardTitle className="text-xl font-bold">Tariff Analysis</CardTitle>
-      <CardDescription>{data.pattern_analysis}</CardDescription>
+      <CardDescription>{data.patternAnalysis}</CardDescription>
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -525,5 +525,6 @@ export {
   ExecutiveSummaryCard,
   SmartDevicesAnalysisCard,
   SolarAnalysisCard,
-  TariffAnalysisCard,
+  TariffAnalysisCard
 };
+

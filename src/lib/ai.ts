@@ -38,16 +38,15 @@ const executiveSummarySchema = z.object({
 });
 
 const tariffAnalysisSchema = z.object({
-  forecasted_rates: z.array(
+  forecastedRates: z.array(
     z.object({
       time: z.string(),
       rate: z.number(),
       variationPercentage: z.number(),
     }),
   ),
-  savings_opportunities: z.array(z.string()),
-  pattern_analysis: z.string(),
-  peak_to_off_peak_ratio: z.number(),
+  savingsOpportunities: z.array(z.string()),
+  patternAnalysis: z.string(),
 });
 
 const consumptionAnalysisSchema = z.object({
@@ -64,9 +63,7 @@ const consumptionAnalysisSchema = z.object({
   ),
   unusualPatterns: z.array(z.string()),
   weatherImpact: z.string(),
-  weatherCorrectedConsumption: z.number(),
   optimizationOpportunities: z.array(z.string()),
-  potentialAnnualSavings: z.number(),
   timeOfDayRecommendations: z.array(z.string()),
 });
 
@@ -75,16 +72,6 @@ const solarAnalysisSchema = z.object({
   maintenance_tasks: z.array(z.string()),
   weather_impact: z.string(),
   storage_tips: z.array(z.string()),
-  degradationRate: z.number(),
-  potentialUpgradeBenefits: z
-    .array(
-      z.object({
-        type: z.string(),
-        estimatedAnnualSavings: z.number(),
-        implementationCost: z.number(),
-      }),
-    )
-    .optional(),
 });
 
 const deviceScheduleSchema = z.object({
@@ -105,29 +92,31 @@ const smartDevicesAnalysisSchema = z.object({
   deviceIntegrationTips: z.array(z.string()),
 });
 
-const SYSTEM_PROMPT = `You are an advanced energy analytics expert with deep expertise in:
-- Residential and commercial energy consumption patterns
-- Solar power systems and battery storage optimization
-- Time-of-use electricity pricing and tariff structures
-- Weather impact on energy usage
-- Energy-saving recommendations and ROI calculations
+const SYSTEM_PROMPT = `You are an expert energy analyst focused on maximizing cost savings through data-driven insights.
 
-Follow these guidelines for all responses:
-1. Always support recommendations with specific data points and calculations
-2. Provide numerical estimates for potential savings
-3. Consider local context (weather, tariffs, infrastructure)
-4. Focus on actionable, prioritized insights
-5. Include both immediate actions and long-term strategies
-6. Explain the reasoning behind each recommendation
-7. Reference industry benchmarks when available
+Core capabilities:
+- Energy consumption pattern analysis
+- TOU pricing optimization
+- Solar/battery system recommendations
+- Weather impact assessment
+- ROI-based recommendations
 
-Response requirements:
-- Use precise numerical values instead of ranges where possible
-- Include confidence levels for predictions
-- Prioritize recommendations by ROI
-- Consider implementation complexity
-- Account for seasonal variations
-- Factor in peak vs. off-peak timing`;
+Key response criteria:
+1. All insights must include:
+   - Specific data points
+   - Numerical savings estimates
+   - Implementation complexity (1-5)
+   - ROI timeframe
+   - Confidence level (%)
+
+2. Analysis framework:
+   - Immediate vs long-term actions
+   - Peak/off-peak optimization
+   - Seasonal adjustments
+   - Local infrastructure constraints
+   - Industry benchmarks
+
+Always provide concrete, actionable recommendations prioritized by ROI.`;
 
 async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
   try {
@@ -186,33 +175,31 @@ async function calculateExecutiveSummary(
     ? solarGeneration * averageRate
     : 0;
 
-  const aiPrompt = `
-    Analyze household energy metrics and provide actionable recommendations:
-
-    CONSUMPTION METRICS:
-    - Cost trend: ${costComparisonPercentage.toFixed(2)}% ${costComparisonPercentage > 0 ? "increase" : "decrease"}
-    - Current day cost: ${currentDayCost.toFixed(2)}
-    - Previous day cost: ${previousDayCost.toFixed(2)}
-
-    ENERGY INFRASTRUCTURE:
-    - Solar installed: ${userData.hasSolarPanels ? "Yes" : "No"}
-    - Solar capacity: ${userData.hasSolarPanels ? userData.solarCapacity + " kW" : "N/A"}
-    - Battery storage: ${userData.hasBatteryStorage ? userData.storageCapacity + " kWh" : "No"}
+    const aiPrompt = `
+    Based on these metrics, provide actionable energy recommendations:
+    
+    METRICS:
+    - Cost: ${costComparisonPercentage.toFixed(2)}% ${costComparisonPercentage > 0 ? "increase" : "decrease"}
+    - Today: ${currentDayCost.toFixed(2)} Rs
+    - Yesterday: ${previousDayCost.toFixed(2)} Rs
+    - Solar: ${userData.hasSolarPanels ? `${userData.solarCapacity} kW` : "No"}
+    - Battery: ${userData.hasBatteryStorage ? `${userData.storageCapacity} kWh` : "No"}
     - Monthly bill: ${userData.monthlyBill} Rs
-    - Electricity provider: ${userData.electricityProvider}
-
-    WEATHER CONDITIONS:
-    - Temperature: ${weatherData.main.temp}°C
-    - Humidity: ${weatherData.main.humidity}%
-    - Weather: ${weatherData.weather[0].main}
-    - Description: ${weatherData.weather[0].description}
-
-    Recommendations should include:
-    1. Optimized device schedules for cost-saving based on off-peak hours
-    2. Potential energy savings for recommended patterns
-    3. Maintenance or efficiency improvements
-    4. Justifications for recommendations
-  `;
+    - Weather: ${weatherData.main.temp}°C, ${weatherData.weather[0].main}
+    
+    Provide recommendations in this JSON format:
+    {
+      "recommendations": [{
+        "text": "detailed recommendation",
+        "priority": "high" | "medium" | "low",
+        "estimatedImpact": "quantified impact",
+        "potentialMonthlySavings": "amount in Rs",
+        "implementationEffort": "low" | "medium" | "high"
+      }]
+    }
+    
+    Include device schedules, maintenance needs, and efficiency improvements.
+    `;
 
   const aiResponse = await fetchAIResponse(aiPrompt, executiveSummarySchema);
 
@@ -247,36 +234,45 @@ async function generateTariffAnalysis(
   const offPeakRate = Math.min(...rates);
 
   const aiPrompt = `
-    Analyze electricity tariffs and identify cost-saving opportunities:
+{
+  "context": {
+    "rates": {
+      "avg": ${averageRate.toFixed(2)},
+      "peak": ${peakRate.toFixed(2)},
+      "offPeak": ${offPeakRate.toFixed(2)}
+    },
+    "discom": {
+      "state": "${discomData.State}",
+      "name": "${discomData.DISCOM}",
+      "consumers": ${discomData["Total Number of consumers (Millions)"]},
+      "costs": {
+        "purchase": ${discomData["Average power purchase cost (Rs./kWh)"]},
+        "supply": ${discomData["Average Cost of Supply (Rs./kWh)"]},
+        "billing": ${discomData["Average Billing Rate (Rs./kWh)"]}
+      },
+      "losses": ${discomData["AT&C Losses (%)"]}
+    },
+    "usage": ${JSON.stringify(touData)}
+  }
 
-    CURRENT TARIFF METRICS:
-    - Average rate: ${averageRate.toFixed(2)} Rs/kWh
-    - Peak rate: ${peakRate.toFixed(2)} Rs/kWh
-    - Off-peak rate: ${offPeakRate.toFixed(2)} Rs/kWh
+  Return JSON matching:
+  {
+    "forecastedRates": [{
+      "time": "HH:00",       // 24 entries, one per hour
+      "rate": number,        // Rs/kWh with ±10% variation
+      "variationPercentage": number
+    }],
+    "savingsOpportunities": string[],
+    "patternAnalysis": string
+  }
 
-    UTILITY PROVIDER DETAILS:
-    - State: ${discomData.State}
-    - DISCOM: ${discomData.DISCOM}
-    - Consumer base: ${discomData["Total Number of consumers (Millions)"]} million
-    - Power purchase cost: ${discomData["Average power purchase cost (Rs./kWh)"]} Rs/kWh
-    - Supply cost: ${discomData["Average Cost of Supply (Rs./kWh)"]} Rs/kWh
-    - Billing rate: ${discomData["Average Billing Rate (Rs./kWh)"]} Rs/kWh
-    - AT&C losses: ${discomData["AT&C Losses (%)"]}%
-
-    TIME OF USE PATTERNS:
-    ${touData.map((t) => `- ${new Date(t.timestamp).toLocaleTimeString()}: ${t.rate} Rs/kWh`).join("\n    ")}
-
-    Analyze the data and return a JSON response following these strict requirements:
-
-    1. Provide forecasted rates for each hour that MUST vary throughout the day:
-    - Early morning (00:00-05:59): Rates should be near off-peak (${offPeakRate.toFixed(2)} Rs/kWh)
-    - Morning peak (06:00-09:59): Rates should be near peak (${peakRate.toFixed(2)} Rs/kWh)
-    - Mid-day (10:00-16:59): Rates should be near average (${averageRate.toFixed(2)} Rs/kWh)
-    - Evening peak (17:00-21:59): Rates should be near peak (${peakRate.toFixed(2)} Rs/kWh)
-    - Night (22:00-23:59): Rates should be near off-peak (${offPeakRate.toFixed(2)} Rs/kWh)
-
-    2. Add random variations of ±10% to prevent constant rates
-    `;
+  Rate guidelines (Rs/kWh):
+  00:00-05:59: ~${offPeakRate.toFixed(2)}
+  06:00-09:59: ~${peakRate.toFixed(2)}
+  10:00-16:59: ~${averageRate.toFixed(2)}
+  17:00-21:59: ~${peakRate.toFixed(2)}
+  22:00-23:59: ~${offPeakRate.toFixed(2)}
+}`;
 
   try {
     const aiResponse = await fetchAIResponse(aiPrompt, tariffAnalysisSchema);
@@ -286,9 +282,9 @@ async function generateTariffAnalysis(
       averageRate: parseFloat(averageRate.toFixed(2)),
       peakRate: parseFloat(peakRate.toFixed(2)),
       offPeakRate: parseFloat(offPeakRate.toFixed(2)),
-      forecastedRates: aiResponse.forecasted_rates,
-      savingsOpportunities: aiResponse?.savings_opportunities || [],
-      pattern_analysis: aiResponse.pattern_analysis || "",
+      forecastedRates: aiResponse.forecastedRates,
+      savingsOpportunities: aiResponse?.savingsOpportunities || [],
+      patternAnalysis: aiResponse.patternAnalysis || "",
     };
   } catch (error) {
     console.error("Error generating tariff analysis:", error);
@@ -299,7 +295,7 @@ async function generateTariffAnalysis(
       offPeakRate: parseFloat(offPeakRate.toFixed(2)),
       forecastedRates: [],
       savingsOpportunities: [],
-      pattern_analysis:
+      patternAnalysis:
         "There was an error generating the tariff analysis. Please try again.",
     };
   }
@@ -343,41 +339,45 @@ async function generateConsumptionAnalytics(
     }))
     .sort((a, b) => a.hour - b.hour);
 
-  // Get AI insights for consumption patterns
-  const aiPrompt = `
-    Analyze the following energy consumption data and return a JSON response.
-
-    CONSUMPTION METRICS:
-    - Daily total: ${totalConsumption.toFixed(2)} kWh
-    - Peak consumption: ${peakConsumption.consumption.toFixed(2)} kWh at ${new Date(peakConsumption.time).toLocaleTimeString()}
-    - Average hourly: ${(totalConsumption / 24).toFixed(2)} kWh
-
-    HOURLY CONSUMPTION PATTERN:
-    ${hourlyAverages
-      .map(
-        (h) =>
-          `- Hour ${h.hour.toString().padStart(2, "0")}: ${h.average.toFixed(2)} kWh`,
-      )
-      .join("\n    ")}
-
-    WEATHER CONDITIONS:
-    - Temperature: ${weatherData.main.temp}°C
-    - Humidity: ${weatherData.main.humidity}%
-    - Conditions: ${weatherData.weather[0].main}
-    - Details: ${weatherData.weather[0].description}
-
-    Analyze the data and provide insights in the following JSON structure. Ensure all numbers are provided as numbers, not strings:
-
-    Important formatting rules:
-    1. Ensure the response is valid JSON
-    2. All number values should be actual numbers, not strings
-    3. Arrays should contain string elements for text fields
-    4. Keep time format consistent as "M/D/YYYY HH:mm"
-    5. Hour values in consumptionByTimeOfDay should be numbers 0-23
-    6. All text descriptions should be clear and actionable
-    7. Ensure weatherImpact is a single comprehensive string
-    8. Recommendations should be specific and practical
-`;
+    const aiPrompt = `
+    {
+      "context": {
+        "consumption": {
+          "total": ${totalConsumption.toFixed(2)},
+          "peak": {
+            "value": ${peakConsumption.consumption.toFixed(2)},
+            "time": "${new Date(peakConsumption.time).toLocaleString()}"
+          },
+          "hourlyAvg": ${(totalConsumption / 24).toFixed(2)},
+          "hourly": ${JSON.stringify(hourlyAverages)}
+        },
+        "weather": {
+          "temp": ${weatherData.main.temp},
+          "humidity": ${weatherData.main.humidity},
+          "condition": "${weatherData.weather[0].main}",
+          "details": "${weatherData.weather[0].description}"
+        }
+      }
+    
+      Return JSON matching exactly:
+      {
+        "totalConsumption": number,
+        "averageDailyConsumption": number,
+        "peakConsumptionTime": "M/D/YYYY HH:mm",
+        "peakConsumptionValue": number,
+        "consumptionByTimeOfDay": [{
+          "hour": number,      // 0-23
+          "average": number,
+          "varianceFromMean": number
+        }],
+        "unusualPatterns": string[],
+        "weatherImpact": string,
+        "optimizationOpportunities": string[],
+        "timeOfDayRecommendations": string[]
+      }
+    
+      All numbers must be actual numbers, not strings.
+    }`;
 
   const aiResponse = await fetchAIResponse(aiPrompt, consumptionAnalysisSchema); // Use insights in future updates
 
