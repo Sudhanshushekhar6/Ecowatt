@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Discom, TOUData } from "@/types/user";
+import { useCopilotReadable } from "@copilotkit/react-core";
 import { DollarSign, Percent, Users, Zap } from "lucide-react";
 import {
   Bar,
@@ -39,6 +40,12 @@ const DiscomInfoCard = ({
       value: parseFloat(discomInfo["Average Billing Rate (Rs./kWh)"]),
     },
   ];
+
+  useCopilotReadable({
+    description:
+      "Information about user's Energy Distribution Company (DISCOM)",
+    value: discomInfo,
+  });
 
   return (
     <Card className="w-full text-sm">

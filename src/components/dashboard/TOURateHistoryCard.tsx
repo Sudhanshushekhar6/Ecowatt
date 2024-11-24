@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TOUData } from "@/types/user";
+import { useCopilotReadable } from "@copilotkit/react-core";
 import { Info } from "lucide-react";
 import {
   Line,
@@ -97,6 +98,12 @@ export default function TOURateHistoryCard({
 
   const recommendation = getRecommendation(lastTou.rate);
   const status = getRateStatus(lastTou.rate);
+
+  useCopilotReadable({
+    description:
+      "Latest Time-Of-Use (TOU) rate history for past 24hours, including timestamp, rate, and category.",
+    value: touHistory,
+  });
 
   return (
     <Card className="w-full">

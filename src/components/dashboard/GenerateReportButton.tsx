@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { generateReport } from "@/lib/ai";
+import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 import PDFReport from "./PDFReport";
 import {
   ConsumptionAnalyticsCard,
@@ -77,6 +78,19 @@ const GenerateReportButton = ({
       setIsGenerating(false);
     }
   };
+
+  useCopilotReadable({
+    description:
+      "User's analysis report based on their energy data and recommendations for improvement. If the values are empty, then the report hasn't been generated yet.",
+    value: report,
+  });
+
+  useCopilotAction({
+    name: "generateReport",
+    description:
+      "Generate an analysis report based on the user's data and generate recommendations for improvement.",
+    handler: handleGenerateReport,
+  });
 
   return (
     <div className="w-full space-y-6">

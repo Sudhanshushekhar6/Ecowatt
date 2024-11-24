@@ -12,6 +12,7 @@ import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
 import { calculateCurrentBatteryPower } from "@/lib/utils";
 import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
+import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { parse } from "papaparse";
@@ -48,6 +49,13 @@ export default function Dashboard() {
       },
     });
   }, []);
+
+  useCopilotChatSuggestions({
+    instructions: `Suggest user to:
+      - Get an overview of their current energy profile, including electricity provider, monthly bill, solar panels, battery storage, and primary goal.
+      - Generate an analysis report of their data and generate recommendations for improvement. Use the generateReport action to generate the report.
+    `,
+  });
 
   // Initialize dashboard data and set initial battery power
   useEffect(() => {
