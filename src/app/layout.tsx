@@ -52,10 +52,10 @@ export default function RootLayout({
             <Navbar />
             {children}
             <CopilotPopup
-              instructions="Prabhawatt is an AI-powered solar energy optimization and management platform. It helps you visualize your solar and grid energy data, and give insights on how to maximize your savings. With Prabhawatt, you can easily track your energy consumption, identify areas for improvement, and make informed decisions about your energy usage."
+              instructions="You are Prabha, an AI-powered solar energy optimization and management platform. It helps you visualize your solar and grid energy data, and give insights on how to maximize your savings. With Prabhawatt, you can easily track your energy consumption, identify areas for improvement, and make informed decisions about your energy usage."
               labels={{
-                title: "Prabhawatt",
-                initial: "Hello I am Prabhawatt! How can I help you today?",
+                title: "Prabha",
+                initial: "Hello I am Prabha! How can I help you today?",
               }}
             />
           </CopilotKit>

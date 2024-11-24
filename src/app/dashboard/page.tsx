@@ -12,6 +12,7 @@ import { fetchDISCOMData, fetchTOUHistory, fetchWeatherData } from "@/lib/api";
 import { db } from "@/lib/firebase";
 import { calculateCurrentBatteryPower } from "@/lib/utils";
 import { Discom, EnergyData, TOUData, UserData } from "@/types/user";
+import { useCopilotReadable } from "@copilotkit/react-core";
 import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
@@ -49,6 +50,12 @@ export default function Dashboard() {
       },
     });
   }, []);
+
+  useCopilotReadable({
+    description:
+      "User's weather data, includes user's current location, temperature, and wind speed etc.",
+    value: weatherData,
+  });
 
   useCopilotChatSuggestions({
     instructions: `Suggest user to:
@@ -212,7 +219,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[90vh] text-sm text-muted-foreground">
-        Loading...
+        <div className="loader"></div>
       </div>
     );
   }

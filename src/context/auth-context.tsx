@@ -35,7 +35,7 @@ export const AuthContextProvider = ({
     <AuthContext.Provider value={{ user }}>
       {loading ? (
         <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
-          Loading...
+          <div className="loader"></div>
         </div>
       ) : (
         children

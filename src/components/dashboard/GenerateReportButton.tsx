@@ -54,9 +54,31 @@ const GenerateReportButton = ({
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateReport = async () => {
-    if (!weatherData || !userData || !discomInfo) {
+    if (!userData || !discomInfo) {
       setError("Missing required data");
       return;
+    }
+
+    if (!weatherData) {
+      weatherData = {
+        name: "Unknown",
+        main: {
+          temp: 0,
+          humidity: 0,
+          feels_like: 0,
+        },
+        weather: [
+          {
+            main: "Clear",
+            description: "Clear skies",
+            icon: "01d",
+          },
+        ],
+        wind: {
+          speed: 0,
+        },
+        visibility: 0,
+      };
     }
 
     setIsGenerating(true);
