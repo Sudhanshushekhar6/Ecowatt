@@ -159,27 +159,29 @@ export default function Dashboard() {
   // Fetch TOU history
   useEffect(() => {
     let isMounted = true;
-    fetchTOUHistory().then((touHistory) => {
-      if (isMounted) {
-        const latestTou = touHistory[touHistory.length - 1];
-        toast.success("Latest TOU rate fetched", {
-          description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
-          action: (
-            <Button
-              onClick={() => {
-                toast.dismiss();
-              }}
-              className="ml-auto"
-              variant={"outline"}
-              size={"sm"}
-            >
-              Ok
-            </Button>
-          ),
-        });
-        setTOUHistory(touHistory);
-      }
-    });
+    fetchTOUHistory(userData ? userData.userCategory : "").then(
+      (touHistory) => {
+        if (isMounted) {
+          const latestTou = touHistory[touHistory.length - 1];
+          toast.success("Latest TOU rate fetched", {
+            description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
+            action: (
+              <Button
+                onClick={() => {
+                  toast.dismiss();
+                }}
+                className="ml-auto"
+                variant={"outline"}
+                size={"sm"}
+              >
+                Ok
+              </Button>
+            ),
+          });
+          setTOUHistory(touHistory);
+        }
+      },
+    );
 
     return () => {
       isMounted = false;
@@ -254,7 +256,10 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DiscomInfoCard discomInfo={discomInfo} touHistory={touHistory} />
-            <TOURateHistoryCard touHistory={touHistory} />
+            <TOURateHistoryCard
+              category={userData ? userData.userCategory : ""}
+              touHistory={touHistory}
+            />
           </div>
 
           <EnergyCharts

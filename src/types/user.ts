@@ -13,6 +13,7 @@ export interface UserData {
   monthlyBill: number;
   hasSolarPanels: boolean;
   solarCapacity: number | null;
+  userCategory: "domestic" | "non_domestic" | "industry" | null;
   installationDate: string | null;
   hasBatteryStorage: boolean;
   storageCapacity: string;

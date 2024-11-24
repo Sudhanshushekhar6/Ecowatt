@@ -175,7 +175,7 @@ async function calculateExecutiveSummary(
     ? solarGeneration * averageRate
     : 0;
 
-    const aiPrompt = `
+  const aiPrompt = `
     Based on these metrics, provide actionable energy recommendations:
     
     METRICS:
@@ -339,7 +339,7 @@ async function generateConsumptionAnalytics(
     }))
     .sort((a, b) => a.hour - b.hour);
 
-    const aiPrompt = `
+  const aiPrompt = `
     {
       "context": {
         "consumption": {

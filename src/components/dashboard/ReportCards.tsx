@@ -525,6 +525,5 @@ export {
   ExecutiveSummaryCard,
   SmartDevicesAnalysisCard,
   SolarAnalysisCard,
-  TariffAnalysisCard
+  TariffAnalysisCard,
 };
-

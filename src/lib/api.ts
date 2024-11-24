@@ -20,7 +20,9 @@ export async function fetchWeatherData(
   }
 }
 
-export async function fetchTOUHistory(): Promise<TOUData[]> {
+export async function fetchTOUHistory(
+  userCategory: string | null,
+): Promise<TOUData[]> {
   try {
     const touCollection = collection(db, "tou-rates");
     const q = query(touCollection, orderBy("timestamp", "desc"), limit(24));
@@ -31,7 +33,11 @@ export async function fetchTOUHistory(): Promise<TOUData[]> {
       category: doc.data().category,
     }));
 
-    history = history.filter((data) => data.category === "DOMESTIC");
+    history = history.filter(
+      (data) =>
+        data.category.toLocaleLowerCase() ===
+        (userCategory?.toLocaleLowerCase() || "domestic"),
+    );
 
     return history.reverse();
   } catch (error) {

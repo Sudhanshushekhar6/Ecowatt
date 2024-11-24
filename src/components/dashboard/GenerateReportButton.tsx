@@ -24,7 +24,7 @@ import {
   ExecutiveSummaryCard,
   SmartDevicesAnalysisCard,
   SolarAnalysisCard,
-  TariffAnalysisCard
+  TariffAnalysisCard,
 } from "./ReportCards";
 
 interface Report {
@@ -84,52 +84,43 @@ const GenerateReportButton = ({
       wind: { speed: 0 },
       visibility: 0,
     }),
-    []
+    [],
   );
 
   const generateReportSection = async (
     section: keyof Report,
-    signal: AbortSignal
+    fullReport: any, // Add the full report as an argument
   ) => {
-    setSectionStatus(prev => ({
+    setSectionStatus((prev) => ({
       ...prev,
-      [section]: { isLoading: true, error: null }
+      [section]: { isLoading: true, error: null },
     }));
 
     try {
-      // Add a small delay between sections to prevent UI blocking
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      if (signal.aborted) return;
+      // Extract the section from the full report
+      const generatedSection = fullReport[section];
 
-      const generatedReport = await generateReport(
-        userData,
-        touHistory,
-        weatherData || defaultWeatherData(),
-        discomInfo!,
-        energyData,
-      );
-
-      if (signal.aborted) return;
-
-      setReport(prev => ({
-        ...prev,
-        [section]: generatedReport[section]
-      }));
+      if (generatedSection) {
+        setReport((prev) => ({
+          ...prev,
+          [section]: generatedSection,
+        }));
+      }
     } catch (error) {
-      if (!signal.aborted) {
-        setSectionStatus(prev => ({
-          ...prev,
-          [section]: { isLoading: false, error: 'Failed to generate this section' }
-        }));
-      }
+      setSectionStatus((prev) => ({
+        ...prev,
+        [section]: {
+          isLoading: false,
+          error: "Failed to generate this section",
+        },
+      }));
     } finally {
-      if (!signal.aborted) {
-        setSectionStatus(prev => ({
-          ...prev,
-          [section]: { ...prev[section], isLoading: false }
-        }));
-      }
+      setSectionStatus((prev) => ({
+        ...prev,
+        [section]: { ...prev[section], isLoading: false },
+      }));
     }
   };
 
@@ -150,18 +141,34 @@ const GenerateReportButton = ({
     setReport(INITIAL_REPORT_STATE);
     setSectionStatus(INITIAL_STATUS_STATE);
 
-    // Generate sections sequentially to prevent UI blocking
-    const sections: (keyof Report)[] = [
-      'executiveSummary',
-      'tariffAnalysis',
-      'consumptionAnalytics',
-      'solarAnalysis',
-      'smartDevicesAnalysis'
-    ];
+    try {
+      // Generate the full report once
+      const fullReport = await generateReport(
+        userData,
+        touHistory,
+        weatherData || defaultWeatherData(),
+        discomInfo!,
+        energyData,
+      );
 
-    for (const section of sections) {
-      if (signal.aborted) break;
-      await generateReportSection(section, signal);
+      if (signal.aborted) return;
+
+      // Generate individual sections after the full report is generated
+      const sections: (keyof Report)[] = [
+        "executiveSummary",
+        "tariffAnalysis",
+        "consumptionAnalytics",
+        "solarAnalysis",
+        "smartDevicesAnalysis",
+      ];
+
+      for (const section of sections) {
+        if (signal.aborted) break;
+        await generateReportSection(section, fullReport);
+      }
+    } catch (error) {
+      setIsGenerating(false);
+      setSectionStatus(INITIAL_STATUS_STATE);
     }
 
     if (!signal.aborted) {
@@ -179,19 +186,21 @@ const GenerateReportButton = ({
   }, []);
 
   useCopilotReadable({
-    description: "User's analysis report based on their energy data and recommendations for improvement.",
+    description:
+      "User's analysis report based on their energy data and recommendations for improvement.",
     value: report,
   });
 
   useCopilotAction({
     name: "generateReport",
-    description: "Generate an analysis report based on the user's data and generate recommendations for improvement.",
+    description:
+      "Generate an analysis report based on the user's data and generate recommendations for improvement.",
     handler: handleGenerateReport,
   });
 
   const renderSection = (
     section: keyof Report,
-    Component: React.ComponentType<any>
+    Component: React.ComponentType<any>,
   ) => {
     const status = sectionStatus[section];
     const data = report[section];
@@ -217,7 +226,9 @@ const GenerateReportButton = ({
     return data && <Component data={data} />;
   };
 
-  const isReportComplete = Object.values(report).every(section => section !== null);
+  const isReportComplete = Object.values(report).every(
+    (section) => section !== null,
+  );
 
   return (
     <div className="w-full space-y-6">
@@ -249,11 +260,11 @@ const GenerateReportButton = ({
       </div>
 
       <div className="space-y-6">
-        {renderSection('executiveSummary', ExecutiveSummaryCard)}
-        {renderSection('tariffAnalysis', TariffAnalysisCard)}
-        {renderSection('consumptionAnalytics', ConsumptionAnalyticsCard)}
-        {renderSection('solarAnalysis', SolarAnalysisCard)}
-        {renderSection('smartDevicesAnalysis', SmartDevicesAnalysisCard)}
+        {renderSection("executiveSummary", ExecutiveSummaryCard)}
+        {renderSection("tariffAnalysis", TariffAnalysisCard)}
+        {renderSection("consumptionAnalytics", ConsumptionAnalyticsCard)}
+        {renderSection("solarAnalysis", SolarAnalysisCard)}
+        {renderSection("smartDevicesAnalysis", SmartDevicesAnalysisCard)}
       </div>
 
       {isReportComplete && (

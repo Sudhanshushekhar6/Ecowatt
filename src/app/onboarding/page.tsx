@@ -55,6 +55,7 @@ export default function Onboarding() {
     electricityProvider: "",
     monthlyBill: "",
     hasSolarPanels: false,
+    userCategory: "",
     solarCapacity: "",
     installationDate: "",
     hasBatteryStorage: false,
@@ -225,7 +226,7 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[92vh] bg-gray-100">
+    <div className="flex items-center justify-center min-h-[92vh] bg-gray-100 py-8">
       <TooltipProvider>
         <Card className="w-full max-w-2xl">
           <CardHeader>
@@ -260,7 +261,7 @@ export default function Onboarding() {
                       </TooltipTrigger>
                       <TooltipContent className="bg-background text-foreground rounded-md shadow-lg max-w-xs">
                         <p>
-                          Provided in Indid Climate and Energy Dashboard by NITI
+                          Provided in India Climate and Energy Dashboard by NITI
                           Aayog
                         </p>
                         <Link
@@ -287,6 +288,46 @@ export default function Onboarding() {
                       onChange={handleInputChange}
                       required
                     />
+                  </div>
+                  <div>
+                    <Label htmlFor="userCategory">
+                      * Please select your category:
+                    </Label>
+                    <RadioGroup
+                      name="userCategory"
+                      value={formData.userCategory || ""}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          userCategory: value,
+                        }))
+                      }
+                      required
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="domestic"
+                          id="category-domestic"
+                        />
+                        <Label htmlFor="category-domestic">Domestic</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="non_domestic"
+                          id="category-non_domestic"
+                        />
+                        <Label htmlFor="category-non_domestic">
+                          Non-Domestic
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="industry"
+                          id="category-industry"
+                        />
+                        <Label htmlFor="category-industry">Industry</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
                   <div>
                     <Label>Do you have solar panels?</Label>

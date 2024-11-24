@@ -21,8 +21,10 @@ import {
 } from "recharts";
 
 export default function TOURateHistoryCard({
+  category = "DOMESTIC",
   touHistory = [],
 }: {
+  category: string | null;
   touHistory: TOUData[];
 }) {
   const lastTou = touHistory[touHistory.length - 1];
@@ -126,6 +128,10 @@ export default function TOURateHistoryCard({
           <span className="text-muted-foreground">•</span>
           <span className="text-muted-foreground">
             Avg: ₹{averageRate.toFixed(2)}/kWh
+          </span>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground">
+            {category ? `(${category.toLowerCase()})` : ""}
           </span>
         </CardDescription>
       </CardHeader>
