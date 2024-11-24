@@ -35,27 +35,31 @@ export default function TOURateHistoryCard({
   };
 
   const getRecommendation = (rate: number) => {
+    const optimalRate = 5; // Set the optimal rate at ₹10 per unit
+    let percentageDifference = ((rate - optimalRate) / optimalRate) * 100;
+
     if (rate < 5) {
       return {
         title: "Low TOU Rates",
         description:
-          "Consider switching to Grid energy if you haven't already.",
-        detail: `${(((5 - rate) / 5) * 100).toFixed(1)}% lower than usual`,
+          Math.abs(percentageDifference).toFixed(2) +
+          "% lower than the optimal rate.",
         variant: "default" as "default",
       };
     }
     if (rate < 10) {
       return {
         title: "Moderate TOU Rates",
-        description: "Current rates are within normal range",
-        detail: `Rates between ₹5.00 and ₹10.00 are typical`,
+        description:
+          percentageDifference.toFixed(2) + "% higher than the optimal rate.",
         variant: "default" as "default",
       };
     }
     return {
       title: "High TOU Rates",
-      description: "Consider switching to Solar energy if available",
-      detail: `${(((rate - 10) / 5) * 100).toFixed(1)}% higher than usual`,
+      description:
+        percentageDifference.toFixed(2) +
+        "% higher than the optimal rate. Consider switching to Solar energy if available.",
       variant: "destructive" as "destructive",
     };
   };
@@ -167,9 +171,8 @@ export default function TOURateHistoryCard({
                 {recommendation.title}
               </AlertTitle>
               <AlertDescription>
-                <p>{recommendation.description}</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {recommendation.detail}
+                <p className="text-muted-foreground">
+                  {recommendation.description}
                 </p>
               </AlertDescription>
             </div>

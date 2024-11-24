@@ -371,7 +371,9 @@ export default function StatsCards({
       title: "Smart Home Setup",
       value:
         Object.values(userData.smartDevices).filter((v) => v === true).length +
-        userData.smartDevices.other.split(",").length +
+        (userData.smartDevices.other
+          ? userData.smartDevices.other.split(",").length
+          : 0) +
         " Device(s)",
       subtitle: "Connected smart devices",
       icon: Laptop,

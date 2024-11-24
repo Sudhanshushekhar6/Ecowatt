@@ -203,18 +203,8 @@ const PDFReport = ({
         <View style={styles.list}>
           {executiveSummary.keyRecommendations.map((rec, index) => (
             <View key={index}>
-              <Text
-                style={[
-                  styles.listItem,
-                  rec.priority === "high"
-                    ? styles.priorityHigh
-                    : rec.priority === "medium"
-                      ? styles.priorityMedium
-                      : styles.priorityLow,
-                ]}
-              >
+              <Text style={styles.listItem}>
                 • {rec.text}
-                {"\n"} Priority: {rec.priority.toUpperCase()}
                 {"\n"} Impact: {rec.estimatedImpact}
               </Text>
             </View>

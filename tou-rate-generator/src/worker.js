@@ -89,7 +89,6 @@ async function generateAndStoreTOUData(category, env) {
     messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
     appId: env.FIREBASE_APP_ID,
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
@@ -102,23 +101,18 @@ async function generateAndStoreTOUData(category, env) {
     console.log(`Stored ${category} TOU rate: ${currentRate}`);
   } catch (error) {
     console.error("Error storing TOU rate:", error);
-    throw error; // Propagate error for proper handling
   }
 }
 
 export default {
   async scheduled(event, env, ctx) {
-    try {
-      ctx.waitUntil(
-        Promise.all(
-          ["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].map((category) =>
-            generateAndStoreTOUData(category, env),
-          ),
-        ),
-      );
-    } catch (error) {
-      console.error("Scheduled task failed:", error);
-    }
+    ctx.waitUntil(
+      Promise.all(
+        ["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].map((industry) => {
+          return generateAndStoreTOUData(industry, env);
+        }),
+      ),
+    );
   },
 
   async fetch(request, env, ctx) {

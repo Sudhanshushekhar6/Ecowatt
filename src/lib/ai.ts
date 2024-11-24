@@ -207,12 +207,11 @@ async function calculateExecutiveSummary(
     - Weather: ${weatherData.weather[0].main}
     - Description: ${weatherData.weather[0].description}
 
-    Based on this data, provide recommendations that:
-    1. Address the most impactful cost-saving opportunities
-    2. Consider existing infrastructure (solar/battery if present)
-    3. Account for current weather conditions
-    4. Can be implemented immediately
-    5. Have measurable impact on energy costs
+    Recommendations should include:
+    1. Optimized device schedules for cost-saving based on off-peak hours
+    2. Potential energy savings for recommended patterns
+    3. Maintenance or efficiency improvements
+    4. Justifications for recommendations
   `;
 
   const aiResponse = await fetchAIResponse(aiPrompt, executiveSummarySchema);
