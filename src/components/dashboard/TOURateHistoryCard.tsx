@@ -80,7 +80,9 @@ export default function TOURateHistoryCard({
       return (
         <div className="bg-white p-3 rounded-lg shadow-lg border">
           <p className="text-sm font-medium">
-            {new Date(label).toLocaleString()}
+            {new Date(label).toLocaleTimeString([], {
+              hour12: true,
+            })}
           </p>
           <div className="flex items-center gap-2 mt-1">
             <div className={`w-2 h-2 rounded-full ${status.color}`} />

@@ -4,11 +4,10 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { SmartDevices, UserData, WeatherData } from "@/types/user";
 import { useCopilotReadable } from "@copilotkit/react-core";
@@ -53,7 +52,7 @@ const LocationWeatherDetails = ({
             Weather Details for {weatherData.name}
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription>
+        <div>
           <p>
             Weather conditions greatly affect energy consumption and tariff
             rates.
@@ -78,7 +77,7 @@ const LocationWeatherDetails = ({
               </div>
             ))}
           </div>
-        </DialogDescription>
+        </div>
         <DialogFooter className="mt-6">
           <DialogClose asChild>
             <Button className="w-full">Close</Button>
@@ -171,7 +170,7 @@ const SmartDevicesDialog = ({
             Monitor and optimize your smart device energy consumption
           </p>
         </DialogHeader>
-        <DialogDescription>
+        <div>
           <div className="space-y-6">
             {/* Device Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -274,7 +273,7 @@ const SmartDevicesDialog = ({
               </div>
             )}
           </div>
-        </DialogDescription>
+        </div>
         <DialogFooter className="mt-6">
           <DialogClose asChild>
             <Button className="w-full">Close</Button>

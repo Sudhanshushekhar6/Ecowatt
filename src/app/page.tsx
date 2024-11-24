@@ -188,11 +188,11 @@ export default function Home() {
                   </li>
                 </ul>
               </div>
-              <div className="relative group">
+              <div className="relative group flex justify-center">
                 <div className="absolute -inset-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-200" />
                 <Image
                   alt="Solar panels"
-                  className="relative max-h-[280px] rounded-2xl shadow-2xl object-cover object-center aspect-[4/3] w-full"
+                  className="relative max-h-[280px] max-w-[400px] rounded-2xl shadow-2xl object-cover object-center aspect-[4/3] w-full"
                   height="400"
                   src="/solar.jpg"
                   width="600"

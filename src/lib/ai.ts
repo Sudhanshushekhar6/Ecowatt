@@ -133,7 +133,7 @@ async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
   try {
     const response = await client.chat.completions.create({
       model: "llama-3.2-90b-text-preview",
-      max_tokens: 8192,
+      max_tokens: 4096,
       temperature: 0.7,
       top_p: 0.9,
       response_model: { schema: schema, name: "response" },
