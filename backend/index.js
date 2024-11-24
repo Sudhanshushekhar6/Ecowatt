@@ -1,6 +1,20 @@
-// src/worker.js
-import { initializeApp } from "firebase/app";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
+const cron = require("node-cron");
+const { initializeApp } = require("firebase/app");
+const { getFirestore, collection, addDoc } = require("firebase/firestore");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env.local") });
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const baseTouRates = {
   DOMESTIC: [
@@ -60,7 +74,9 @@ function getCurrentTOURate(category) {
   let rate = currentRateConfig.baseRate;
 
   rate += generateRandomVariation(currentRateConfig.variation);
+
   rate *= SEASON_MULTIPLIER[currentSeason];
+
   rate *= isWeekend ? DEMAND_MULTIPLIER.WEEKEND : DEMAND_MULTIPLIER.WEEKDAY;
 
   if (category !== "DOMESTIC") {
@@ -74,56 +90,30 @@ function getCurrentTOURate(category) {
   }
 
   rate *= 1 + (Math.random() * 0.02 - 0.01);
+
   rate *= SURCHARGES.ACCUMULATED_DEFICIT;
   rate *= SURCHARGES.PENSION_TRUST;
 
   return Math.round(rate * 100) / 100;
 }
 
-async function generateAndStoreTOUData(category, env) {
-  const firebaseConfig = {
-    apiKey: env.FIREBASE_API_KEY,
-    authDomain: env.FIREBASE_AUTH_DOMAIN,
-    projectId: env.FIREBASE_PROJECT_ID,
-    storageBucket: env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.FIREBASE_APP_ID,
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
+async function generateAndStoreTOUData(category) {
   const currentRate = getCurrentTOURate(category);
   const timestamp = new Date().toISOString();
 
   try {
     const touCollection = collection(db, "tou-rates");
     await addDoc(touCollection, { category, rate: currentRate, timestamp });
-    console.log(`Stored ${category} TOU rate: ${currentRate}`);
+    console.log(`Stored ${category} TOU rate: ${currentRate} at ${timestamp}`);
   } catch (error) {
     console.error("Error storing TOU rate:", error);
-    throw error; // Propagate error for proper handling
   }
 }
 
-export default {
-  async scheduled(event, env, ctx) {
-    try {
-      ctx.waitUntil(
-        Promise.all(
-          ["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].map((category) =>
-            generateAndStoreTOUData(category, env),
-          ),
-        ),
-      );
-    } catch (error) {
-      console.error("Scheduled task failed:", error);
-    }
-  },
+cron.schedule("0 * * * *", () => {
+  ["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].forEach(generateAndStoreTOUData);
+});
 
-  async fetch(request, env, ctx) {
-    return new Response("TOU Rate Generator Worker is running!", {
-      headers: { "content-type": "text/plain" },
-    });
-  },
-};
+console.log("Background process for TOU data generation started");
+
+["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].forEach(generateAndStoreTOUData);
