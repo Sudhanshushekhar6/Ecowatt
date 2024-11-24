@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import WordPullUp from "@/components/ui/word-pull-up";
 import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
+import { useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { doc, getDoc } from "firebase/firestore";
 import { ArrowRightIcon, PiggyBank, Smartphone, Sun } from "lucide-react";
 import Image from "next/image";
@@ -36,6 +38,45 @@ export default function Home() {
       await router.push("/sign-in");
     }
   };
+
+  useCopilotChatSuggestions({
+    instructions: `Help me understand how to use Prabhawatt. I'm new to this platform and I'm not sure how to get started.`,
+  });
+
+  useCopilotReadable({
+    description: "Key Benefits of Prabhawatt",
+    value: {
+      "Increased Savings":
+        "Optimized energy usage leads to lower electricity bills.",
+      Sustainability: "Efficient use of solar energy reduces carbon footprint.",
+      "User Convenience":
+        "Automation and notifications simplify energy management.",
+    },
+  });
+
+  useCopilotReadable({
+    description: "Why Choose Prabhawatt?",
+    value: {
+      "Better Savings":
+        "Prabhawatt offers a comprehensive solution for solar energy optimization, helping you maximize efficiency and minimize costs.",
+      "Smart Home Integration":
+        "Prabhawatt integrates with your smart home devices, allowing you to control and monitor your energy usage from anywhere.",
+      "Energy Goals":
+        "Set specific energy goals and receive personalized recommendations to help you reach your targets.",
+      Notifications:
+        "Receive instant notifications for important updates and reminders.",
+    },
+  });
+
+  useCopilotReadable({
+    description: "Get Started with Prabhawatt",
+    value: {
+      "Sign Up":
+        "Sign up for a free account and start optimizing your solar energy today!",
+      "Learn More":
+        "Explore the features and benefits of Prabhawatt to see how it can help you save money and reduce your carbon footprint.",
+    },
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">

@@ -11,6 +11,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { SmartDevices, UserData, WeatherData } from "@/types/user";
+import { useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import {
   Car,
   ExternalLink,
@@ -397,6 +399,36 @@ export default function StatsCards({
       ),
     },
   ];
+
+  useCopilotReadable({
+    description: "Energy details given during onboarding",
+    value: {
+      "Solar Power (kW)": userData.hasSolarPanels
+        ? "Installed"
+        : "Not Installed",
+      "Solar Energy (kWh)": userData.hasSolarPanels
+        ? userData.solarCapacity + " kWh"
+        : "No Solar",
+      "Consumption (kW)": userData.hasSolarPanels
+        ? userData.solarCapacity + " kWh"
+        : "No Solar",
+      "Battery Storage": userData.hasBatteryStorage
+        ? userData.storageCapacity + " kWh"
+        : "No Solar",
+      "Energy System": userData.hasSolarPanels ? "Installed" : "Not Installed",
+      "Smart Home Setup":
+        Object.values(userData.smartDevices).filter((v) => v === true).length +
+        (userData.smartDevices.other
+          ? userData.smartDevices.other.split(",").length
+          : 0) +
+        " Device(s)",
+      "Energy Goals": userData.primaryGoal || "Not specified",
+    },
+  });
+
+  useCopilotChatSuggestions({
+    instructions: `Give a brief energy overview of the details I have already enetered during onboarding.`,
+  });
 
   return (
     <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,5 +1,8 @@
 import Navbar from "@/components/navbar";
 import { AuthContextProvider } from "@/context/auth-context";
+import { CopilotKit } from "@copilotkit/react-core";
+import { CopilotPopup } from "@copilotkit/react-ui";
+import "@copilotkit/react-ui/styles.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import NextTopLoader from "nextjs-toploader";
@@ -45,8 +48,17 @@ export default function RootLayout({
       >
         <AuthContextProvider>
           <NextTopLoader showSpinner={false} color="#65a30d" />
-          <Navbar />
-          {children}
+          <CopilotKit runtimeUrl="/api/copilotkit">
+            <Navbar />
+            {children}
+            <CopilotPopup
+              instructions="Prabhawatt is an AI-powered solar energy optimization and management platform. It helps you visualize your solar and grid energy data, and give insights on how to maximize your savings. With Prabhawatt, you can easily track your energy consumption, identify areas for improvement, and make informed decisions about your energy usage."
+              labels={{
+                title: "Prabhawatt",
+                initial: "Hello I am Prabhawatt! How can I help you today?",
+              }}
+            />
+          </CopilotKit>
           <Toaster />
         </AuthContextProvider>
       </body>
