@@ -25,17 +25,19 @@ export default function LearnMore() {
       <main className="flex-1 py-12 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-12">
           <section className="text-center">
-            <h1 className="text-4xl font-bold mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
               Learn More About Solar Energy and PrabhaWatt
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-lg md:text-xl text-gray-600">
               Discover how solar energy and PrabhaWatt can revolutionize your
               energy consumption and savings.
             </p>
           </section>
 
           <section>
-            <h2 className="text-3xl font-bold mb-4">What is Solar Energy?</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              What is Solar Energy?
+            </h2>
             <div className="grid md:grid-cols-2 gap-6 items-center">
               <div>
                 <p className="mb-4">
@@ -65,7 +67,7 @@ export default function LearnMore() {
           </section>
 
           <section>
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               The Growth of Solar Energy
             </h2>
             <p className="mb-4">
@@ -87,7 +89,7 @@ export default function LearnMore() {
           </section>
 
           <section>
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Benefits of Solar Energy
             </h2>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -155,7 +157,7 @@ export default function LearnMore() {
           </section>
 
           <section>
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Current Energy Landscape
             </h2>
             <p className="mb-4">
@@ -177,7 +179,9 @@ export default function LearnMore() {
           </section>
 
           <section>
-            <h2 className="text-3xl font-bold mb-4">Why Choose PrabhaWatt?</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Why Choose PrabhaWatt?
+            </h2>
             <p className="mb-6">
               PrabhaWatt is not just another solar energy solution – it&apos;s a
               comprehensive platform designed to maximize your solar investment
@@ -233,7 +237,7 @@ export default function LearnMore() {
           </section>
 
           <section>
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Projected Savings with PrabhaWatt
             </h2>
             <p className="mb-4">
@@ -243,7 +247,7 @@ export default function LearnMore() {
             <div className="flex items-center justify-center">
               <SavingsProjectionChart />
             </div>
-            <p className="mt-4 text-sm text-gray-600">
+            <p className="mt-4 text-sm md:text-base text-gray-600">
               Note: Actual savings may vary based on individual energy
               consumption, local electricity rates, and solar system
               specifications.
@@ -251,7 +255,7 @@ export default function LearnMore() {
           </section>
 
           <section className="text-center">
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Ready to Optimize Your Solar Energy?
             </h2>
             <p className="mb-6">

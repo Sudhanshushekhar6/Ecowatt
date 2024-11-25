@@ -207,7 +207,15 @@ async function calculateExecutiveSummary(
     text: string;
     priority: "high" | "medium" | "low";
     estimatedImpact: string;
-  }[] = aiResponse?.recommendations ? aiResponse.recommendations : [];
+  }[] = aiResponse?.recommendations
+    ? aiResponse.recommendations
+    : [
+        {
+          text: "No recommendations found.",
+          priority: "low",
+          estimatedImpact: "0% impact",
+        },
+      ];
 
   return {
     currentMonthCost: parseFloat(currentDayCost.toFixed(2)),

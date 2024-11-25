@@ -61,6 +61,7 @@ export default function Dashboard() {
     instructions: `Suggest user to:
       - Get an overview of their current energy profile, including electricity provider, monthly bill, solar panels, battery storage, and primary goal.
       - Generate an analysis report of their data and generate recommendations for improvement. Use the generateReport action to generate the report.
+      - Explain the generated report in detail. It may not have been generated yet, so you can ask the user to generate it.
     `,
   });
 

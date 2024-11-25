@@ -165,6 +165,7 @@ const GenerateReportButton = ({
       for (const section of sections) {
         if (signal.aborted) break;
         await generateReportSection(section, fullReport);
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     } catch (error) {
       setIsGenerating(false);
@@ -195,7 +196,11 @@ const GenerateReportButton = ({
     name: "generateReport",
     description:
       "Generate an analysis report based on the user's data and generate recommendations for improvement.",
-    handler: handleGenerateReport,
+    handler: () => {
+      if (Object.values(report).every((section) => section === null)) {
+        handleGenerateReport();
+      }
+    },
   });
 
   const renderSection = (
@@ -234,14 +239,24 @@ const GenerateReportButton = ({
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between w-full">
         <div>
-          <Button
-            className="bg-green-600 text-white hover:bg-green-700"
-            onClick={handleGenerateReport}
-            disabled={isGenerating || energyData.length === 0}
-          >
-            <BarChart3 className="mr-2 h-4 w-4" />
-            {isGenerating ? "Generating Report..." : "Generate Report"}
-          </Button>
+          {Object.values(report).every((section) => section === null) ? (
+            <Button
+              className="bg-green-600 text-white hover:bg-green-700"
+              onClick={handleGenerateReport}
+              disabled={isGenerating || energyData.length === 0}
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              {isGenerating ? "Generating Report..." : "Generate Report"}
+            </Button>
+          ) : (
+            <Button
+              className="bg-green-600 text-white hover:bg-green-700"
+              disabled={true}
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              Report Already Generated
+            </Button>
+          )}
           {energyData.length === 0 && (
             <div className="text-sm text-gray-600 mt-2">
               Please upload energy data to generate a report.

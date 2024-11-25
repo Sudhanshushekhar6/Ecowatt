@@ -155,7 +155,10 @@ const SmartDevicesDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="absolute bottom-2 right-2 text-xs">
+        <Button
+          variant="outline"
+          className="absolute bottom-2 right-2 text-xs hidden sm:block"
+        >
           View Devices
         </Button>
       </DialogTrigger>

@@ -271,7 +271,10 @@ const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
           {data.weatherImpact && (
             <Alert>
               <CloudRain className="h-4 w-4" />
-              <AlertDescription>{data.weatherImpact}</AlertDescription>
+              <AlertDescription>
+                <span className="font-bold mr-2">Weather Impact:</span>
+                {data.weatherImpact}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -438,7 +441,9 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                   <div>
-                    <p className="text-sm text-gray-600">Current Usage:</p>
+                    <p className="text-sm text-gray-600">
+                      Current Usage (assumed):
+                    </p>
                     <p className="text-sm">{device.currentUsagePattern}</p>
                   </div>
                   <div>
@@ -491,6 +496,13 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
                   <AlertDescription>{opp}</AlertDescription>
                 </Alert>
               ))}
+              {data.automationOpportunities.length === 0 && (
+                <Alert>
+                  <AlertDescription>
+                    No automation opportunities found.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             <div>
@@ -503,6 +515,13 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
                   <AlertDescription>{tip}</AlertDescription>
                 </Alert>
               ))}
+              {data.deviceIntegrationTips.length === 0 && (
+                <Alert>
+                  <AlertDescription>
+                    No integration tips found.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -514,6 +533,11 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
               <AlertDescription className="mt-1">{warning}</AlertDescription>
             </Alert>
           ))}
+          {data.peakUsageWarnings.length === 0 && (
+            <Alert>
+              <AlertDescription>No peak usage warnings found.</AlertDescription>
+            </Alert>
+          )}
         </TabsContent>
       </Tabs>
     </CardContent>

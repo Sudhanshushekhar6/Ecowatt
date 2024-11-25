@@ -86,7 +86,7 @@ export default function Home() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <WordPullUp
-                  className="text-3xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl/none max-w-[800px]"
+                  className="text-4xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl/none max-w-[800px]"
                   words="Illuminate Your Savings with Prabhawatt"
                 />
                 <SparkleText />
@@ -208,10 +208,10 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                <h2 className="text-2xl font-bold tracking-tighter sm:text-4xl">
                   Ready to Optimize Your Solar Energy?
                 </h2>
-                <p className="mx-auto max-w-[600px] text-gray-400 md:text-xl">
+                <p className="mx-auto max-w-[600px] text-sm text-gray-400 md:text-xl">
                   Join thousands of satisfied customers who have reduced their
                   energy costs with PrabhaWatt.
                 </p>
