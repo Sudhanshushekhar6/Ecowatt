@@ -1,3 +1,4 @@
+import { groupDataByDay } from "@/lib/utils";
 import {
   ConsumptionAnalytics,
   Discom,
@@ -13,7 +14,6 @@ import {
 import Instructor from "@instructor-ai/instructor";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import { groupDataByDay } from "./utils";
 
 const groqClient = new Groq({
   apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY,
@@ -499,7 +499,6 @@ async function generateSolarAnalysis(
 async function generateSmartDevicesAnalysis(
   userData: UserData,
   touData: TOUData[],
-  energyData: EnergyData[],
   weatherData: WeatherData,
 ): Promise<SmartDevicesAnalysis> {
   const smartDevices = userData.smartDevices;
@@ -608,12 +607,7 @@ export async function generateReport(
       generateTariffAnalysis(touData, discomData),
       generateConsumptionAnalytics(sortedEnergyData, weatherData),
       generateSolarAnalysis(sortedEnergyData, userData, weatherData),
-      generateSmartDevicesAnalysis(
-        userData,
-        touData,
-        sortedEnergyData,
-        weatherData,
-      ),
+      generateSmartDevicesAnalysis(userData, touData, weatherData),
     ]);
 
     return {

@@ -59,7 +59,7 @@ export default function RootLayout({
               }}
             />
           </CopilotKit>
-          <Toaster />
+          <Toaster position="top-right" />
         </AuthContextProvider>
       </body>
     </html>

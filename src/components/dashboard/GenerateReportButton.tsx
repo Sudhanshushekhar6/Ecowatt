@@ -18,6 +18,7 @@ import { User } from "firebase/auth";
 import { AlertCircle, BarChart3, Download, Settings } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import PDFReport from "./PDFReport";
 import {
   ConsumptionAnalyticsCard,
@@ -152,6 +153,19 @@ const GenerateReportButton = ({
       );
 
       if (signal.aborted) return;
+
+      toast.success("Report generated successfully!", {
+        description: "Scroll down to view the report",
+        action: {
+          label: "View",
+          onClick: () => {
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: "smooth",
+            });
+          },
+        },
+      });
 
       // Generate individual sections after the full report is generated
       const sections: (keyof Report)[] = [
