@@ -71,7 +71,7 @@ export function SolarGrowthChart() {
               color: "#FFB627",
             },
           }}
-          className="h-[300px]"
+          className="h-[300px] w-[340px] sm:w-full"
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={solarGrowthData}>
@@ -111,7 +111,7 @@ export function EnergySourceChart() {
               color: "#0077BE",
             },
           }}
-          className="h-[300px]"
+          className="h-[300px] w-[340px] sm:w-full"
         >
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -162,7 +162,7 @@ export function SavingsProjectionChart() {
               color: "#2A9D8F",
             },
           }}
-          className="h-[300px]"
+          className="h-[300px] w-[340px] sm:w-full"
         >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={savingsProjectionData}>

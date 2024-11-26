@@ -113,7 +113,10 @@ export default function Navbar() {
             href="/sign-in"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
-            <Button size="sm" variant="outline">
+            <Button
+              size="sm"
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
               Sign In
             </Button>
           </Link>

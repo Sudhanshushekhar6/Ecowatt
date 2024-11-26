@@ -4,11 +4,13 @@ import { CircleDollarSignIcon } from "@/components/icons/circle-dollar-sign";
 import { SunIcon } from "@/components/icons/sun";
 import { UsersIcon } from "@/components/icons/users";
 import { SparkleText } from "@/components/landing/SparkleText";
+import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import WordPullUp from "@/components/ui/word-pull-up";
 import { useAuthContext } from "@/context/auth-context";
 import { db } from "@/lib/firebase";
+import { cn } from "@/lib/utils";
 import { useCopilotReadable } from "@copilotkit/react-core";
 import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { doc, getDoc } from "firebase/firestore";
@@ -81,118 +83,153 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-white flex flex-col items-center justify-center">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <WordPullUp
-                  className="text-4xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl/none max-w-[800px]"
-                  words="Illuminate Your Savings with Prabhawatt"
-                />
-                <SparkleText />
-                <p className="mx-auto max-w-[700px] text-gray-600 md:text-xl">
-                  Your all-in-one solution for optimizing solar energy usage,
-                  reducing electricity bills, and contributing to a greener
-                  future.
-                </p>
-              </div>
-              <div className="space-x-4">
-                <Link href="/learn-more">
+        {/* Hero Section */}
+        <section className="w-full bg-white flex flex-col items-center justify-center">
+          <div className="relative flex h-[70vh] w-full items-center justify-center overflow-hidden rounded-lg bg-background">
+            <div className="container px-4 md:px-6 max-w-7xl">
+              <div className="flex flex-col items-center space-y-6 text-center">
+                <div className="space-y-4">
+                  <WordPullUp
+                    className="text-4xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mx-auto"
+                    words="Illuminate Your Savings with Prabhawatt"
+                  />
+                  <SparkleText />
+                  <p className="mx-auto max-w-2xl text-gray-600 text-base md:text-lg lg:text-xl">
+                    Your all-in-one solution for optimizing solar energy usage,
+                    reducing electricity bills, and contributing to a greener
+                    future.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                  <Link href="/learn-more" className="w-full sm:w-auto">
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-green-50"
+                    >
+                      Learn More
+                    </Button>
+                  </Link>
                   <Button
-                    variant="outline"
-                    className="text-green-600 border-green-600 hover:bg-green-50"
+                    variant="expandIcon"
+                    Icon={() => (
+                      <ArrowRightIcon className="w-4 h-4 text-white" />
+                    )}
+                    iconPlacement="right"
+                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
+                    onClick={handleGetStarted}
+                    disabled={isLoading}
                   >
-                    Learn More
+                    {isLoading ? "Loading..." : "Get Started"}
                   </Button>
-                </Link>
-                <Button
-                  variant={"expandIcon"}
-                  Icon={() => <ArrowRightIcon className="w-4 h-4 text-white" />}
-                  iconPlacement="right"
-                  className="bg-green-600 text-white hover:bg-green-700"
-                  onClick={handleGetStarted}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." : "Get Started"}
-                </Button>
+                </div>
               </div>
             </div>
+            <AnimatedGridPattern
+              numSquares={30}
+              maxOpacity={0.1}
+              duration={3}
+              repeatDelay={1}
+              className={cn(
+                "[mask-image:radial-gradient(1000px_circle_at_center,white,transparent)]",
+                "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12 opacity-50",
+              )}
+            />
           </div>
         </section>
+
+        {/* Benefits Section */}
         <section
           id="benefits"
-          className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 flex flex-col items-center justify-center"
+          className="w-full py-12 md:py-16 lg:py-20 bg-gray-100 flex flex-col items-center justify-center"
         >
-          <div className="container px-4 md:px-6">
-            <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-4xl text-center mb-12">
+          <div className="container px-10 md:px-20 max-w-7xl">
+            <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-3xl md:text-4xl text-center mb-10">
               Key Benefits
             </h2>
-            <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
-              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-shadow">
-                <CircleDollarSignIcon />
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Increased Savings
-                </h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Optimized energy usage leads to lower electricity bills.
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-shadow">
-                <SunIcon />
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Sustainability
-                </h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Efficient use of solar energy reduces carbon footprint.
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-shadow">
-                <UsersIcon />
-                <h3 className="text-xl font-semibold text-gray-900">
-                  User Convenience
-                </h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Automation and notifications simplify energy management.
-                </p>
-              </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  Icon: CircleDollarSignIcon,
+                  title: "Increased Savings",
+                  description:
+                    "Optimized energy usage leads to lower electricity bills.",
+                },
+                {
+                  Icon: SunIcon,
+                  title: "Sustainability",
+                  description:
+                    "Efficient use of solar energy reduces carbon footprint.",
+                },
+                {
+                  Icon: UsersIcon,
+                  title: "User Convenience",
+                  description:
+                    "Automation and notifications simplify energy management.",
+                },
+              ].map(({ Icon, title, description }, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center space-y-3 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out"
+                >
+                  <Icon />
+                  <h3 className="text-xl font-semibold text-gray-900 text-center">
+                    {title}
+                  </h3>
+                  <p className="text-sm text-gray-600 text-center">
+                    {description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* Why Choose Section */}
         <section
           id="why-choose"
-          className="w-full py-12 md:py-24 lg:py-32 bg-white flex flex-col items-center justify-center"
+          className="w-full py-12 md:py-16 lg:py-20 bg-white flex flex-col items-center justify-center"
         >
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-10 lg:grid-cols-2">
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-4xl">
+          <div className="container px-10 md:px-20 max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-2 items-center">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-3xl md:text-4xl">
                   Why Choose PrabhaWatt?
                 </h2>
-                <p className="max-w-[600px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className="text-gray-600 text-base md:text-lg lg:text-xl">
                   PrabhaWatt offers a comprehensive solution for solar energy
                   optimization, helping you maximize efficiency and minimize
                   costs.
                 </p>
-                <ul className="grid gap-4 mt-8">
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <Sun className="h-5 w-5 text-green-600" /> Advanced solar
-                    tracking algorithms
-                  </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <PiggyBank className="h-5 w-5 text-green-600" /> Predictive
-                    maintenance to reduce downtime
-                  </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <Smartphone className="h-5 w-5 text-green-600" />{" "}
-                    User-friendly mobile app for remote monitoring
-                  </li>
+                <ul className="grid gap-4 mt-6">
+                  {[
+                    {
+                      Icon: Sun,
+                      text: "Advanced solar tracking algorithms",
+                    },
+                    {
+                      Icon: PiggyBank,
+                      text: "Predictive maintenance to reduce downtime",
+                    },
+                    {
+                      Icon: Smartphone,
+                      text: "User-friendly mobile app for remote monitoring",
+                    },
+                  ].map(({ Icon, text }, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center gap-3 text-gray-600"
+                    >
+                      <Icon className="h-5 w-5 text-green-600" />
+                      {text}
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className="relative group flex justify-center">
                 <div className="absolute -inset-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-200" />
                 <Image
                   alt="Solar panels"
-                  className="relative max-h-[280px] max-w-[400px] rounded-2xl shadow-2xl object-cover object-center aspect-[4/3] w-full"
+                  className="relative max-h-[280px] md:max-h-[300px] max-w-full rounded-2xl shadow-2xl object-cover object-center aspect-[4/3]"
                   height="400"
                   src="/solar.jpg"
                   width="600"
@@ -201,30 +238,32 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Get Started Section */}
         <section
           id="get-started"
-          className="w-full py-12 md:py-24 lg:py-32 bg-gray-900 text-white flex flex-col items-center justify-center"
+          className="w-full py-12 md:py-16 lg:py-20 bg-gray-900 text-white flex flex-col items-center justify-center"
         >
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tighter sm:text-4xl">
+          <div className="container px-4 md:px-6 max-w-7xl">
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl md:text-4xl">
                   Ready to Optimize Your Solar Energy?
                 </h2>
-                <p className="mx-auto max-w-[600px] text-sm text-gray-400 md:text-xl">
+                <p className="mx-auto max-w-2xl text-sm md:text-base text-gray-400">
                   Join thousands of satisfied customers who have reduced their
                   energy costs with PrabhaWatt.
                 </p>
               </div>
-              <div className="w-full max-w-sm space-y-2">
-                <form className="flex space-x-2">
+              <div className="w-full max-w-md space-y-4">
+                <form className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <Input
-                    className="max-w-lg flex-1 bg-gray-800 text-white placeholder-gray-400 border-gray-700"
+                    className="w-full bg-gray-800 text-white placeholder-gray-400 border-gray-700"
                     placeholder="Enter your email"
                     type="email"
                   />
                   <Button
-                    className="bg-green-600 text-white hover:bg-green-700"
+                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
                     type="submit"
                     onClick={(e) => {
                       e.preventDefault();
@@ -248,24 +287,30 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t border-gray-200">
-        <p className="text-xs text-gray-600">
-          © 2024 PrabhaWatt. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-xs text-gray-600 hover:underline underline-offset-4"
-            href="#"
-          >
-            Terms of Service
-          </Link>
-          <Link
-            className="text-xs text-gray-600 hover:underline underline-offset-4"
-            href="#"
-          >
-            Privacy
-          </Link>
-        </nav>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200">
+        <div className="container px-4 md:px-6 max-w-7xl py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between">
+            <p className="text-xs text-gray-600 mb-2 sm:mb-0">
+              © 2024 PrabhaWatt. All rights reserved.
+            </p>
+            <nav className="flex gap-4">
+              <Link
+                className="text-xs text-gray-600 hover:underline underline-offset-4"
+                href="#"
+              >
+                Terms of Service
+              </Link>
+              <Link
+                className="text-xs text-gray-600 hover:underline underline-offset-4"
+                href="#"
+              >
+                Privacy
+              </Link>
+            </nav>
+          </div>
+        </div>
       </footer>
     </div>
   );

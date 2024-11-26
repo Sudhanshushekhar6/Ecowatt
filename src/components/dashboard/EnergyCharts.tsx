@@ -107,7 +107,7 @@ export default function EnergyCharts({
               <LineChart data={energyData}>
                 <XAxis
                   dataKey="SendDate"
-                  label={{ value: "Date", angle: 0, position: "bottom" }}
+                  label={{ angle: 0, position: "bottom" }}
                 />
                 <YAxis
                   yAxisId="left"
@@ -161,7 +161,7 @@ export default function EnergyCharts({
               <AreaChart data={energyData}>
                 <XAxis
                   dataKey="SendDate"
-                  label={{ value: "Date", angle: 0, position: "bottom" }}
+                  label={{ angle: 0, position: "bottom" }}
                 />
                 <YAxis
                   label={{
@@ -171,6 +171,7 @@ export default function EnergyCharts({
                   }}
                 />
                 <Tooltip />
+                <Legend />
                 <Area
                   type="monotone"
                   dataKey="SolarEnergy"
@@ -197,7 +198,7 @@ export default function EnergyCharts({
               <BarChart data={energyData}>
                 <XAxis
                   dataKey="SendDate"
-                  label={{ value: "Date", angle: 0, position: "bottom" }}
+                  label={{ angle: 0, position: "bottom" }}
                 />
                 <YAxis
                   label={{
@@ -207,6 +208,7 @@ export default function EnergyCharts({
                   }}
                 />
                 <Tooltip />
+                <Legend />
                 <Bar
                   dataKey="Consumption"
                   fill="#8884d8"
