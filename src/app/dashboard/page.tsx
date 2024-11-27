@@ -97,7 +97,6 @@ export default function Dashboard() {
     initializeDashboard();
   }, [user]);
 
-  // Update battery power when energy data or user data changes
   useEffect(() => {
     const updateBatteryPower = async () => {
       if (user && userData && energyData.length > 0) {
@@ -106,17 +105,10 @@ export default function Dashboard() {
           userData,
         );
 
-        // Only update if the value has changed and is different from current
         if (
           newBatteryPower !== lastCalculatedBatteryPower.current &&
           newBatteryPower !== userData.currentBatteryPower
         ) {
-          console.log("Updating battery power:", {
-            previous: lastCalculatedBatteryPower.current,
-            new: newBatteryPower,
-            storedInUserData: userData.currentBatteryPower,
-          });
-
           lastCalculatedBatteryPower.current = newBatteryPower;
 
           try {
@@ -187,7 +179,7 @@ export default function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [userData]);
 
   // File upload handler
   const handleFileUpload = useCallback(

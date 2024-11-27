@@ -42,6 +42,7 @@ export default function Settings() {
     hasSolarPanels: false,
     solarCapacity: "",
     installationDate: "",
+    userCategory: "",
     hasBatteryStorage: false,
     storageCapacity: "",
     smartDevices: {
@@ -230,6 +231,46 @@ export default function Settings() {
                         }))
                       }
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="userCategory">
+                      Your requirement category:
+                    </Label>
+                    <RadioGroup
+                      name="userCategory"
+                      value={formData.userCategory || ""}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          userCategory: value,
+                        }))
+                      }
+                      required
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="domestic"
+                          id="category-domestic"
+                        />
+                        <Label htmlFor="category-domestic">Domestic</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="non_domestic"
+                          id="category-non_domestic"
+                        />
+                        <Label htmlFor="category-non_domestic">
+                          Non-Domestic
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="industry"
+                          id="category-industry"
+                        />
+                        <Label htmlFor="category-industry">Industry</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
                   <div className="space-y-2">
                     <Label>Do you have solar panels?</Label>

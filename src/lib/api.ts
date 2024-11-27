@@ -25,7 +25,7 @@ export async function fetchTOUHistory(
 ): Promise<TOUData[]> {
   try {
     const touCollection = collection(db, "tou-rates");
-    const q = query(touCollection, orderBy("timestamp", "desc"), limit(24));
+    const q = query(touCollection, orderBy("timestamp", "desc"), limit(72));
     const querySnapshot = await getDocs(q);
     let history = querySnapshot.docs.map((doc) => ({
       timestamp: doc.data().timestamp,

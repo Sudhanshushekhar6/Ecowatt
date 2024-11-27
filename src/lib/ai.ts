@@ -590,7 +590,7 @@ export async function generateReport(
     const sortedEnergyData = [...energyData].sort(
       (a, b) => new Date(a.SendDate).getTime() - new Date(b.SendDate).getTime(),
     );
-    
+
     const [
       executiveSummary,
       tariffAnalysis,
