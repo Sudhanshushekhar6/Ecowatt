@@ -121,7 +121,7 @@ Always provide concrete, actionable recommendations prioritized by ROI.`;
 async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
   try {
     const response = await client.chat.completions.create({
-      model: "llama-3.2-90b-text-preview",
+      model: "llama-3.1-70b-versatile",
       max_tokens: 4096,
       temperature: 0.7,
       top_p: 0.9,
@@ -138,7 +138,7 @@ async function fetchAIResponse(prompt: string, schema: any): Promise<any> {
     return response;
   } catch (error) {
     console.error("AI API call failed:", error);
-    return null;
+    throw new Error(`AI API call failed: ${error}`);
   }
 }
 
@@ -590,7 +590,7 @@ export async function generateReport(
     const sortedEnergyData = [...energyData].sort(
       (a, b) => new Date(a.SendDate).getTime() - new Date(b.SendDate).getTime(),
     );
-
+    
     const [
       executiveSummary,
       tariffAnalysis,
