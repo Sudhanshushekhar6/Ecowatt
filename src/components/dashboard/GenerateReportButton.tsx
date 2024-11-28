@@ -254,7 +254,7 @@ const GenerateReportButton = ({
 
   return (
     <div className="w-full space-y-6">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-start space-x-6 w-full">
         <div>
           {Object.values(report).every((section) => section === null) ? (
             <Button
@@ -266,13 +266,7 @@ const GenerateReportButton = ({
               {isGenerating ? "Generating Report..." : "Generate Report"}
             </Button>
           ) : (
-            <Button
-              className="bg-green-600 text-white hover:bg-green-700"
-              disabled={true}
-            >
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Report Already Generated
-            </Button>
+            <></>
           )}
           {energyData.length === 0 && (
             <div className="text-sm text-gray-600 mt-2">
@@ -281,14 +275,16 @@ const GenerateReportButton = ({
           )}
         </div>
 
-        <Link href="/settings">
-          <Button
-            variant="outline"
-            className="text-gray-600 border-gray-300 hover:bg-gray-100"
-          >
-            <Settings className="mr-2 h-4 w-4" /> System Settings
-          </Button>
-        </Link>
+        {Object.values(report).every((section) => section === null) && (
+          <Link href="/settings">
+            <Button
+              variant="outline"
+              className="text-gray-600 border-gray-300 hover:bg-gray-100"
+            >
+              <Settings className="mr-2 h-4 w-4" /> System Settings
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="space-y-6">
@@ -300,7 +296,7 @@ const GenerateReportButton = ({
       </div>
 
       {isReportComplete && (
-        <div className="flex justify-end">
+        <div className="flex justify-start">
           <PDFDownloadLink
             document={
               <PDFReport

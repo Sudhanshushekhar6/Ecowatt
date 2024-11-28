@@ -273,7 +273,7 @@ export default function Dashboard() {
             <DemoDataButton onLoadDemoData={processCSV} />
           )}
 
-          <div className="flex mt-6 justify-between items-center">
+          <div className="flex justify-between items-center">
             <GenerateReportButton
               user={user}
               userData={userData}
