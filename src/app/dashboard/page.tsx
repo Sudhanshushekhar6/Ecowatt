@@ -29,7 +29,8 @@ export default function Dashboard() {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [discomInfo, setDiscomInfo] = useState<Discom | null>(null);
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
-  const [dataPoints, setDataPoints] = useState<number>(1000);
+  const [dataPoints, setDataPoints] = useState<number>(500);
+  const [reportGenerated, setReportGenerated] = useState<Boolean>(false);
 
   // Initialize with the current battery power from userData when available
   const lastCalculatedBatteryPower = useRef<number>(0);
@@ -240,27 +241,33 @@ export default function Dashboard() {
     <div className="flex flex-col min-h-screen bg-gray-100">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          <StatsCards
-            userData={userData}
-            totalSolarPower={totalSolarPower}
-            uniqueDays={uniqueDays}
-            weatherData={weatherData}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DiscomInfoCard discomInfo={discomInfo} touHistory={touHistory} />
-            <TOURateHistoryCard
-              category={userData ? userData.userCategory : ""}
-              touHistory={touHistory}
+          {!reportGenerated && (
+            <StatsCards
+              userData={userData}
+              totalSolarPower={totalSolarPower}
+              uniqueDays={uniqueDays}
+              weatherData={weatherData}
             />
-          </div>
+          )}
 
-          <EnergyCharts
-            energyData={energyData.slice(0, dataPoints)}
-            handleFileUpload={handleFileUpload}
-            fileName={fileName}
-            setDataPoints={setDataPoints}
-          />
+          {!reportGenerated && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <DiscomInfoCard discomInfo={discomInfo} touHistory={touHistory} />
+              <TOURateHistoryCard
+                category={userData ? userData.userCategory : ""}
+                touHistory={touHistory}
+              />
+            </div>
+          )}
+
+          {!reportGenerated && (
+            <EnergyCharts
+              energyData={energyData.slice(0, dataPoints)}
+              handleFileUpload={handleFileUpload}
+              fileName={fileName}
+              setDataPoints={setDataPoints}
+            />
+          )}
 
           {energyData.length === 0 && (
             <DemoDataButton onLoadDemoData={processCSV} />
@@ -274,6 +281,7 @@ export default function Dashboard() {
               weatherData={weatherData}
               discomInfo={discomInfo}
               touHistory={touHistory}
+              setReportGenerated={setReportGenerated}
             />
           </div>
         </div>

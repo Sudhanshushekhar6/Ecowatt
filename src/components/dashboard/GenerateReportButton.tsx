@@ -64,6 +64,7 @@ const GenerateReportButton = ({
   weatherData,
   discomInfo,
   touHistory,
+  setReportGenerated,
 }: {
   user: User;
   userData: UserData;
@@ -71,6 +72,7 @@ const GenerateReportButton = ({
   weatherData: WeatherData;
   discomInfo: Discom | null;
   touHistory: TOUData[];
+  setReportGenerated: React.Dispatch<React.SetStateAction<Boolean>>;
 }) => {
   const [report, setReport] = useState<Report>(INITIAL_REPORT_STATE);
   const [sectionStatus, setSectionStatus] = useState(INITIAL_STATUS_STATE);
@@ -153,6 +155,7 @@ const GenerateReportButton = ({
       );
 
       if (signal.aborted) return;
+      setReportGenerated(true);
 
       toast.success("Report generated successfully!", {
         description: "Scroll down to view the report",
@@ -179,7 +182,7 @@ const GenerateReportButton = ({
       for (const section of sections) {
         if (signal.aborted) break;
         await generateReportSection(section, fullReport);
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     } catch (error) {
       setIsGenerating(false);
