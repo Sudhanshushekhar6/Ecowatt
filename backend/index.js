@@ -1,8 +1,13 @@
 const cron = require("node-cron");
 const { initializeApp } = require("firebase/app");
-const { getFirestore, collection, addDoc } = require("firebase/firestore");
+const { getFirestore, collection, addDoc, getDocs, query, where } = require("firebase/firestore");
+const { initializeApp: adminInit } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
 const path = require("path");
+const { Resend } = require("resend");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env.local") });
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +17,14 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
+initializeApp(firebaseConfig);
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+adminInit({
+  credential: require("firebase-admin").credential.cert(require("../serviceAccountKey.json")),
+});
+
+const db = getFirestore();
+const auth = getAuth();
 
 const baseTouRates = {
   DOMESTIC: [
@@ -29,21 +39,10 @@ const baseTouRates = {
   NON_DOMESTIC: [{ startHour: 0, endHour: 24, baseRate: 8.5, variation: 0.6 }],
 };
 
-const SEASON_MULTIPLIER = {
-  SUMMER: 1.15,
-  WINTER: 0.9,
-  MONSOON: 1.0,
-};
-
-const DEMAND_MULTIPLIER = {
-  WEEKDAY: 1.1,
-  WEEKEND: 0.95,
-};
-
-const SURCHARGES = {
-  ACCUMULATED_DEFICIT: 1.08,
-  PENSION_TRUST: 1.05,
-};
+const SEASON_MULTIPLIER = { SUMMER: 1.15, WINTER: 0.9, MONSOON: 1.0 };
+const DEMAND_MULTIPLIER = { WEEKDAY: 1.1, WEEKEND: 0.95 };
+const SURCHARGES = { ACCUMULATED_DEFICIT: 1.08, PENSION_TRUST: 1.05 };
+const RATE_THRESHOLD = 10.0;
 
 function getCurrentSeason() {
   const month = new Date().getMonth();
@@ -72,29 +71,52 @@ function getCurrentTOURate(category) {
   if (!currentRateConfig) return 5.0;
 
   let rate = currentRateConfig.baseRate;
-
   rate += generateRandomVariation(currentRateConfig.variation);
-
   rate *= SEASON_MULTIPLIER[currentSeason];
-
   rate *= isWeekend ? DEMAND_MULTIPLIER.WEEKEND : DEMAND_MULTIPLIER.WEEKDAY;
-
-  if (category !== "DOMESTIC") {
-    const peakHours = [14, 15, 16, 22, 23, 0];
-    const offPeakHours = [4, 5, 6, 7, 8, 9];
-    if (peakHours.includes(currentHour)) {
-      rate *= 1.2;
-    } else if (offPeakHours.includes(currentHour)) {
-      rate *= 0.8;
-    }
-  }
-
-  rate *= 1 + (Math.random() * 0.02 - 0.01);
-
   rate *= SURCHARGES.ACCUMULATED_DEFICIT;
   rate *= SURCHARGES.PENSION_TRUST;
 
   return Math.round(rate * 100) / 100;
+}
+
+async function fetchUsersWithEmailNotifications() {
+  const usersCollection = collection(db, "users");
+  const querySnapshot = await getDocs(
+    query(usersCollection, where("notificationMethod", "==", "email"))
+  );
+
+  const users = [];
+  for (const doc of querySnapshot.docs) {
+    const userId = doc.id;
+    try {
+      const userRecord = await auth.getUser(userId);
+      const email = userRecord.email;
+      if (email) {
+        users.push({ email, ...doc.data() });
+      }
+    } catch (error) {
+      console.error(`Failed to fetch email for user ID ${userId}:`, error);
+    }
+  }
+
+  return users;
+}
+
+async function sendEmailToUsers(users, rate) {
+  for (const user of users) {
+    try {
+      await resend.emails.send({
+        from: "Prabhawatt <alerts@chiragaggarwal.tech>",
+        to: [user.email],
+        subject: "High Tariff Rate Alert!",
+        html: `<p>Dear User,</p><p>The current tariff rate has reached <b>${rate}</b>, which is higher the normal threshold.</p><p>Consider adjusting your electricity usage during this period.</p><br>For more information, please visit <a href="https://prabhawatt.vercel.app/">https://prabhawatt.vercel.app/</a>`,
+      });
+      console.log(`Email sent to ${user.email}`);
+    } catch (error) {
+      console.error(`Failed to send email to ${user.email}:`, error);
+    }
+  }
 }
 
 async function generateAndStoreTOUData(category) {
@@ -105,8 +127,13 @@ async function generateAndStoreTOUData(category) {
     const touCollection = collection(db, "tou-rates");
     await addDoc(touCollection, { category, rate: currentRate, timestamp });
     console.log(`Stored ${category} TOU rate: ${currentRate} at ${timestamp}`);
+
+    if (currentRate > RATE_THRESHOLD) {
+      const users = await fetchUsersWithEmailNotifications();
+      await sendEmailToUsers(users, currentRate);
+    }
   } catch (error) {
-    console.error("Error storing TOU rate:", error);
+    console.error("Error storing TOU rate or sending emails:", error);
   }
 }
 
@@ -116,4 +143,4 @@ cron.schedule("0 * * * *", () => {
 
 console.log("Background process for TOU data generation started");
 
-["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].forEach(generateAndStoreTOUData);
+// ["DOMESTIC", "INDUSTRIAL", "NON_DOMESTIC"].forEach(generateAndStoreTOUData);
