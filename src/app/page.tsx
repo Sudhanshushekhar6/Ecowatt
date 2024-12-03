@@ -261,7 +261,7 @@ export default function Home() {
               <div className="w-full max-w-md space-y-4">
                 <form className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <Input
-                    className="w-full bg-background/90 text-white placeholder-gray-400 border-gray-700"
+                    className="w-full bg-background/90 placeholder-muted-foreground"
                     placeholder="Enter your email"
                     type="email"
                   />
@@ -292,7 +292,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-background border-t border-gray-200">
+      <footer className="bg-background border-t">
         <div className="container px-4 md:px-6 max-w-7xl py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <p className="text-xs text-muted-foreground mb-2 sm:mb-0">
