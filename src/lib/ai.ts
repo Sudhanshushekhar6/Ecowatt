@@ -1,3 +1,4 @@
+import { env } from "@/env.mjs";
 import { groupDataByDay } from "@/lib/utils";
 import {
   ConsumptionAnalytics,
@@ -16,7 +17,7 @@ import Groq from "groq-sdk";
 import { z } from "zod";
 
 const groqClient = new Groq({
-  apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY,
+  apiKey: env.NEXT_PUBLIC_GROQ_API_KEY,
   dangerouslyAllowBrowser: true,
 });
 
