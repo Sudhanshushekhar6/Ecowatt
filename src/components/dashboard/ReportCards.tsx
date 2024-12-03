@@ -65,7 +65,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 rounded-lg bg-gray-50">
+        <div className="p-4 rounded-lg bg-muted">
           <div className="flex items-center justify-between mb-2">
             <span className="text-muted-foreground">Current Month's Cost</span>
             <Zap className="h-5 w-5 text-blue-500" />
@@ -81,7 +81,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
         </div>
 
         {data.solarGeneration !== null && (
-          <div className="p-4 rounded-lg bg-gray-50">
+          <div className="p-4 rounded-lg bg-muted">
             <div className="flex items-center justify-between mb-2">
               <span className="text-muted-foreground">Solar Generation</span>
               <Sun className="h-5 w-5 text-yellow-500" />
@@ -94,7 +94,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
         )}
 
         {data.batteryUsage !== null && (
-          <div className="p-4 rounded-lg bg-gray-50">
+          <div className="p-4 rounded-lg bg-muted">
             <div className="flex items-center justify-between mb-2">
               <span className="text-muted-foreground">Battery Usage</span>
               <Battery className="h-5 w-5 text-green-500" />
@@ -144,19 +144,19 @@ const TariffAnalysisCard = ({ data }: { data: TariffAnalysis }) => (
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Current Rate</p>
           <p className="text-xl font-bold">₹{data.currentRate}/kWh</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Average Rate</p>
           <p className="text-xl font-bold">₹{data.averageRate}/kWh</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Peak Rate</p>
           <p className="text-xl font-bold">₹{data.peakRate}/kWh</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Off-Peak Rate</p>
           <p className="text-xl font-bold">₹{data.offPeakRate}/kWh</p>
         </div>
@@ -209,17 +209,17 @@ const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Total Consumption</p>
           <p className="text-xl font-bold">{data.totalConsumption} kWh</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Daily Average</p>
           <p className="text-xl font-bold">
             {data.averageDailyConsumption} kWh
           </p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">Peak Consumption</p>
           <p className="text-xl font-bold">{data.peakConsumptionValue} kW</p>
           <p className="text-sm text-muted-foreground">
@@ -309,15 +309,15 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          <div className="p-4 bg-gray-50 rounded-lg">
+          <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">Daily Generation</p>
             <p className="text-xl font-bold">{data.dailyGeneration} kWh</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
+          <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">Monthly Generation</p>
             <p className="text-xl font-bold">{data.monthlyGeneration} kWh</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg flex items-center justify-between">
+          <div className="p-4 bg-muted rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">System Efficiency</p>
               <p className="text-xl font-bold">{data.efficiency}%</p>
@@ -336,7 +336,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
               </TooltipProvider>
             )}
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
+          <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">Monthly Savings</p>
             <p className="text-xl font-bold">₹{data.savingsFromSolar}</p>
           </div>
@@ -408,7 +408,7 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
       </CardTitle>
     </CardHeader>
     <CardContent>
-      <div className="p-4 rounded-lg bg-gray-50 mb-6">
+      <div className="p-4 rounded-lg bg-muted mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-muted-foreground">Total Potential Savings</span>
           <Zap className="h-5 w-5 text-green-500" />

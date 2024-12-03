@@ -20,6 +20,7 @@ export function NotJustIndia() {
         </p>
       </div>
       <WorldMap
+        lineColor="#22c55e"
         dots={[
           {
             start: { lat: 28.6139, lng: 77.209 }, // New Delhi

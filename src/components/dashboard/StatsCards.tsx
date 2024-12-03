@@ -37,7 +37,7 @@ const LocationWeatherDetails = ({
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex absolute top-2 right-2 items-center text-sm justify-end hover:text-foreground transition-colors">
-          <div className="flex items-center justify-center gap-2 rounded-xl bg-background/90 backdrop-blur-sm p-2 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-gray-100 group">
+          <div className="flex items-center justify-center gap-2 rounded-xl bg-background/90 backdrop-blur-sm p-2 shadow-lg hover:shadow-xl transition-all cursor-pointer border border group">
             <MapPinHouse className="text-green-600 group-hover:scale-110 transition-transform" />
             <p className="font-medium">{weatherData.name}</p>
             <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -69,7 +69,7 @@ const LocationWeatherDetails = ({
               { label: "Visibility", value: `${weatherData.visibility} m` },
               { label: "Weather", value: weatherData.weather[0].description },
             ].map((item, index) => (
-              <div key={index} className="bg-gray-50 p-3 rounded-lg">
+              <div key={index} className="bg-muted p-3 rounded-lg">
                 <p className="text-sm font-semibold text-foreground">
                   {item.label}
                 </p>
@@ -180,16 +180,16 @@ const SmartDevicesDialog = ({
               {devicesList.map((device, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg border ${
+                  className={`p-4 rounded-lg border bg-muted ${
                     device.enabled
-                      ? "bg-green-50 border-green-300"
-                      : "bg-gray-50 border-gray-200"
+                      ? "border-green-300 dark:border-green-700/50"
+                      : "border"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <device.icon
-                        className={`w-5 h-5 ${device.enabled ? "text-green-600" : "text-gray-400"}`}
+                        className={`w-5 h-5 ${device.enabled ? "text-green-600" : "text-muted-foreground"}`}
                       />
                       <span
                         className={`font-medium font-semibold ${device.enabled ? "" : "text-muted-foreground"}`}
@@ -241,7 +241,7 @@ const SmartDevicesDialog = ({
             </div>
 
             {/* Summary Section */}
-            <div className="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-300">
+            <div className="mt-6 p-4 rounded-lg bg-muted border border">
               <h4 className="font-medium font-semibold mb-3">
                 Combined Energy Analysis
               </h4>
@@ -272,7 +272,7 @@ const SmartDevicesDialog = ({
             </div>
 
             {smartDevices.other && (
-              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+              <div className="p-4 rounded-lg bg-muted border border">
                 <p className="font-medium mb-2 font-semibold">
                   Other Connected Devices
                 </p>
@@ -311,7 +311,7 @@ const StatsCard = ({
   additionalInfo?: React.ReactNode;
 }) => (
   <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow">
-    <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-green-50 to-transparent opacity-50" />
+    <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-green-100 dark:from-green-900/50 to-transparent opacity-50" />
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium flex items-center gap-2">
         {title}
@@ -370,7 +370,7 @@ export default function StatsCards({
         : "Consider installing solar panels",
       icon: Sun,
       additionalInfo: userData.hasBatteryStorage && (
-        <div className="mt-2 text-xs bg-green-50 p-2 rounded-lg">
+        <div className="mt-2 text-xs bg-muted p-2 rounded-lg">
           <span className="font-medium">Battery Storage:</span>{" "}
           {userData.storageCapacity} kW
         </div>
@@ -398,7 +398,7 @@ export default function StatsCards({
       additionalInfo: (
         <div className="mt-2 flex flex-col gap-2">
           {userData.primaryGoal && (
-            <div className="text-xs bg-green-50 p-2 rounded-lg">
+            <div className="text-xs bg-muted p-2 rounded-lg">
               Goal: {userData.primaryGoal}
             </div>
           )}

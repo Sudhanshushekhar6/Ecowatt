@@ -82,7 +82,7 @@ export default function Home() {
   });
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-muted">
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full bg-background flex flex-col items-center justify-center">
@@ -105,7 +105,7 @@ export default function Home() {
                   <Link href="/learn-more" className="w-full sm:w-auto">
                     <Button
                       variant="outline"
-                      className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-green-50"
+                      className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-muted"
                     >
                       Learn More
                     </Button>
