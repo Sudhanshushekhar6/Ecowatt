@@ -238,7 +238,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-muted">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
           {!reportGenerated && (

@@ -75,7 +75,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-muted">
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
@@ -92,7 +92,7 @@ export default function SignUp() {
                 <Label htmlFor="name">Name</Label>
                 <div className="relative">
                   <User
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                     size={20}
                   />
                   <Input
@@ -110,7 +110,7 @@ export default function SignUp() {
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                     size={20}
                   />
                   <Input
@@ -128,7 +128,7 @@ export default function SignUp() {
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Lock
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                     size={20}
                   />
                   <Input
@@ -161,7 +161,7 @@ export default function SignUp() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">
+                <span className="bg-background px-2 text-muted-foreground">
                   Or continue with
                 </span>
               </div>
@@ -191,7 +191,7 @@ export default function SignUp() {
             </Button>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link href="/sign-in" className="text-green-600 hover:underline">
                 Sign in
@@ -200,9 +200,9 @@ export default function SignUp() {
           </CardFooter>
         </Card>
       </main>
-      <footer className="py-6 px-4 md:px-6 mt-8 bg-white border-t border-gray-200">
+      <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             © 2024 PrabhaWatt. All rights reserved.
           </p>
         </div>

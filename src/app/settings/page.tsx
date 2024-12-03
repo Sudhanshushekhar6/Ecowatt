@@ -154,7 +154,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="flex flex-col min-h-[92vh] bg-gray-100">
+    <div className="flex flex-col min-h-[92vh] bg-muted">
       <main className="flex-1 py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold mb-6">Settings</h1>

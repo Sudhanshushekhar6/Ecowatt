@@ -80,7 +80,7 @@ export default function TOURateHistoryCard({
       const rate = payload[0].value;
       const status = getRateStatus(rate);
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border">
+        <div className="bg-background p-3 rounded-lg shadow-lg border">
           <p className="text-sm font-medium">
             {new Date(label).toLocaleTimeString([], {
               hour12: true,
@@ -118,7 +118,7 @@ export default function TOURateHistoryCard({
           </CardTitle>
           <Badge
             variant="outline"
-            className={`${status.color} bg-opacity-10 text-black`}
+            className={`${status.color} bg-opacity-10 text-foreground`}
           >
             Current: ₹{lastTou.rate.toFixed(2)}/kWh
           </Badge>

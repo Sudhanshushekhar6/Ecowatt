@@ -37,7 +37,7 @@ const LocationWeatherDetails = ({
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex absolute top-2 right-2 items-center text-sm justify-end hover:text-foreground transition-colors">
-          <div className="flex items-center justify-center gap-2 rounded-xl bg-white/90 backdrop-blur-sm p-2 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-gray-100 group">
+          <div className="flex items-center justify-center gap-2 rounded-xl bg-background/90 backdrop-blur-sm p-2 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-gray-100 group">
             <MapPinHouse className="text-green-600 group-hover:scale-110 transition-transform" />
             <p className="font-medium">{weatherData.name}</p>
             <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -192,7 +192,7 @@ const SmartDevicesDialog = ({
                         className={`w-5 h-5 ${device.enabled ? "text-green-600" : "text-gray-400"}`}
                       />
                       <span
-                        className={`font-medium font-semibold ${device.enabled ? "" : "text-gray-500"}`}
+                        className={`font-medium font-semibold ${device.enabled ? "" : "text-muted-foreground"}`}
                       >
                         {device.name}
                       </span>
@@ -201,7 +201,7 @@ const SmartDevicesDialog = ({
                       className={`text-xs px-2 py-1 rounded-full ${
                         device.enabled
                           ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {device.enabled ? "Active" : "Inactive"}
@@ -212,23 +212,25 @@ const SmartDevicesDialog = ({
                     <div className="space-y-2">
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <p className="text-gray-600">Energy per use</p>
+                          <p className="text-muted-foreground">
+                            Energy per use
+                          </p>
                           <p className="font-medium">
                             {device.energyPerUse} kWh
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Usage</p>
+                          <p className="text-muted-foreground">Usage</p>
                           <p className="font-medium">{device.usageFrequency}</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Monthly usage</p>
+                          <p className="text-muted-foreground">Monthly usage</p>
                           <p className="font-medium">
                             {device.monthlyUsage} kWh
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Monthly cost</p>
+                          <p className="text-muted-foreground">Monthly cost</p>
                           <p className="font-medium">₹{device.costPerMonth}</p>
                         </div>
                       </div>
@@ -244,24 +246,26 @@ const SmartDevicesDialog = ({
                 Combined Energy Analysis
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-3 bg-white rounded-lg">
-                  <p className="text-sm text-gray-600">Active Devices</p>
+                <div className="p-3 bg-background rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    Active Devices
+                  </p>
                   <p className="text-lg font-medium">{enabledDevices.length}</p>
                 </div>
-                <div className="p-3 bg-white rounded-lg">
-                  <p className="text-sm text-gray-600">Monthly Usage</p>
+                <div className="p-3 bg-background rounded-lg">
+                  <p className="text-sm text-muted-foreground">Monthly Usage</p>
                   <p className="text-lg font-medium">
                     {totalMonthlyUsage.toFixed(1)} kWh
                   </p>
                 </div>
-                <div className="p-3 bg-white rounded-lg">
-                  <p className="text-sm text-gray-600">Daily Average</p>
+                <div className="p-3 bg-background rounded-lg">
+                  <p className="text-sm text-muted-foreground">Daily Average</p>
                   <p className="text-lg font-medium">
                     {averageDaily.toFixed(1)} kWh
                   </p>
                 </div>
-                <div className="p-3 bg-white rounded-lg">
-                  <p className="text-sm text-gray-600">Monthly Cost</p>
+                <div className="p-3 bg-background rounded-lg">
+                  <p className="text-sm text-muted-foreground">Monthly Cost</p>
                   <p className="text-lg font-medium">₹{totalMonthlyCost}</p>
                 </div>
               </div>
@@ -272,7 +276,9 @@ const SmartDevicesDialog = ({
                 <p className="font-medium mb-2 font-semibold">
                   Other Connected Devices
                 </p>
-                <p className="text-sm text-gray-600">{smartDevices.other}</p>
+                <p className="text-sm text-muted-foreground">
+                  {smartDevices.other}
+                </p>
               </div>
             )}
           </div>

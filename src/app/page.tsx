@@ -3,6 +3,7 @@
 import { CircleDollarSignIcon } from "@/components/icons/circle-dollar-sign";
 import { SunIcon } from "@/components/icons/sun";
 import { UsersIcon } from "@/components/icons/users";
+import { NotJustIndia } from "@/components/landing/NotJustIndia";
 import { SparkleText } from "@/components/landing/SparkleText";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { Button } from "@/components/ui/button";
@@ -84,17 +85,17 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="w-full bg-white flex flex-col items-center justify-center">
+        <section className="w-full bg-background flex flex-col items-center justify-center">
           <div className="relative flex h-[70vh] w-full items-center justify-center overflow-hidden rounded-lg bg-background">
             <div className="container px-4 md:px-6 max-w-7xl">
               <div className="flex flex-col items-center space-y-6 text-center">
                 <div className="space-y-4">
                   <WordPullUp
-                    className="text-4xl font-bold tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mx-auto"
+                    className="text-4xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mx-auto"
                     words="Illuminate Your Savings with Prabhawatt"
                   />
                   <SparkleText />
-                  <p className="mx-auto max-w-2xl text-gray-600 text-base md:text-lg lg:text-xl">
+                  <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg lg:text-xl">
                     Your all-in-one solution for optimizing solar energy usage,
                     reducing electricity bills, and contributing to a greener
                     future.
@@ -140,10 +141,10 @@ export default function Home() {
         {/* Benefits Section */}
         <section
           id="benefits"
-          className="w-full py-12 md:py-16 lg:py-20 bg-gray-100 flex flex-col items-center justify-center"
+          className="w-full py-12 md:py-16 lg:py-20 bg-muted flex flex-col items-center justify-center"
         >
           <div className="container px-10 md:px-20 max-w-7xl">
-            <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-3xl md:text-4xl text-center mb-10">
+            <h2 className="text-2xl font-bold tracking-tighter text-foreground sm:text-3xl md:text-4xl text-center mb-10">
               Key Benefits
             </h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -169,13 +170,13 @@ export default function Home() {
               ].map(({ Icon, title, description }, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center space-y-3 p-6 rounded-lg bg-white shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out"
+                  className="flex flex-col items-center space-y-3 p-6 rounded-lg bg-background shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out"
                 >
                   <Icon />
-                  <h3 className="text-xl font-semibold text-gray-900 text-center">
+                  <h3 className="text-xl font-semibold text-foreground text-center">
                     {title}
                   </h3>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-muted-foreground text-center">
                     {description}
                   </p>
                 </div>
@@ -184,18 +185,20 @@ export default function Home() {
           </div>
         </section>
 
+        <NotJustIndia />
+
         {/* Why Choose Section */}
         <section
           id="why-choose"
-          className="w-full py-12 md:py-16 lg:py-20 bg-white flex flex-col items-center justify-center"
+          className="w-full py-12 md:py-16 lg:py-20 bg-background flex flex-col items-center justify-center"
         >
           <div className="container px-10 md:px-20 max-w-7xl">
             <div className="grid gap-10 lg:grid-cols-2 items-center">
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold tracking-tighter text-gray-900 sm:text-3xl md:text-4xl">
+                <h2 className="text-2xl font-bold tracking-tighter text-foreground sm:text-3xl md:text-4xl">
                   Why Choose PrabhaWatt?
                 </h2>
-                <p className="text-gray-600 text-base md:text-lg lg:text-xl">
+                <p className="text-muted-foreground text-base md:text-lg lg:text-xl">
                   PrabhaWatt offers a comprehensive solution for solar energy
                   optimization, helping you maximize efficiency and minimize
                   costs.
@@ -217,7 +220,7 @@ export default function Home() {
                   ].map(({ Icon, text }, index) => (
                     <li
                       key={index}
-                      className="flex items-center gap-3 text-gray-600"
+                      className="flex items-center gap-3 text-muted-foreground"
                     >
                       <Icon className="h-5 w-5 text-green-600" />
                       {text}
@@ -226,7 +229,7 @@ export default function Home() {
                 </ul>
               </div>
               <div className="relative group flex justify-center">
-                <div className="absolute -inset-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-200" />
+                <div className="absolute -inset-4 bg-accent rounded-2xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-200" />
                 <Image
                   alt="Solar panels"
                   className="relative max-h-[280px] md:max-h-[300px] max-w-full rounded-2xl shadow-2xl object-cover object-center aspect-[4/3]"
@@ -242,7 +245,7 @@ export default function Home() {
         {/* Get Started Section */}
         <section
           id="get-started"
-          className="w-full py-12 md:py-16 lg:py-20 bg-gray-900 text-white flex flex-col items-center justify-center"
+          className="w-full py-12 md:py-16 lg:py-20 bg-muted text-foreground flex flex-col items-center justify-center"
         >
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center space-y-6 text-center">
@@ -250,7 +253,7 @@ export default function Home() {
                 <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl md:text-4xl">
                   Ready to Optimize Your Solar Energy?
                 </h2>
-                <p className="mx-auto max-w-2xl text-sm md:text-base text-gray-400">
+                <p className="mx-auto max-w-2xl text-sm md:text-base text-muted-foreground">
                   Join thousands of satisfied customers who have reduced their
                   energy costs with PrabhaWatt.
                 </p>
@@ -258,7 +261,7 @@ export default function Home() {
               <div className="w-full max-w-md space-y-4">
                 <form className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <Input
-                    className="w-full bg-gray-800 text-white placeholder-gray-400 border-gray-700"
+                    className="w-full bg-background/90 text-white placeholder-gray-400 border-gray-700"
                     placeholder="Enter your email"
                     type="email"
                   />
@@ -273,7 +276,7 @@ export default function Home() {
                     Get Started
                   </Button>
                 </form>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   By signing up, you agree to our{" "}
                   <Link
                     className="underline underline-offset-2 hover:text-white"
@@ -289,21 +292,21 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200">
+      <footer className="bg-background border-t border-gray-200">
         <div className="container px-4 md:px-6 max-w-7xl py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between">
-            <p className="text-xs text-gray-600 mb-2 sm:mb-0">
+            <p className="text-xs text-muted-foreground mb-2 sm:mb-0">
               © 2024 PrabhaWatt. All rights reserved.
             </p>
             <nav className="flex gap-4">
               <Link
-                className="text-xs text-gray-600 hover:underline underline-offset-4"
+                className="text-xs text-muted-foreground hover:underline underline-offset-4"
                 href="#"
               >
                 Terms of Service
               </Link>
               <Link
-                className="text-xs text-gray-600 hover:underline underline-offset-4"
+                className="text-xs text-muted-foreground hover:underline underline-offset-4"
                 href="#"
               >
                 Privacy

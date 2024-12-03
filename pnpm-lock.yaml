@@ -9,25 +9,34 @@ importers:
     dependencies:
       "@copilotkit/react-core":
         specifier: ^1.3.15
-        version: 1.3.15(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)
+        version: 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)
       "@copilotkit/react-ui":
         specifier: ^1.3.15
-        version: 1.3.15(@types/react@18.3.12)(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)
+        version: 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(@types/react@18.3.12)(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)
       "@copilotkit/runtime":
         specifier: ^1.3.15
-        version: 1.3.15(axios@1.7.7)(class-validator@0.14.1)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(ws@8.18.0)
+        version: 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(class-validator@0.14.1)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(ws@8.18.0)
       "@formkit/auto-animate":
         specifier: ^0.8.2
         version: 0.8.2
       "@instructor-ai/instructor":
         specifier: ^1.5.0
         version: 1.5.0(openai@4.73.0(zod@3.23.8))(zod@3.23.8)
+      "@langchain/core":
+        specifier: ^0.3.19
+        version: 0.3.19(openai@4.73.0(zod@3.23.8))
+      "@langchain/groq":
+        specifier: ^0.1.2
+        version: 0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))
       "@radix-ui/react-checkbox":
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       "@radix-ui/react-dialog":
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-dropdown-menu":
+        specifier: ^2.1.2
+        version: 2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       "@radix-ui/react-icons":
         specifier: ^1.3.2
         version: 1.3.2(react@18.3.1)
@@ -76,6 +85,9 @@ importers:
       cmdk:
         specifier: 1.0.4
         version: 1.0.4(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      dotted-map:
+        specifier: ^2.2.3
+        version: 2.2.3
       firebase:
         specifier: ^10.14.1
         version: 10.14.1
@@ -88,6 +100,9 @@ importers:
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@18.3.1)
+      motion:
+        specifier: ^11.13.1
+        version: 11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next:
         specifier: 14.2.15
         version: 14.2.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1718,10 +1733,10 @@ packages:
       }
     engines: { node: ">=18" }
 
-  "@langchain/core@0.3.18":
+  "@langchain/core@0.3.19":
     resolution:
       {
-        integrity: sha512-IEZCrFs1Xd0J2FTH1D3Lnm3/Yk2r8LSpwDeLYwcCom3rNAK5k4mKQ2rwIpNq3YuqBdrTNMKRO+PopjkP1SB17A==,
+        integrity: sha512-pJVOAHShefu1SRO8uhzUs0Pexah/Ib66WETLMScIC2w9vXlpwQy3DzXJPJ5X7ixry9N666jYO5cHtM2Z1DnQIQ==,
       }
     engines: { node: ">=18" }
 
@@ -1738,6 +1753,15 @@ packages:
     resolution:
       {
         integrity: sha512-5fPPaVcv4l2o/WdPuFLkIKFsfAeY8JD7zP/lFlTTeDvCbGbnsywwX08ZCqe9jgDIVBGcIoUqhiyBvwrpJMzMEw==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      "@langchain/core": ">=0.2.21 <0.4.0"
+
+  "@langchain/groq@0.1.2":
+    resolution:
+      {
+        integrity: sha512-bgQ9yGoNHOwG6LG2ngGvSNxF/1U1c1u3vKmFWmzecFIcBoQQOJY0jb0MrL3g1uTife0Sr3zxkWKXQg2aK/U4Sg==,
       }
     engines: { node: ">=18" }
     peerDependencies:
@@ -2399,6 +2423,22 @@ packages:
       "@types/react-dom":
         optional: true
 
+  "@radix-ui/react-dropdown-menu@2.1.2":
+    resolution:
+      {
+        integrity: sha512-GVZMR+eqK8/Kes0a36Qrv+i20bAPXSn8rCBTHx30w+3ECnR5o3xixAlqcVaYvLeyKUsm0aqyhWfmUcqufM8nYA==,
+      }
+    peerDependencies:
+      "@types/react": "*"
+      "@types/react-dom": "*"
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      "@types/react-dom":
+        optional: true
+
   "@radix-ui/react-focus-guards@1.1.1":
     resolution:
       {
@@ -2451,6 +2491,22 @@ packages:
     resolution:
       {
         integrity: sha512-peLblDlFw/ngk3UWq0VnYaOLy6agTZZ+MUO/WhVfm14vJGML+xH4FAl2XQGLqdefjNb7ApRg6Yn7U42ZhmYXdw==,
+      }
+    peerDependencies:
+      "@types/react": "*"
+      "@types/react-dom": "*"
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      "@types/react-dom":
+        optional: true
+
+  "@radix-ui/react-menu@2.1.2":
+    resolution:
+      {
+        integrity: sha512-lZ0R4qR2Al6fZ4yCCZzu/ReTFrylHFxIqy7OezIpWF4bL0o9biKo0pFIvkaew3TyZ9Fy5gYVrR5zCGZBVbO1zg==,
       }
     peerDependencies:
       "@types/react": "*"
@@ -3283,6 +3339,24 @@ packages:
     resolution:
       {
         integrity: sha512-0l1LlWRX6kaXpmi3206gb+SpwHQtsZ0hAjuoDWQBi4B1OGDclxBaTLhrTZG3M41z7MdoMyvW7OgOmITbpc5GQw==,
+      }
+
+  "@turf/boolean-point-in-polygon@6.5.0":
+    resolution:
+      {
+        integrity: sha512-DtSuVFB26SI+hj0SjrvXowGTUCHlgevPAIsukssW6BG5MlNSBQAo70wpICBNJL6RjukXg8d2eXaAWuD/CqL00A==,
+      }
+
+  "@turf/helpers@6.5.0":
+    resolution:
+      {
+        integrity: sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==,
+      }
+
+  "@turf/invariant@6.5.0":
+    resolution:
+      {
+        integrity: sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==,
       }
 
   "@typechain/ethers-v6@0.5.1":
@@ -5173,6 +5247,12 @@ packages:
         integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==,
       }
 
+  dotted-map@2.2.3:
+    resolution:
+      {
+        integrity: sha512-8hyOOHHLLVCcCisM3yb9hqp+3bJ7TSMcr1SfrUw8Wxp5UMqih35jIvUyagweCooJbz/EH1nC9GGuPysh7+YlAg==,
+      }
+
   dset@3.1.4:
     resolution:
       {
@@ -5956,6 +6036,23 @@ packages:
     resolution:
       {
         integrity: sha512-O8QzvoKiuzI5HSAHbcYuL6xU+ZLXbrH7C8Akaato4JzQbX2ULNeniqC2Vo5eiCtFktX9XsJ+7nUhxcl2E2IjpA==,
+      }
+    peerDependencies:
+      "@emotion/is-prop-valid": "*"
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    peerDependenciesMeta:
+      "@emotion/is-prop-valid":
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
+  framer-motion@11.13.1:
+    resolution:
+      {
+        integrity: sha512-F40tpGTHByhn9h3zdBQPcEro+pSLtzARcocbNqAyfBI+u9S+KZuHH/7O9+z+GEkoF3eqFxfvVw0eBDytohwqmQ==,
       }
     peerDependencies:
       "@emotion/is-prop-valid": "*"
@@ -7692,6 +7789,12 @@ packages:
       }
     engines: { node: ">= 0.6" }
 
+  mgrs@1.0.0:
+    resolution:
+      {
+        integrity: sha512-awNbTOqCxK1DBGjalK3xqWIstBZgN6fxsMSiXLs9/spqWkF2pAhb2rrYCFSsr1/tT7PhcDGjZndG8SWYn0byYA==,
+      }
+
   micro-ftch@0.3.1:
     resolution:
       {
@@ -8172,6 +8275,35 @@ packages:
       }
     engines: { node: ">= 14.0.0" }
     hasBin: true
+
+  motion-dom@11.13.0:
+    resolution:
+      {
+        integrity: sha512-Oc1MLGJQ6nrvXccXA89lXtOqFyBmvHtaDcTRGT66o8Czl7nuA8BeHAd9MQV1pQKX0d2RHFBFaw5g3k23hQJt0w==,
+      }
+
+  motion-utils@11.13.0:
+    resolution:
+      {
+        integrity: sha512-lq6TzXkH5c/ysJQBxgLXgM01qwBH1b4goTPh57VvZWJbVJZF/0SB31UWEn4EIqbVPf3au88n2rvK17SpDTja1A==,
+      }
+
+  motion@11.13.1:
+    resolution:
+      {
+        integrity: sha512-64+QpZQv8WJJFn+tEEzX04il9s6ReA6lhKRZaxzD6SunGqoaq5g+AFVfcKWme8N83eytUOpGp7mpfJ9cyZlhAA==,
+      }
+    peerDependencies:
+      "@emotion/is-prop-valid": "*"
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    peerDependenciesMeta:
+      "@emotion/is-prop-valid":
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
 
   mri@1.2.0:
     resolution:
@@ -8959,6 +9091,12 @@ packages:
         integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==,
       }
     engines: { node: ">= 0.6.0" }
+
+  proj4@2.15.0:
+    resolution:
+      {
+        integrity: sha512-LqCNEcPdI03BrCHxPLj29vsd5afsm+0sV1H/O3nTDKrv8/LA01ea1z4QADDMjUqxSXWnrmmQDjqFm1J/uZ5RLw==,
+      }
 
   promise@8.3.0:
     resolution:
@@ -10968,6 +11106,12 @@ packages:
       }
     engines: { node: ">=8" }
 
+  wkt-parser@1.4.0:
+    resolution:
+      {
+        integrity: sha512-qpwO7Ihds/YYDTi1aADFTI1Sm9YC/tTe3SHD24EeIlZxy7Ik6a1b4HOz7jAi0xdUAw487duqpo8OGu+Tf4nwlQ==,
+      }
+
   wonka@6.3.4:
     resolution:
       {
@@ -11228,9 +11372,9 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
-  "@copilotkit/react-core@1.3.15(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)":
+  "@copilotkit/react-core@1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)":
     dependencies:
-      "@copilotkit/runtime-client-gql": 1.3.15(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react@18.3.1)(ws@8.18.0)
+      "@copilotkit/runtime-client-gql": 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react@18.3.1)(ws@8.18.0)
       "@copilotkit/shared": 1.3.15
       "@scarf/scarf": 1.4.0
       react: 18.3.1
@@ -11344,10 +11488,10 @@ snapshots:
       - web-auth-library
       - ws
 
-  "@copilotkit/react-ui@1.3.15(@types/react@18.3.12)(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)":
+  "@copilotkit/react-ui@1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(@types/react@18.3.12)(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)":
     dependencies:
-      "@copilotkit/react-core": 1.3.15(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)
-      "@copilotkit/runtime-client-gql": 1.3.15(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react@18.3.1)(ws@8.18.0)
+      "@copilotkit/react-core": 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.0)
+      "@copilotkit/runtime-client-gql": 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react@18.3.1)(ws@8.18.0)
       "@copilotkit/shared": 1.3.15
       "@headlessui/react": 2.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
@@ -11465,9 +11609,9 @@ snapshots:
       - web-auth-library
       - ws
 
-  "@copilotkit/runtime-client-gql@1.3.15(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react@18.3.1)(ws@8.18.0)":
+  "@copilotkit/runtime-client-gql@1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(react@18.3.1)(ws@8.18.0)":
     dependencies:
-      "@copilotkit/runtime": 1.3.15(axios@1.7.7)(class-validator@0.14.1)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(ws@8.18.0)
+      "@copilotkit/runtime": 1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(class-validator@0.14.1)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(ws@8.18.0)
       "@copilotkit/shared": 1.3.15
       "@urql/core": 5.0.8(graphql@16.9.0)
       class-transformer: 0.5.1
@@ -11585,14 +11729,14 @@ snapshots:
       - web-auth-library
       - ws
 
-  "@copilotkit/runtime@1.3.15(axios@1.7.7)(class-validator@0.14.1)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(ws@8.18.0)":
+  "@copilotkit/runtime@1.3.15(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(class-validator@0.14.1)(google-auth-library@8.9.0)(handlebars@4.7.8)(lodash@4.17.21)(ws@8.18.0)":
     dependencies:
       "@anthropic-ai/sdk": 0.27.3
       "@copilotkit/shared": 1.3.15
       "@graphql-yoga/plugin-defer-stream": 3.10.3(graphql-yoga@5.10.3(graphql@16.9.0))(graphql@16.9.0)
       "@langchain/community": 0.0.53(google-auth-library@8.9.0)(lodash@4.17.21)(openai@4.73.0(zod@3.23.8))(ws@8.18.0)
-      "@langchain/core": 0.3.18(openai@4.73.0(zod@3.23.8))
-      "@langchain/google-gauth": 0.1.2(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
+      "@langchain/google-gauth": 0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)
       "@langchain/openai": 0.0.28
       class-transformer: 0.5.1
       express: 4.21.1
@@ -11600,7 +11744,7 @@ snapshots:
       graphql-scalars: 1.23.0(graphql@16.9.0)
       graphql-yoga: 5.10.3(graphql@16.9.0)
       groq-sdk: 0.5.0
-      langchain: 0.3.6(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))(axios@1.7.7)(handlebars@4.7.8)(openai@4.73.0(zod@3.23.8))
+      langchain: 0.3.6(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(handlebars@4.7.8)(openai@4.73.0(zod@3.23.8))
       openai: 4.73.0(zod@3.23.8)
       pino: 9.5.0
       pino-pretty: 11.3.0
@@ -12649,7 +12793,7 @@ snapshots:
     transitivePeerDependencies:
       - openai
 
-  "@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8))":
+  "@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))":
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
@@ -12665,23 +12809,33 @@ snapshots:
     transitivePeerDependencies:
       - openai
 
-  "@langchain/google-common@0.1.2(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)":
+  "@langchain/google-common@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)":
     dependencies:
-      "@langchain/core": 0.3.18(openai@4.73.0(zod@3.23.8))
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
       uuid: 10.0.0
       zod-to-json-schema: 3.23.5(zod@3.23.8)
     transitivePeerDependencies:
       - zod
 
-  "@langchain/google-gauth@0.1.2(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)":
+  "@langchain/google-gauth@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)":
     dependencies:
-      "@langchain/core": 0.3.18(openai@4.73.0(zod@3.23.8))
-      "@langchain/google-common": 0.1.2(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
+      "@langchain/google-common": 0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))(zod@3.23.8)
       google-auth-library: 8.9.0
     transitivePeerDependencies:
       - encoding
       - supports-color
       - zod
+
+  "@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))":
+    dependencies:
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
+      "@langchain/openai": 0.3.14(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))
+      groq-sdk: 0.5.0
+      zod: 3.23.8
+      zod-to-json-schema: 3.23.5(zod@3.23.8)
+    transitivePeerDependencies:
+      - encoding
 
   "@langchain/openai@0.0.28":
     dependencies:
@@ -12693,9 +12847,9 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  "@langchain/openai@0.3.14(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))":
+  "@langchain/openai@0.3.14(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))":
     dependencies:
-      "@langchain/core": 0.3.18(openai@4.73.0(zod@3.23.8))
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
       js-tiktoken: 1.0.15
       openai: 4.73.0(zod@3.23.8)
       zod: 3.23.8
@@ -12703,9 +12857,9 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  "@langchain/textsplitters@0.1.0(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))":
+  "@langchain/textsplitters@0.1.0(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))":
     dependencies:
-      "@langchain/core": 0.3.18(openai@4.73.0(zod@3.23.8))
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
       js-tiktoken: 1.0.15
 
   "@lukeed/csprng@1.1.0": {}
@@ -13089,6 +13243,21 @@ snapshots:
       "@types/react": 18.3.12
       "@types/react-dom": 18.3.1
 
+  "@radix-ui/react-dropdown-menu@2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)":
+    dependencies:
+      "@radix-ui/primitive": 1.1.0
+      "@radix-ui/react-compose-refs": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-context": 1.1.1(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-id": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-menu": 2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-primitive": 2.0.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-use-controllable-state": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      "@types/react": 18.3.12
+      "@types/react-dom": 18.3.1
+
   "@radix-ui/react-focus-guards@1.1.1(@types/react@18.3.12)(react@18.3.1)":
     dependencies:
       react: 18.3.1
@@ -13122,6 +13291,32 @@ snapshots:
       "@radix-ui/react-primitive": 2.0.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      "@types/react": 18.3.12
+      "@types/react-dom": 18.3.1
+
+  "@radix-ui/react-menu@2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)":
+    dependencies:
+      "@radix-ui/primitive": 1.1.0
+      "@radix-ui/react-collection": 1.1.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-compose-refs": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-context": 1.1.1(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-direction": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-dismissable-layer": 1.1.1(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-focus-guards": 1.1.1(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-focus-scope": 1.1.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-id": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-popper": 1.2.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-portal": 1.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-presence": 1.1.1(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-primitive": 2.0.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-roving-focus": 1.1.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-slot": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      "@radix-ui/react-use-callback-ref": 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      aria-hidden: 1.2.4
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-remove-scroll: 2.6.0(@types/react@18.3.12)(react@18.3.1)
     optionalDependencies:
       "@types/react": 18.3.12
       "@types/react-dom": 18.3.1
@@ -13810,6 +14005,17 @@ snapshots:
   "@tsparticles/updater-stroke-color@3.6.0":
     dependencies:
       "@tsparticles/engine": 3.6.0
+
+  "@turf/boolean-point-in-polygon@6.5.0":
+    dependencies:
+      "@turf/helpers": 6.5.0
+      "@turf/invariant": 6.5.0
+
+  "@turf/helpers@6.5.0": {}
+
+  "@turf/invariant@6.5.0":
+    dependencies:
+      "@turf/helpers": 6.5.0
 
   "@typechain/ethers-v6@0.5.1(ethers@6.13.4)(typechain@8.3.2(typescript@5.7.2))(typescript@5.7.2)":
     dependencies:
@@ -14899,6 +15105,11 @@ snapshots:
       "@babel/runtime": 7.25.7
       csstype: 3.1.3
 
+  dotted-map@2.2.3:
+    dependencies:
+      "@turf/boolean-point-in-polygon": 6.5.0
+      proj4: 2.15.0
+
   dset@3.1.4: {}
 
   eastasianwidth@0.2.0: {}
@@ -15112,7 +15323,7 @@ snapshots:
       debug: 4.3.7(supports-color@8.1.1)
       enhanced-resolve: 5.17.1
       eslint: 9.15.0(jiti@1.21.6)
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.15.0(jiti@1.21.6)))(eslint@9.15.0(jiti@1.21.6))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.15.0(jiti@1.21.6))
       fast-glob: 3.3.2
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
@@ -15125,7 +15336,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.15.0(jiti@1.21.6)))(eslint@9.15.0(jiti@1.21.6)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.15.0(jiti@1.21.6)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -15147,7 +15358,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.15.0(jiti@1.21.6)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.15.0(jiti@1.21.6)))(eslint@9.15.0(jiti@1.21.6))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.9.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.15.0(jiti@1.21.6))
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -15652,6 +15863,15 @@ snapshots:
 
   framer-motion@11.11.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
+      tslib: 2.8.0
+    optionalDependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  framer-motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      motion-dom: 11.13.0
+      motion-utils: 11.13.0
       tslib: 2.8.0
     optionalDependencies:
       react: 18.3.1
@@ -16465,11 +16685,11 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  langchain@0.3.6(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))(axios@1.7.7)(handlebars@4.7.8)(openai@4.73.0(zod@3.23.8)):
+  langchain@0.3.6(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))(@langchain/groq@0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8))))(axios@1.7.7)(handlebars@4.7.8)(openai@4.73.0(zod@3.23.8)):
     dependencies:
-      "@langchain/core": 0.3.18(openai@4.73.0(zod@3.23.8))
-      "@langchain/openai": 0.3.14(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))
-      "@langchain/textsplitters": 0.1.0(@langchain/core@0.3.18(openai@4.73.0(zod@3.23.8)))
+      "@langchain/core": 0.3.19(openai@4.73.0(zod@3.23.8))
+      "@langchain/openai": 0.3.14(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))
+      "@langchain/textsplitters": 0.1.0(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))
       js-tiktoken: 1.0.15
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
@@ -16481,6 +16701,7 @@ snapshots:
       zod: 3.23.8
       zod-to-json-schema: 3.23.5(zod@3.23.8)
     optionalDependencies:
+      "@langchain/groq": 0.1.2(@langchain/core@0.3.19(openai@4.73.0(zod@3.23.8)))
       axios: 1.7.7
       handlebars: 4.7.8
     transitivePeerDependencies:
@@ -16871,6 +17092,8 @@ snapshots:
   merge2@1.4.1: {}
 
   methods@1.1.2: {}
+
+  mgrs@1.0.0: {}
 
   micro-ftch@0.3.1: {}
 
@@ -17353,6 +17576,18 @@ snapshots:
       yargs-parser: 20.2.9
       yargs-unparser: 2.0.0
 
+  motion-dom@11.13.0: {}
+
+  motion-utils@11.13.0: {}
+
+  motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      framer-motion: 11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tslib: 2.8.0
+    optionalDependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   mri@1.2.0: {}
 
   ms@2.0.0: {}
@@ -17766,6 +18001,11 @@ snapshots:
   process-warning@4.0.0: {}
 
   process@0.11.10: {}
+
+  proj4@2.15.0:
+    dependencies:
+      mgrs: 1.0.0
+      wkt-parser: 1.4.0
 
   promise@8.3.0:
     dependencies:
@@ -19371,6 +19611,8 @@ snapshots:
   widest-line@3.1.0:
     dependencies:
       string-width: 4.2.3
+
+  wkt-parser@1.4.0: {}
 
   wonka@6.3.4: {}
 

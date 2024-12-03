@@ -226,7 +226,7 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[92vh] bg-gray-100 py-8">
+    <div className="flex items-center justify-center min-h-[92vh] bg-muted py-8">
       <TooltipProvider>
         <Card className="w-full max-w-2xl">
           <CardHeader>

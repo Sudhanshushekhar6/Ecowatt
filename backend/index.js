@@ -1,6 +1,13 @@
 const cron = require("node-cron");
 const { initializeApp } = require("firebase/app");
-const { getFirestore, collection, addDoc, getDocs, query, where } = require("firebase/firestore");
+const {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+} = require("firebase/firestore");
 const { initializeApp: adminInit } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const path = require("path");
@@ -20,7 +27,9 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 adminInit({
-  credential: require("firebase-admin").credential.cert(require("../serviceAccountKey.json")),
+  credential: require("firebase-admin").credential.cert(
+    require("../serviceAccountKey.json"),
+  ),
 });
 
 const db = getFirestore();
@@ -83,7 +92,7 @@ function getCurrentTOURate(category) {
 async function fetchUsersWithEmailNotifications() {
   const usersCollection = collection(db, "users");
   const querySnapshot = await getDocs(
-    query(usersCollection, where("notificationMethod", "==", "email"))
+    query(usersCollection, where("notificationMethod", "==", "email")),
   );
 
   const users = [];

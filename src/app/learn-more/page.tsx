@@ -28,7 +28,7 @@ export default function LearnMore() {
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               Learn More About Solar Energy and PrabhaWatt
             </h1>
-            <p className="text-lg md:text-xl text-gray-600">
+            <p className="text-lg md:text-xl text-muted-foreground">
               Discover how solar energy and PrabhaWatt can revolutionize your
               energy consumption and savings.
             </p>
@@ -82,7 +82,7 @@ export default function LearnMore() {
               target="_blank"
               rel="noopener noreferrer"
               href={`https://www.statista.com/outlook/io/energy/renewable-energy/solar-energy/worldwide#production`}
-              className="mt-4 text-sm text-gray-600 hover:underline"
+              className="mt-4 text-sm text-muted-foreground hover:underline"
             >
               Source: Statista Solar Energy - Worldwide
             </Link>
@@ -172,7 +172,7 @@ export default function LearnMore() {
               target="_blank"
               rel="noopener noreferrer"
               href={`https://www.investindia.gov.in/sector/renewable-energy#:~:text=This%20is%20the%20world's%20largest,(as%20of%20Sep%202024).`}
-              className="mt-4 text-sm text-gray-600 hover:underline"
+              className="mt-4 text-sm text-muted-foreground hover:underline"
             >
               Source: Renewable Energy Information, Invest India, 2024 data
             </Link>
@@ -247,7 +247,7 @@ export default function LearnMore() {
             <div className="flex items-center justify-center">
               <SavingsProjectionChart />
             </div>
-            <p className="mt-4 text-sm md:text-base text-gray-600">
+            <p className="mt-4 text-sm md:text-base text-muted-foreground">
               Note: Actual savings may vary based on individual energy
               consumption, local electricity rates, and solar system
               specifications.
@@ -271,12 +271,12 @@ export default function LearnMore() {
           </section>
         </div>
       </main>
-      <footer className="py-6 px-4 md:px-6 mt-8 bg-white border-t border-gray-200">
+      <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             © 2024 PrabhaWatt. All rights reserved.
           </p>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             For more information about solar energy, visit the{" "}
             <a
               href="https://mnre.gov.in/solar-overview/"

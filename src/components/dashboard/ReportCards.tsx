@@ -67,7 +67,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="p-4 rounded-lg bg-gray-50">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-600">Current Month's Cost</span>
+            <span className="text-muted-foreground">Current Month's Cost</span>
             <Zap className="h-5 w-5 text-blue-500" />
           </div>
           <p className="text-2xl font-bold">
@@ -83,7 +83,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
         {data.solarGeneration !== null && (
           <div className="p-4 rounded-lg bg-gray-50">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600">Solar Generation</span>
+              <span className="text-muted-foreground">Solar Generation</span>
               <Sun className="h-5 w-5 text-yellow-500" />
             </div>
             <p className="text-2xl font-bold">{data.solarGeneration} kWh</p>
@@ -96,7 +96,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
         {data.batteryUsage !== null && (
           <div className="p-4 rounded-lg bg-gray-50">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600">Battery Usage</span>
+              <span className="text-muted-foreground">Battery Usage</span>
               <Battery className="h-5 w-5 text-green-500" />
             </div>
             <p className="text-2xl font-bold">{data.batteryUsage} kWh</p>
@@ -125,7 +125,7 @@ const ExecutiveSummaryCard = ({ data }: { data: ExecutiveSummary }) => (
                   {rec.text}
                 </AlertDescription>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Impact: {rec.estimatedImpact}
               </p>
             </Alert>
@@ -145,19 +145,19 @@ const TariffAnalysisCard = ({ data }: { data: TariffAnalysis }) => (
     <CardContent>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Current Rate</p>
+          <p className="text-sm text-muted-foreground">Current Rate</p>
           <p className="text-xl font-bold">₹{data.currentRate}/kWh</p>
         </div>
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Average Rate</p>
+          <p className="text-sm text-muted-foreground">Average Rate</p>
           <p className="text-xl font-bold">₹{data.averageRate}/kWh</p>
         </div>
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Peak Rate</p>
+          <p className="text-sm text-muted-foreground">Peak Rate</p>
           <p className="text-xl font-bold">₹{data.peakRate}/kWh</p>
         </div>
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Off-Peak Rate</p>
+          <p className="text-sm text-muted-foreground">Off-Peak Rate</p>
           <p className="text-xl font-bold">₹{data.offPeakRate}/kWh</p>
         </div>
       </div>
@@ -210,19 +210,19 @@ const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
     <CardContent>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Total Consumption</p>
+          <p className="text-sm text-muted-foreground">Total Consumption</p>
           <p className="text-xl font-bold">{data.totalConsumption} kWh</p>
         </div>
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Daily Average</p>
+          <p className="text-sm text-muted-foreground">Daily Average</p>
           <p className="text-xl font-bold">
             {data.averageDailyConsumption} kWh
           </p>
         </div>
         <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Peak Consumption</p>
+          <p className="text-sm text-muted-foreground">Peak Consumption</p>
           <p className="text-xl font-bold">{data.peakConsumptionValue} kW</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             at {new Date(data.peakConsumptionTime).toLocaleTimeString()}
           </p>
         </div>
@@ -310,16 +310,16 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Daily Generation</p>
+            <p className="text-sm text-muted-foreground">Daily Generation</p>
             <p className="text-xl font-bold">{data.dailyGeneration} kWh</p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Monthly Generation</p>
+            <p className="text-sm text-muted-foreground">Monthly Generation</p>
             <p className="text-xl font-bold">{data.monthlyGeneration} kWh</p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">System Efficiency</p>
+              <p className="text-sm text-muted-foreground">System Efficiency</p>
               <p className="text-xl font-bold">{data.efficiency}%</p>
             </div>
             {data.efficiency > 100 && (
@@ -337,7 +337,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
             )}
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Monthly Savings</p>
+            <p className="text-sm text-muted-foreground">Monthly Savings</p>
             <p className="text-xl font-bold">₹{data.savingsFromSolar}</p>
           </div>
         </div>
@@ -376,7 +376,7 @@ const SolarAnalysisCard = ({ data }: { data: SolarAnalysis }) => {
             {data.maintenance_tasks.map((task, index) => (
               <Alert key={index}>
                 <AlertDescription className="flex items-center">
-                  <NotepadText className="h-4 w-4 text-black-600 mr-2" />
+                  <NotepadText className="h-4 w-4 text-foreground-600 mr-2" />
                   {task}
                 </AlertDescription>
               </Alert>
@@ -410,7 +410,7 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
     <CardContent>
       <div className="p-4 rounded-lg bg-gray-50 mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-600">Total Potential Savings</span>
+          <span className="text-muted-foreground">Total Potential Savings</span>
           <Zap className="h-5 w-5 text-green-500" />
         </div>
         <p className="text-2xl font-bold">
@@ -441,19 +441,23 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       Current Usage (assumed):
                     </p>
                     <p className="text-sm">{device.currentUsagePattern}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Recommended Usage:</p>
+                    <p className="text-sm text-muted-foreground">
+                      Recommended Usage:
+                    </p>
                     <p className="text-sm">{device.recommendedPattern}</p>
                   </div>
                 </div>
 
                 <div className="mt-2">
-                  <p className="text-sm text-gray-600">Optimal Hours:</p>
+                  <p className="text-sm text-muted-foreground">
+                    Optimal Hours:
+                  </p>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {device.optimalHours.map((hour) => (
                       <Badge key={hour} variant="outline">
@@ -464,7 +468,7 @@ const SmartDevicesAnalysisCard = ({ data }: { data: SmartDevicesAnalysis }) => (
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   {device.reasonForRecommendation}
                 </p>
               </div>

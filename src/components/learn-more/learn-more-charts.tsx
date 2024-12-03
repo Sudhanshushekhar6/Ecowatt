@@ -127,7 +127,7 @@ export function EnergySourceChart() {
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="bg-white p-2 rounded-lg shadow-md">
+                      <div className="bg-background p-2 rounded-lg shadow-md">
                         <p>{`${payload[0].name}: ${payload[0].value} GW`}</p>
                       </div>
                     );

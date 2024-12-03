@@ -229,7 +229,7 @@ const GenerateReportButton = ({
 
     if (status.isLoading) {
       return (
-        <div className="animate-pulse bg-gray-100 rounded-lg p-6">
+        <div className="animate-pulse bg-muted rounded-lg p-6">
           <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-1/2"></div>
         </div>
@@ -269,7 +269,7 @@ const GenerateReportButton = ({
             <></>
           )}
           {energyData.length === 0 && (
-            <div className="text-sm text-gray-600 mt-2">
+            <div className="text-sm text-muted-foreground mt-2">
               Please upload energy data to generate a report.
             </div>
           )}
@@ -279,7 +279,7 @@ const GenerateReportButton = ({
           <Link href="/settings">
             <Button
               variant="outline"
-              className="text-gray-600 border-gray-300 hover:bg-gray-100"
+              className="text-muted-foreground border-gray-300 hover:bg-muted"
             >
               <Settings className="mr-2 h-4 w-4" /> System Settings
             </Button>

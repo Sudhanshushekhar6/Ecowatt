@@ -6,6 +6,7 @@ import { Menu, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ModeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 
 export default function Navbar() {
@@ -46,21 +47,21 @@ export default function Navbar() {
       {/* {isLandingPage && (
         <>
           <a
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="#benefits"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Benefits
           </a>
           <a
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="#why-choose"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Why Choose Us
           </a>
           <a
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="#get-started"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
@@ -71,45 +72,47 @@ export default function Navbar() {
       {user ? (
         <>
           <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="/learn-more"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Learn More
           </Link>
           <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="/dashboard"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Dashboard
           </Link>
           {/* <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="/trading"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Trading
           </Link> */}
           <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="/settings"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Settings
           </Link>
+
+          <ModeToggle />
         </>
       ) : (
         <>
           <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="/learn-more"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
             Learn More
           </Link>
           <Link
-            className="text-sm font-medium text-gray-700 hover:text-green-600 cursor-pointer"
+            className="text-sm font-medium text-muted-foreground hover:text-green-600 cursor-pointer"
             href="/sign-in"
             onClick={() => setIsOpen(false)} // Close sheet on click
           >
@@ -120,16 +123,18 @@ export default function Navbar() {
               Sign In
             </Button>
           </Link>
+
+          <ModeToggle />
         </>
       )}
     </>
   );
 
   return (
-    <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-200 sticky top-0 bg-white z-10">
+    <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-200 sticky top-0 bg-background z-10">
       <Link className="flex items-center justify-center" href="/">
         <Sun className="h-6 w-6 text-green-600" />
-        <span className="ml-2 text-xl font-semibold text-gray-900">
+        <span className="ml-2 text-xl font-semibold text-foreground">
           PrabhaWatt
         </span>
       </Link>
