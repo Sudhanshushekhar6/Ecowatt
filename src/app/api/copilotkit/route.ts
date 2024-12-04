@@ -1,4 +1,3 @@
-import { env } from "@/env.mjs";
 import {
   CopilotRuntime,
   GroqAdapter,
@@ -7,7 +6,7 @@ import {
 import Groq from "groq-sdk";
 import { NextRequest } from "next/server";
 
-const groq = new Groq({ apiKey: env.NEXT_PUBLIC_GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY! });
 
 const copilotKit = new CopilotRuntime();
 

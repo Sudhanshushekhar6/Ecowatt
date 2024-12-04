@@ -1,6 +1,5 @@
 "use client";
 
-import { env } from "@/env.mjs";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useMemo } from "react";
 
@@ -20,7 +19,7 @@ function Map() {
 
 export default function FindSolar() {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
   });
 
   if (!isLoaded) return <div>Loading...</div>;
