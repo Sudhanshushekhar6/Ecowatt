@@ -12,7 +12,7 @@ import {
   UserData,
   WeatherData,
 } from "@/types/user";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotReadable } from "@copilotkit/react-core";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { User } from "firebase/auth";
 import { AlertCircle, BarChart3, Download, Settings } from "lucide-react";
@@ -207,17 +207,6 @@ const GenerateReportButton = ({
     description:
       "User's analysis report based on their energy data and recommendations for improvement.",
     value: report,
-  });
-
-  useCopilotAction({
-    name: "generateReport",
-    description:
-      "Generate an analysis report based on the user's data and generate recommendations for improvement.",
-    handler: () => {
-      if (Object.values(report).every((section) => section === null)) {
-        handleGenerateReport();
-      }
-    },
   });
 
   const renderSection = (
