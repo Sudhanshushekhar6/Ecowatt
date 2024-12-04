@@ -81,6 +81,14 @@ export default function Home() {
     },
   });
 
+  useCopilotReadable({
+    description: "What is Time of Use Tariff?",
+    value: {
+      "Time of Use Tariff":
+        "Time of Use Tariff (ToU) is a pricing structure that charges different rates for electricity based on the time of day. It encourages consumers to shift their usage to off-peak hours when rates are lower, thereby balancing the load on the grid and reducing costs for everyone.",
+    },
+  });
+
   return (
     <div className="flex flex-col min-h-screen bg-muted">
       <main className="flex-1">
@@ -101,7 +109,7 @@ export default function Home() {
                     future.
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <div className="flex flex-row gap-4 items-center justify-center">
                   <Link href="/learn-more" className="w-full sm:w-auto">
                     <Button
                       variant="outline"
@@ -259,14 +267,14 @@ export default function Home() {
                 </p>
               </div>
               <div className="w-full max-w-md space-y-4">
-                <form className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <form className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-center items-center">
                   <Input
                     className="w-full bg-background/90 placeholder-muted-foreground"
                     placeholder="Enter your email"
                     type="email"
                   />
                   <Button
-                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
+                    className="w-fit bg-green-600 text-white hover:bg-green-700"
                     type="submit"
                     onClick={(e) => {
                       e.preventDefault();

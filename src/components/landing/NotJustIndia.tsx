@@ -3,7 +3,7 @@ import WorldMap from "@/components/ui/world-map";
 
 export function NotJustIndia() {
   return (
-    <div className="px-20 bg-background pt-20 w-full">
+    <div className="hidden md:block px-20 bg-background pt-20 w-full">
       <div className="max-w-7xl mx-auto text-center">
         <h2 className="text-2xl font-bold tracking-tighter text-foreground sm:text-3xl md:text-4xl text-center">
           Built for everyone, not just{" "}
