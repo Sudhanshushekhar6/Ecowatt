@@ -12,8 +12,6 @@ const envSchema = z.object({
   NEXT_PUBLIC_OPENWEATHER_API_KEY: z.string(),
   NEXT_PUBLIC_GROQ_API_KEY: z.string(),
 
-  RESEND_API_KEY: z.string(),
-
   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string(),
 });
 
