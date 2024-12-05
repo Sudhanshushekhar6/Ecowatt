@@ -527,7 +527,7 @@ export default function Settings() {
           <div className="mt-6 flex justify-between">
             <Button
               onClick={handleSaveChanges}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-white"
               disabled={loading}
             >
               <SettingsIcon className="mr-2 h-4 w-4" /> Save Changes

@@ -100,7 +100,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <WordPullUp
                     className="text-4xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mx-auto"
-                    words="Illuminate Your Savings with Prabhawatt"
+                    words="Illuminate Your Savings with प्रभाwatt"
                   />
                   <SparkleText />
                   <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg lg:text-xl">

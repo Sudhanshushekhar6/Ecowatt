@@ -71,7 +71,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthContextProvider>
-            <NextTopLoader showSpinner={false} color="#65a30d" />
+            <NextTopLoader showSpinner={false} color="#22c55e" />
             <CopilotKit runtimeUrl="/api/copilotkit">
               <Navbar />
               {children}
