@@ -4,7 +4,7 @@ import DottedMap from "dotted-map";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useRef } from "react";
+import { memo, useMemo, useRef } from "react";
 
 interface MapProps {
   dots?: Array<{
@@ -14,21 +14,59 @@ interface MapProps {
   lineColor?: string;
 }
 
+interface AnimatedCircleProps {
+  cx: number;
+  cy: number;
+  r: string | number;
+  fill: string;
+}
+
+const AnimatedCircle = memo(({ cx, cy, r, fill }: AnimatedCircleProps) => (
+  <>
+    <circle cx={cx} cy={cy} r={r} fill={fill} />
+    <circle cx={cx} cy={cy} r={r} fill={fill} opacity="0.5">
+      <animate
+        attributeName="r"
+        from="2"
+        to="8"
+        dur="1.5s"
+        begin="0s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="opacity"
+        from="0.5"
+        to="0"
+        dur="1.5s"
+        begin="0s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </>
+));
+
 export default function WorldMap({
   dots = [],
   lineColor = "#0ea5e9",
 }: MapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const map = new DottedMap({ height: 100, grid: "diagonal" });
+  const map = useMemo(
+    () => new DottedMap({ height: 100, grid: "diagonal" }),
+    [],
+  );
 
   const { theme } = useTheme();
 
-  const svgMap = map.getSVG({
-    radius: 0.22,
-    color: theme === "dark" ? "#FFFFFF40" : "#00000040",
-    shape: "circle",
-    backgroundColor: theme === "dark" ? "black" : "white",
-  });
+  const svgMap = useMemo(
+    () =>
+      map.getSVG({
+        radius: 0.22,
+        color: theme === "dark" ? "#FFFFFF40" : "#00000040",
+        shape: "circle",
+        backgroundColor: theme === "dark" ? "black" : "white",
+      }),
+    [theme],
+  );
 
   const projectPoint = (lat: number, lng: number) => {
     const x = (lng + 180) * (800 / 360);
@@ -99,68 +137,20 @@ export default function WorldMap({
         {dots.map((dot, i) => (
           <g key={`points-group-${i}`}>
             <g key={`start-${i}`}>
-              <circle
+              <AnimatedCircle
                 cx={projectPoint(dot.start.lat, dot.start.lng).x}
                 cy={projectPoint(dot.start.lat, dot.start.lng).y}
                 r="2"
                 fill={lineColor}
               />
-              <circle
-                cx={projectPoint(dot.start.lat, dot.start.lng).x}
-                cy={projectPoint(dot.start.lat, dot.start.lng).y}
-                r="2"
-                fill={lineColor}
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="r"
-                  from="2"
-                  to="8"
-                  dur="1.5s"
-                  begin="0s"
-                  repeatCount="indefinite"
-                />
-                <animate
-                  attributeName="opacity"
-                  from="0.5"
-                  to="0"
-                  dur="1.5s"
-                  begin="0s"
-                  repeatCount="indefinite"
-                />
-              </circle>
             </g>
             <g key={`end-${i}`}>
-              <circle
+              <AnimatedCircle
                 cx={projectPoint(dot.end.lat, dot.end.lng).x}
                 cy={projectPoint(dot.end.lat, dot.end.lng).y}
                 r="2"
                 fill={lineColor}
               />
-              <circle
-                cx={projectPoint(dot.end.lat, dot.end.lng).x}
-                cy={projectPoint(dot.end.lat, dot.end.lng).y}
-                r="2"
-                fill={lineColor}
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="r"
-                  from="2"
-                  to="8"
-                  dur="1.5s"
-                  begin="0s"
-                  repeatCount="indefinite"
-                />
-                <animate
-                  attributeName="opacity"
-                  from="0.5"
-                  to="0"
-                  dur="1.5s"
-                  begin="0s"
-                  repeatCount="indefinite"
-                />
-              </circle>
             </g>
           </g>
         ))}
