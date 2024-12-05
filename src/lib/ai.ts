@@ -317,16 +317,17 @@ async function generateConsumptionAnalytics(
   const days = Array.from(dataByDay.keys()).sort();
   const latestDayData = dataByDay.get(days[days.length - 1]) || [];
 
-  const totalConsumption = latestDayData.reduce(
-    (sum, data) => sum + data.Consumption,
-    0,
+  const totalConsumption = Math.abs(
+    latestDayData.reduce((sum, data) => sum + data.Consumption, 0),
   );
 
   const peakConsumption = latestDayData.reduce(
-    (max, data) =>
-      data.Consumption > max.consumption
-        ? { time: data.SendDate, consumption: data.Consumption }
-        : max,
+    (max, data) => {
+      const consumption = Math.abs(data.Consumption);
+      return consumption > max.consumption
+        ? { time: data.SendDate, consumption }
+        : max;
+    },
     { time: "", consumption: 0 },
   );
 
@@ -340,11 +341,21 @@ async function generateConsumptionAnalytics(
     {} as Record<number, number[]>,
   );
 
+  type HourlyData = {
+    hour: number;
+    average: number;
+    varianceFromMean: number;
+  };
+
   const hourlyAverages = Object.entries(hourlyConsumption)
-    .map(([hour, values]) => ({
-      hour: parseInt(hour),
-      average: values.reduce((a, b) => a + b, 0) / values.length,
-    }))
+    .map(([hour, values]) => {
+      const average = values.reduce((a, b) => a + b, 0) / values.length;
+      return {
+        hour: parseInt(hour),
+        average,
+        varianceFromMean: Math.abs(average - totalConsumption / 24),
+      } as HourlyData;
+    })
     .sort((a, b) => a.hour - b.hour);
 
   const aiPrompt = `
@@ -390,11 +401,21 @@ async function generateConsumptionAnalytics(
   const aiResponse = await fetchAIResponse(aiPrompt, consumptionAnalysisSchema); // Use insights in future updates
 
   return {
-    totalConsumption: parseFloat(totalConsumption.toFixed(2)),
-    averageDailyConsumption: parseFloat((totalConsumption / 24).toFixed(2)),
+    totalConsumption: Math.abs(parseFloat(totalConsumption.toFixed(2))),
+    averageDailyConsumption: Math.abs(
+      parseFloat((totalConsumption / 24).toFixed(2)),
+    ),
     peakConsumptionTime: peakConsumption.time,
-    peakConsumptionValue: parseFloat(peakConsumption.consumption.toFixed(2)),
-    consumptionByTimeOfDay: hourlyAverages,
+    peakConsumptionValue: Math.abs(
+      parseFloat(peakConsumption.consumption.toFixed(2)),
+    ),
+    consumptionByTimeOfDay: hourlyAverages.map((hour) => ({
+      ...hour,
+      average: Math.abs(hour.average),
+      varianceFromMean: hour.varianceFromMean
+        ? Math.abs(hour.varianceFromMean)
+        : 0,
+    })),
     unusualPatterns: aiResponse?.unusualPatterns,
     weatherImpact: aiResponse?.weatherImpact,
     optimizationOpportunities: aiResponse?.optimizationOpportunities,
@@ -425,18 +446,21 @@ async function generateSolarAnalysis(
   const days = Array.from(dataByDay.keys()).sort();
   const latestDayData = dataByDay.get(days[days.length - 1]) || [];
 
-  const dailyGeneration = latestDayData.reduce(
-    (sum, data) => sum + (data.SolarEnergy || 0),
-    0,
+  const dailyGeneration = Math.abs(
+    latestDayData.reduce((sum, data) => sum + (data.SolarEnergy || 0), 0),
   );
 
-  const monthlyGeneration = dailyGeneration * 30;
+  const monthlyGeneration = Math.abs(dailyGeneration * 30);
   const theoreticalDaily = userData.solarCapacity
-    ? userData.solarCapacity * 5.5
+    ? Math.abs(userData.solarCapacity * 5.5)
     : 1;
-  const efficiency = (dailyGeneration / theoreticalDaily) * 100;
-  const savingsFromSolar =
-    (dailyGeneration * parseFloat(userData.monthlyBill.toString())) / 30;
+  const efficiency = Math.min(
+    100,
+    Math.abs((dailyGeneration / theoreticalDaily) * 100),
+  );
+  const savingsFromSolar = Math.abs(
+    (dailyGeneration * parseFloat(userData.monthlyBill.toString())) / 30,
+  );
 
   const aiPrompt = `
     Analyze solar system performance and provide optimization guidance:
@@ -474,10 +498,10 @@ async function generateSolarAnalysis(
   const aiResponse = await fetchAIResponse(aiPrompt, solarAnalysisSchema);
 
   return {
-    dailyGeneration: parseFloat(dailyGeneration.toFixed(2)),
-    monthlyGeneration: parseFloat(monthlyGeneration.toFixed(2)),
-    efficiency: parseFloat(efficiency.toFixed(2)),
-    savingsFromSolar: parseFloat(savingsFromSolar.toFixed(2)),
+    dailyGeneration: Math.abs(parseFloat(dailyGeneration.toFixed(2))),
+    monthlyGeneration: Math.abs(parseFloat(monthlyGeneration.toFixed(2))),
+    efficiency: Math.min(100, Math.abs(parseFloat(efficiency.toFixed(2)))),
+    savingsFromSolar: Math.abs(parseFloat(savingsFromSolar.toFixed(2))),
     optimizations: aiResponse?.optimizations || [
       "Clean solar panels regularly to maintain efficiency",
       "Consider adjusting panel angles seasonally",
@@ -564,8 +588,13 @@ async function generateSmartDevicesAnalysis(
   );
 
   return {
-    deviceSchedules: aiResponse.deviceSchedules,
-    totalPotentialSavings: aiResponse.totalPotentialSavings,
+    deviceSchedules: aiResponse.deviceSchedules.map(
+      (schedule: typeof deviceScheduleSchema._type) => ({
+        ...schedule,
+        expectedSavings: Math.abs(schedule.expectedSavings),
+      }),
+    ),
+    totalPotentialSavings: Math.abs(aiResponse.totalPotentialSavings),
     generalRecommendations: aiResponse.generalRecommendations,
     automationOpportunities: aiResponse.automationOpportunities,
     peakUsageWarnings: aiResponse.peakUsageWarnings,
