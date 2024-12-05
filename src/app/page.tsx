@@ -74,10 +74,10 @@ export default function Home() {
   useCopilotReadable({
     description: "Get Started with Prabhawatt",
     value: {
-      "Sign Up":
-        "Sign up for a free account and start optimizing your solar energy today!",
       "Learn More":
         "Explore the features and benefits of Prabhawatt to see how it can help you save money and reduce your carbon footprint.",
+      "Guiding Users":
+        "Prabhawatt guides you through the process of optimizing your solar energy usage, reducing electricity bills, and contributing to a greener future.",
     },
   });
 
