@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [touHistory, setTOUHistory] = useState<TOUData[]>([]);
   const [dataPoints, setDataPoints] = useState<number>(500);
   const [reportGenerated, setReportGenerated] = useState<Boolean>(false);
+  const hasShownToast = useRef(false);
 
   // Initialize with the current battery power from userData when available
   const lastCalculatedBatteryPower = useRef<number>(0);
@@ -153,29 +154,33 @@ export default function Dashboard() {
   // Fetch TOU history
   useEffect(() => {
     let isMounted = true;
-    fetchTOUHistory(userData ? userData.userCategory : "").then(
-      (touHistory) => {
-        if (isMounted) {
-          const latestTou = touHistory[touHistory.length - 1];
-          toast.success("Latest TOU rate fetched", {
-            description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
-            action: (
-              <Button
-                onClick={() => {
-                  toast.dismiss();
-                }}
-                className="ml-auto"
-                variant={"outline"}
-                size={"sm"}
-              >
-                Ok
-              </Button>
-            ),
-          });
-          setTOUHistory(touHistory);
-        }
-      },
-    );
+
+    if (!hasShownToast.current) {
+      fetchTOUHistory(userData ? userData.userCategory : "").then(
+        (touHistory) => {
+          if (isMounted) {
+            const latestTou = touHistory[touHistory.length - 1];
+            toast.success("Latest TOU rate fetched", {
+              description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
+              action: (
+                <Button
+                  onClick={() => {
+                    toast.dismiss();
+                  }}
+                  className="ml-auto"
+                  variant={"outline"}
+                  size={"sm"}
+                >
+                  Ok
+                </Button>
+              ),
+            });
+            setTOUHistory(touHistory);
+            hasShownToast.current = true;
+          }
+        },
+      );
+    }
 
     return () => {
       isMounted = false;

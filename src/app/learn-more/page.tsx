@@ -271,7 +271,7 @@ export default function LearnMore() {
           </section>
         </div>
       </main>
-      <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t border-gray-200">
+      <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-muted-foreground">
             © 2024 PrabhaWatt. All rights reserved.

@@ -40,12 +40,45 @@ interface EnergyChartsProps {
   setDataPoints: React.Dispatch<React.SetStateAction<number>>;
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    dataKey: string;
+    name: string;
+    color: string;
+  }>;
+  label?: string;
+}
+
 export default function EnergyCharts({
   energyData,
   handleFileUpload,
   fileName,
   setDataPoints,
 }: EnergyChartsProps) {
+  function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+    if (!active || !payload) return null;
+
+    return (
+      <div className="rounded-lg border bg-background p-2 shadow-lg">
+        <div className="text-sm font-medium mb-1">
+          {new Date(label || "").toLocaleString()}
+        </div>
+        {payload.map((item, index) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: item.color }}
+            />
+            <span>{item.name}:</span>
+            <span className="font-medium">{item.value.toFixed(2)} kW</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <Tabs defaultValue="power-consumption">
       <TabsList>
@@ -126,7 +159,7 @@ export default function EnergyCharts({
                     position: "insideRight",
                   }}
                 />
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Line
                   yAxisId="left"
@@ -134,6 +167,18 @@ export default function EnergyCharts({
                   dataKey="Consumption"
                   stroke="#8884d8"
                   name="Consumption (kW)"
+                  dot={{
+                    stroke: "#8884d8",
+                    strokeWidth: 1,
+                    fill: "hsl(var(--background))",
+                    r: 2,
+                  }}
+                  activeDot={{
+                    stroke: "#8884d8",
+                    strokeWidth: 1,
+                    fill: "hsl(var(--background))",
+                    r: 2,
+                  }}
                 />
                 <Line
                   yAxisId="right"
@@ -141,6 +186,18 @@ export default function EnergyCharts({
                   dataKey="SolarPower"
                   stroke="#82ca9d"
                   name="Solar Power (kW)"
+                  dot={{
+                    stroke: "#82ca9d",
+                    strokeWidth: 1,
+                    fill: "hsl(var(--background))",
+                    r: 2,
+                  }}
+                  activeDot={{
+                    stroke: "#82ca9d",
+                    strokeWidth: 1,
+                    fill: "hsl(var(--background))",
+                    r: 2,
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>

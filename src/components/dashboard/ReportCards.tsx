@@ -179,7 +179,7 @@ const TariffAnalysisCard = ({ data }: { data: TariffAnalysis }) => (
                       payload?.[0]?.value
                     ) {
                       return (
-                        <div className="bg-white border border-gray-300 p-2 rounded">
+                        <div className="bg-background border border-gray-300 p-2 rounded">
                           <p>{`Time: ${payload[0].payload.time}`}</p>
                           <p>{`Rate: ₹${Number(payload[0].value).toFixed(2)}/kWh`}</p>
                         </div>
@@ -264,7 +264,7 @@ const ConsumptionAnalyticsCard = ({ data }: { data: ConsumptionAnalytics }) => (
                       payload?.[0]?.value
                     ) {
                       return (
-                        <div className="bg-white border border-gray-300 p-2 rounded">
+                        <div className="bg-background border border-gray-300 p-2 rounded">
                           <p>{`Hour: ${payload[0].payload.hour}`}</p>
                           <p>{`Average: ${Number(payload[0].value).toFixed(2)} kW`}</p>
                         </div>
