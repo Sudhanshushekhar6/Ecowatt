@@ -1,10 +1,14 @@
+
 "use client";
 
-import DottedMap from "dotted-map";
-import { motion } from "motion/react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
-import { memo, useMemo, useRef } from "react";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  Polyline,
+  InfoWindow,
+} from "@react-google-maps/api";
+import { useEffect, useMemo, useState } from "react";
 
 interface MapProps {
   dots?: Array<{
@@ -14,147 +18,161 @@ interface MapProps {
   lineColor?: string;
 }
 
-interface AnimatedCircleProps {
-  cx: number;
-  cy: number;
-  r: string | number;
-  fill: string;
-}
+export default function WorldMap({ dots = [], lineColor = "#0ea5e9" }: MapProps) {
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [activeMarker, setActiveMarker] = useState<string | null>(null);
 
-const AnimatedCircle = memo(({ cx, cy, r, fill }: AnimatedCircleProps) => (
-  <>
-    <circle cx={cx} cy={cy} r={r} fill={fill} />
-    <circle cx={cx} cy={cy} r={r} fill={fill} opacity="0.5">
-      <animate
-        attributeName="r"
-        from="2"
-        to="8"
-        dur="1.5s"
-        begin="0s"
-        repeatCount="indefinite"
-      />
-      <animate
-        attributeName="opacity"
-        from="0.5"
-        to="0"
-        dur="1.5s"
-        begin="0s"
-        repeatCount="indefinite"
-      />
-    </circle>
-  </>
-));
+  const center = useMemo(() => currentLocation || { lat: 20, lng: 0 }, [currentLocation]);
+  const zoom = currentLocation ? 3 : 2;
 
-export default function WorldMap({
-  dots = [],
-  lineColor = "#0ea5e9",
-}: MapProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const map = useMemo(
-    () => new DottedMap({ height: 100, grid: "diagonal" }),
-    [],
-  );
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCurrentLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => console.warn("Location access denied.")
+      );
+    }
+  }, []);
 
-  const { theme } = useTheme();
-
-  const svgMap = useMemo(
-    () =>
-      map.getSVG({
-        radius: 0.22,
-        color: theme === "dark" ? "#FFFFFF40" : "#00000040",
-        shape: "circle",
-        backgroundColor: theme === "dark" ? "black" : "white",
-      }),
-    [theme],
-  );
-
-  const projectPoint = (lat: number, lng: number) => {
-    const x = (lng + 180) * (800 / 360);
-    const y = (90 - lat) * (400 / 180);
-    return { x, y };
+  const mapStyles = {
+    height: "500px",
+    width: "100%",
+    borderRadius: "12px",
   };
 
-  const createCurvedPath = (
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-  ) => {
-    const midX = (start.x + end.x) / 2;
-    const midY = Math.min(start.y, end.y) - 50;
-    return `M ${start.x} ${start.y} Q ${midX} ${midY} ${end.x} ${end.y}`;
+  const polylineOptions = {
+    strokeColor: lineColor,
+    strokeOpacity: 0,
+    icons: [
+      {
+        icon: {
+          path: "M 0,-1 0,1",
+          strokeOpacity: 1,
+          scale: 4,
+        },
+        offset: "0",
+        repeat: "20px",
+      },
+    ],
   };
+
+  const mapTheme = [
+    {
+      elementType: "geometry",
+      stylers: [{ color: "#1d2c4d" }],
+    },
+    {
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#8ec3b9" }],
+    },
+    {
+      elementType: "labels.text.stroke",
+      stylers: [{ color: "#1a3646" }],
+    },
+    {
+      featureType: "administrative.country",
+      elementType: "geometry.stroke",
+      stylers: [{ color: "#4b6878" }],
+    },
+    {
+      featureType: "landscape.natural",
+      elementType: "geometry",
+      stylers: [{ color: "#023e58" }],
+    },
+    {
+      featureType: "poi",
+      elementType: "geometry",
+      stylers: [{ color: "#283d6a" }],
+    },
+    {
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [{ color: "#304a7d" }],
+    },
+    {
+      featureType: "transit",
+      elementType: "geometry",
+      stylers: [{ color: "#406d80" }],
+    },
+    {
+      featureType: "water",
+      elementType: "geometry",
+      stylers: [{ color: "#0e1626" }],
+    },
+  ];
 
   return (
-    <div className="w-full aspect-[2/1] bg-background  rounded-lg  relative font-sans">
-      <Image
-        src={`data:image/svg+xml;utf8,${encodeURIComponent(svgMap)}`}
-        className="h-full w-full [mask-image:linear-gradient(to_bottom,transparent,white_10%,white_90%,transparent)] pointer-events-none select-none"
-        alt="world map"
-        height="495"
-        width="1056"
-        draggable={false}
-      />
-      <svg
-        ref={svgRef}
-        viewBox="0 0 800 400"
-        className="w-full h-full absolute inset-0 pointer-events-none select-none"
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
+      <GoogleMap
+        mapContainerStyle={mapStyles}
+        center={center}
+        zoom={zoom}
+        options={{
+          disableDefaultUI: true,
+          styles: mapTheme,
+        }}
       >
-        {dots.map((dot, i) => {
-          const startPoint = projectPoint(dot.start.lat, dot.start.lng);
-          const endPoint = projectPoint(dot.end.lat, dot.end.lng);
-          return (
-            <g key={`path-group-${i}`}>
-              <motion.path
-                d={createCurvedPath(startPoint, endPoint)}
-                fill="none"
-                stroke="url(#path-gradient)"
-                strokeWidth="1"
-                initial={{
-                  pathLength: 0,
-                }}
-                animate={{
-                  pathLength: 1,
-                }}
-                transition={{
-                  duration: 1,
-                  delay: 0.5 * i,
-                  ease: "easeOut",
-                }}
-                key={`start-upper-${i}`}
-              ></motion.path>
-            </g>
-          );
-        })}
+        {/* User's Current Location */}
+        {currentLocation && (
+          <Marker
+            position={currentLocation}
+            icon={{
+              path: window.google?.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: "#3b82f6",
+              fillOpacity: 1,
+              strokeWeight: 2,
+              strokeColor: "#ffffff",
+            }}
+          />
+        )}
 
-        <defs>
-          <linearGradient id="path-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="white" stopOpacity="0" />
-            <stop offset="5%" stopColor={lineColor} stopOpacity="1" />
-            <stop offset="95%" stopColor={lineColor} stopOpacity="1" />
-            <stop offset="100%" stopColor="white" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
+        {/* Dots and Lines */}
         {dots.map((dot, i) => (
-          <g key={`points-group-${i}`}>
-            <g key={`start-${i}`}>
-              <AnimatedCircle
-                cx={projectPoint(dot.start.lat, dot.start.lng).x}
-                cy={projectPoint(dot.start.lat, dot.start.lng).y}
-                r="2"
-                fill={lineColor}
-              />
-            </g>
-            <g key={`end-${i}`}>
-              <AnimatedCircle
-                cx={projectPoint(dot.end.lat, dot.end.lng).x}
-                cy={projectPoint(dot.end.lat, dot.end.lng).y}
-                r="2"
-                fill={lineColor}
-              />
-            </g>
-          </g>
+          <div key={`dot-group-${i}`}>
+            {/* Start Marker */}
+            <Marker
+              position={dot.start}
+              label={{
+                text: dot.start.label || "Start",
+                color: "#ffffff",
+                fontWeight: "bold",
+              }}
+              onClick={() => setActiveMarker(`start-${i}`)}
+            />
+            {/* End Marker */}
+            <Marker
+              position={dot.end}
+              label={{
+                text: dot.end.label || "End",
+                color: "#ffffff",
+                fontWeight: "bold",
+              }}
+              onClick={() => setActiveMarker(`end-${i}`)}
+            />
+
+            {/* InfoWindows */}
+            {activeMarker === `start-${i}` && (
+              <InfoWindow position={dot.start} onCloseClick={() => setActiveMarker(null)}>
+                <div>{dot.start.label || "Start Point"}</div>
+              </InfoWindow>
+            )}
+            {activeMarker === `end-${i}` && (
+              <InfoWindow position={dot.end} onCloseClick={() => setActiveMarker(null)}>
+                <div>{dot.end.label || "End Point"}</div>
+              </InfoWindow>
+            )}
+
+            {/* Dotted Polyline */}
+            <Polyline path={[dot.start, dot.end]} options={polylineOptions} />
+          </div>
         ))}
-      </svg>
-    </div>
+      </GoogleMap>
+    </LoadScript>
   );
 }

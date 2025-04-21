@@ -17,7 +17,7 @@ const DemoDataButton = ({
 
       toast.success("Demo data loaded successfully", {
         description:
-          "You can now explore Prabhawatt's features with sample data",
+          "You can now explore Ecowatt's features with sample data",
       });
     } catch (error) {
       console.error("Error loading demo data:", error);
@@ -30,7 +30,7 @@ const DemoDataButton = ({
   return (
     <div className={`flex flex-col items-center gap-2 ${className}`}>
       <p className="text-sm text-muted-foreground">
-        Want to try Prabhawatt with some demo data?
+        Want to try Ecowatt with some demo data?
       </p>
       <Button variant="outline" className="gap-2" onClick={handleDemoDataClick}>
         <Lightbulb className="w-4 h-4" />

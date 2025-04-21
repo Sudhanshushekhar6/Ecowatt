@@ -43,11 +43,11 @@ export default function Home() {
   };
 
   useCopilotChatSuggestions({
-    instructions: `Help me understand how to use Prabhawatt. I'm new to this platform and I'm not sure how to get started.`,
+    instructions: `Help me understand how to use Ecowatt. I'm new to this platform and I'm not sure how to get started.`,
   });
 
   useCopilotReadable({
-    description: "Key Benefits of Prabhawatt",
+    description: "Key Benefits of Ecowatt",
     value: {
       "Increased Savings":
         "Optimized energy usage leads to lower electricity bills.",
@@ -58,12 +58,12 @@ export default function Home() {
   });
 
   useCopilotReadable({
-    description: "Why Choose Prabhawatt?",
+    description: "Why Choose Ecowatt?",
     value: {
       "Better Savings":
-        "Prabhawatt offers a comprehensive solution for solar energy optimization, helping you maximize efficiency and minimize costs.",
+        "Ecowatt offers a comprehensive solution for solar energy optimization, helping you maximize efficiency and minimize costs.",
       "Smart Home Integration":
-        "Prabhawatt integrates with your smart home devices, allowing you to control and monitor your energy usage from anywhere.",
+        "Ecowatt integrates with your smart home devices, allowing you to control and monitor your energy usage from anywhere.",
       "Energy Goals":
         "Set specific energy goals and receive personalized recommendations to help you reach your targets.",
       Notifications:
@@ -72,12 +72,12 @@ export default function Home() {
   });
 
   useCopilotReadable({
-    description: "Get Started with Prabhawatt",
+    description: "Get Started with Ecowatt",
     value: {
       "Learn More":
-        "Explore the features and benefits of Prabhawatt to see how it can help you save money and reduce your carbon footprint.",
+        "Explore the features and benefits of Ecowatt to see how it can help you save money and reduce your carbon footprint.",
       "Guiding Users":
-        "Prabhawatt guides you through the process of optimizing your solar energy usage, reducing electricity bills, and contributing to a greener future.",
+        "Ecowatt guides you through the process of optimizing your solar energy usage, reducing electricity bills, and contributing to a greener future.",
     },
   });
 
@@ -100,7 +100,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <WordPullUp
                     className="text-4xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mx-auto"
-                    words="Illuminate Your Savings with प्रभाwatt"
+                    words="Illuminate Your Savings with Ecowatt"
                   />
                   <SparkleText />
                   <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg lg:text-xl">
@@ -204,10 +204,10 @@ export default function Home() {
             <div className="grid gap-10 lg:grid-cols-2 items-center">
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold tracking-tighter text-foreground sm:text-3xl md:text-4xl">
-                  Why Choose PrabhaWatt?
+                  Why Choose Ecowatt?
                 </h2>
                 <p className="text-muted-foreground text-base md:text-lg lg:text-xl">
-                  PrabhaWatt offers a comprehensive solution for solar energy
+                  Ecowatt offers a comprehensive solution for solar energy
                   optimization, helping you maximize efficiency and minimize
                   costs.
                 </p>
@@ -263,7 +263,7 @@ export default function Home() {
                 </h2>
                 <p className="mx-auto max-w-2xl text-sm md:text-base text-muted-foreground">
                   Join thousands of satisfied customers who have reduced their
-                  energy costs with PrabhaWatt.
+                  energy costs with Ecowatt.
                 </p>
               </div>
               <div className="w-full max-w-md space-y-4">
@@ -304,7 +304,7 @@ export default function Home() {
         <div className="container px-4 md:px-6 max-w-7xl py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <p className="text-xs text-muted-foreground mb-2 sm:mb-0">
-              © 2024 PrabhaWatt. All rights reserved.
+              © 2024 Ecowatt. All rights reserved.
             </p>
             <nav className="flex gap-4">
               <Link

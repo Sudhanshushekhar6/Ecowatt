@@ -73,7 +73,7 @@ export default function SignIn() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
-              Sign in to PrabhaWatt
+              Sign in to Ecowatt
             </CardTitle>
             <CardDescription className="text-center">
               Enter your email and password to access your account
@@ -178,7 +178,7 @@ export default function SignIn() {
       <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 PrabhaWatt. All rights reserved.
+            © 2024 Ecowatt. All rights reserved.
           </p>
         </div>
       </footer>

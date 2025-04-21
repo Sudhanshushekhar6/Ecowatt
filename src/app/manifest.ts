@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Prabhawatt",
-    short_name: "Prabhawatt",
+    name: "Ecowatt",
+    short_name: "Ecowatt",
     description:
       "Your all-in-one solution for optimizing solar energy usage, reducing electricity bills, and contributing to a greener future.",
     start_url: "/",

@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,23 +25,66 @@ import {
   Waves,
   Zap,
 } from "lucide-react";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const LocationWeatherDetails = ({
   weatherData,
 }: {
   weatherData: WeatherData | null;
 }) => {
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationName, setLocationName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const getLocationName = async (lat: number, lon: number) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
+      );
+      const data = await response.json();
+      if (data.display_name) {
+        setLocationName(data.display_name);
+      }
+    } catch (error) {
+      console.error('Error fetching location name:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDialogOpen = () => {
+    setIsDialogOpen(true);
+    if (!currentLocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          };
+          setCurrentLocation(newLocation);
+          getLocationName(newLocation.lat, newLocation.lon);
+        },
+        (error) => {
+          setLocationError(error.message);
+        }
+      );
+    }
+  };
+
   if (!weatherData) return null;
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <div className="flex absolute top-2 right-2 items-center text-sm justify-end hover:text-foreground transition-colors">
+        <div 
+          className="flex absolute top-2 right-2 items-center text-sm justify-end hover:text-foreground transition-colors"
+          onClick={handleDialogOpen}
+        >
           <div className="flex items-center justify-center gap-2 rounded-xl bg-background/90 backdrop-blur-sm p-2 shadow-lg hover:shadow-xl transition-all cursor-pointer border border group">
             <MapPinHouse className="text-green-600 group-hover:scale-110 transition-transform" />
-            <p className="font-medium">{weatherData.name}</p>
-            <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
         </div>
       </DialogTrigger>
@@ -49,25 +93,37 @@ const LocationWeatherDetails = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPinHouse className="text-green-600" />
-            Weather Details for {weatherData.name}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-600"></div>
+                Getting location...
+              </span>
+            ) : currentLocation ? (
+              `Weather Details for ${locationName || 'Current Location'}`
+            ) : (
+              `Weather Details for ${weatherData.name}`
+            )}
           </DialogTitle>
         </DialogHeader>
         <div>
+          {locationError && (
+            <div className="text-red-500 mb-4">
+              <p>Location Error: {locationError}</p>
+              <p className="text-sm">Showing weather for default location instead.</p>
+            </div>
+          )}
           <p>
             Weather conditions greatly affect energy consumption and tariff
             rates.
           </p>
           <div className="grid grid-cols-2 gap-6 mt-4">
             {[
-              { label: "Temperature", value: `${weatherData.main.temp}°C` },
-              {
-                label: "Feels Like",
-                value: `${weatherData.main.feels_like}°C`,
-              },
-              { label: "Humidity", value: `${weatherData.main.humidity}%` },
-              { label: "Wind Speed", value: `${weatherData.wind.speed} m/s` },
-              { label: "Visibility", value: `${weatherData.visibility} m` },
-              { label: "Weather", value: weatherData.weather[0].description },
+              { label: "Temperature", value: `${weatherData?.main?.temp ?? "N/A"}°C` },
+              { label: "Feels Like", value: `${weatherData?.main?.feels_like ?? "N/A"}°C` },
+              { label: "Humidity", value: `${weatherData?.main?.humidity ?? "N/A"}%` },
+              { label: "Wind Speed", value: `${weatherData?.wind?.speed ?? "N/A"} m/s` },
+              { label: "Visibility", value: `${weatherData?.visibility ?? "N/A"} m` },
+              { label: "Weather", value: weatherData?.weather?.[0]?.description ?? "N/A" },
             ].map((item, index) => (
               <div key={index} className="bg-muted p-3 rounded-lg">
                 <p className="text-sm font-semibold text-foreground">
@@ -77,6 +133,14 @@ const LocationWeatherDetails = ({
               </div>
             ))}
           </div>
+          {currentLocation && (
+            <div className="mt-4 text-sm text-muted-foreground">
+              <p>Coordinates: {currentLocation.lat.toFixed(4)}°N, {currentLocation.lon.toFixed(4)}°E</p>
+              {locationName && (
+                <p className="mt-2">Location: {locationName}</p>
+              )}
+            </div>
+          )}
         </div>
         <DialogFooter className="mt-6">
           <DialogClose asChild>
@@ -88,12 +152,15 @@ const LocationWeatherDetails = ({
   );
 };
 
+import { useRouter } from 'next/navigation';
+
 const SmartDevicesDialog = ({
   smartDevices,
 }: {
   smartDevices: SmartDevices;
 }) => {
   // Device energy consumption data (kWh per use/cycle)
+  const router = useRouter(); 
   const devicesList = [
     {
       name: "Thermostat",
@@ -151,17 +218,22 @@ const SmartDevicesDialog = ({
     0,
   );
   const averageDaily = totalMonthlyUsage / 30;
-
+  
+  const navigateToSchedule = () => {
+    router.push('http://192.168.21.27'); // Replace with your actual IP address
+  };
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="absolute bottom-2 right-2 text-xs hidden sm:block"
-        >
+    <DialogTrigger asChild>
+      <div className="absolute bottom-2 right-2 hidden sm:flex gap-2">
+        <Button variant="outline" className="text-xs">
           View Devices
         </Button>
-      </DialogTrigger>
+        <Button variant="secondary" onClick={navigateToSchedule} className="text-xs">
+          Schedule
+        </Button>
+      </div>
+    </DialogTrigger>
 
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>

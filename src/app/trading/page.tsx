@@ -194,9 +194,9 @@ export default function Trading() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Prabhawatt Market</h1>
+            <h1 className="text-3xl font-bold">Ecowatt Market</h1>
             <p className="text-sm text-muted-foreground">
-              Got too much Solar Power? Want to sell it? Prabhwatt Market is the
+              Got too much Solar Power? Want to sell it? Ecowatt Market is the
               place for you! List your solar power for sale and make a profit.
             </p>
           </div>

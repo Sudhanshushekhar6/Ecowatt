@@ -19,6 +19,7 @@ import Link from "next/link";
 import { parse } from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { startTariffMonitoring } from "@/lib/tariff-monitor";
 
 export default function Dashboard() {
   const { user } = useAuthContext();
@@ -33,10 +34,8 @@ export default function Dashboard() {
   const [reportGenerated, setReportGenerated] = useState<Boolean>(false);
   const hasShownToast = useRef(false);
 
-  // Initialize with the current battery power from userData when available
+  
   const lastCalculatedBatteryPower = useRef<number>(0);
-
-  // CSV processing function
   const processCSV = useCallback((str: string) => {
     parse(str, {
       header: true,
@@ -154,38 +153,48 @@ export default function Dashboard() {
   // Fetch TOU history
   useEffect(() => {
     let isMounted = true;
-
+  
     if (!hasShownToast.current) {
-      fetchTOUHistory(userData ? userData.userCategory : "").then(
-        (touHistory) => {
-          if (isMounted) {
-            const latestTou = touHistory[touHistory.length - 1];
+      fetchTOUHistory(userData ? userData.userCategory : "").then((touHistory) => {
+        if (
+          isMounted &&
+          Array.isArray(touHistory) &&
+          touHistory.length > 0
+        ) {
+          const latestTou = touHistory[touHistory.length - 1];
+  
+          if (latestTou?.rate !== undefined) {
             toast.success("Latest TOU rate fetched", {
               description: `Current TOU rate: ₹${latestTou.rate} /kwh`,
               action: (
                 <Button
-                  onClick={() => {
-                    toast.dismiss();
-                  }}
+                  onClick={() => toast.dismiss()}
                   className="ml-auto"
-                  variant={"outline"}
-                  size={"sm"}
+                  variant="outline"
+                  size="sm"
                 >
                   Ok
                 </Button>
               ),
             });
-            setTOUHistory(touHistory);
-            hasShownToast.current = true;
+          } else {
+            toast.warning("Latest TOU rate is unavailable.");
           }
-        },
-      );
+  
+          setTOUHistory(touHistory);
+          hasShownToast.current = true;
+        }
+      }).catch((err) => {
+        console.error("Error fetching TOU history:", err);
+        toast.error("Failed to fetch TOU rates.");
+      });
     }
-
+  
     return () => {
       isMounted = false;
     };
   }, [userData]);
+  
 
   // File upload handler
   const handleFileUpload = useCallback(
@@ -216,6 +225,15 @@ export default function Dashboard() {
       new Date(data.SendDate.split(" ")[0]).toDateString(),
     ),
   ).size;
+
+  useEffect(() => {
+    if (userData) {
+      const unsubscribe = startTariffMonitoring(userData);
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [userData]);
 
   if (loading) {
     return (

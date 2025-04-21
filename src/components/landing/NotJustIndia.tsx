@@ -11,7 +11,7 @@ export function NotJustIndia() {
         </h2>
         <p className="text-sm md:text-lg text-neutral-500 max-w-2xl mx-auto py-4">
           Given the rise in Solar energy, all across the globe,
-          <span className="text-foreground"> Prabhawatt's</span> smart energy
+          <span className="text-foreground"> Ecowatt's</span> smart energy
           solutions can easily be adopted by{" "}
           <span className="underline underline-offset-2 decoration-dotted decoration-green-500">
             anyone, anywhere

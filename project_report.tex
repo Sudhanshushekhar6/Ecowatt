@@ -1,0 +1,138 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage{tocloft}
+
+% Page layout
+\geometry{
+    a4paper,
+    margin=1in,
+    top=1in,
+    bottom=1in
+}
+
+% Title formatting
+\titleformat{\chapter}[display]
+    {\normalfont\bfseries\centering}
+    {\chaptertitlename\ \thechapter}
+    {20pt}
+    {\Huge}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Line spacing
+\onehalfspacing
+
+% Table of contents depth
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Huge\bfseries Ecowatt Smart Energy Management System\par}
+    \vspace{1cm}
+    {\Large A Comprehensive Project Report\par}
+    \vspace{2cm}
+    {\Large\itshape Submitted by\par}
+    \vspace{0.5cm}
+    {\Large [Your Name]\par}
+    \vspace{2cm}
+    {\Large Under the guidance of\par}
+    \vspace{0.5cm}
+    {\Large [Guide Name]\par}
+    \vspace{2cm}
+    {\Large Department of [Your Department]\par}
+    \vspace{0.5cm}
+    {\Large [Your Institution]\par}
+    \vspace{0.5cm}
+    {\Large [Month, Year]\par}
+\end{titlepage}
+
+% Declaration
+\chapter*{Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+I hereby declare that this project report titled "Ecowatt Smart Energy Management System" is my original work and has not been submitted elsewhere for any degree or diploma. The work presented in this report is the result of my own investigation and study, except where specifically acknowledged.
+
+\vspace{2cm}
+\begin{flushright}
+[Your Name]\\
+[Date]
+\end{flushright}
+
+% Abstract
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+This project report presents the development of Ecowatt, a Smart Energy Management System designed to optimize energy consumption and provide intelligent insights for both residential and commercial users. The system integrates real-time monitoring, predictive analytics, and user-friendly interfaces to deliver comprehensive energy management solutions. The report covers the system's architecture, implementation details, and evaluation results, demonstrating its effectiveness in reducing energy consumption and costs while improving user experience.
+
+% Acknowledgements
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+I would like to express my sincere gratitude to my project guide [Guide Name] for their invaluable guidance and support throughout this project. I am also thankful to [Institution Name] for providing the necessary resources and infrastructure. Special thanks to my family and friends for their constant encouragement and support.
+
+% Table of Contents
+\tableofcontents
+
+% List of Figures
+\listoffigures
+
+% List of Tables
+\listoftables
+
+% Chapters
+\include{chapters/introduction}
+\include{chapters/literature_review/overview}
+\include{chapters/literature_review/review_analysis}
+\include{chapters/system_analysis/proposed_system}
+\include{chapters/system_study/platforms/platform}
+\include{chapters/system_study/platforms/tools}
+\include{chapters/system_design/architecture}
+\include{chapters/system_design/database}
+\include{chapters/system_design/interface}
+\include{chapters/implementation/development}
+\include{chapters/implementation/testing}
+\include{chapters/implementation/deployment}
+\include{chapters/results/discussion}
+\include{chapters/results/evaluation}
+\include{chapters/conclusion}
+\include{chapters/future_scope}
+
+% References
+\bibliographystyle{plain}
+\bibliography{references}
+
+% Appendices
+\appendix
+\include{appendices/installation}
+\include{appendices/user_manual}
+\include{appendices/source_code}
+
+\end{document} 

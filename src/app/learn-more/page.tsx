@@ -26,10 +26,10 @@ export default function LearnMore() {
         <div className="max-w-4xl mx-auto space-y-12">
           <section className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              Learn More About Solar Energy and PrabhaWatt
+              Learn More About Solar Energy and Ecowatt
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground">
-              Discover how solar energy and PrabhaWatt can revolutionize your
+              Discover how solar energy and Ecowatt can revolutionize your
               energy consumption and savings.
             </p>
           </section>
@@ -180,12 +180,12 @@ export default function LearnMore() {
 
           <section>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Why Choose PrabhaWatt?
+              Why Choose Ecowatt?
             </h2>
             <p className="mb-6">
-              PrabhaWatt is not just another solar energy solution – it&apos;s a
+              Ecowatt is not just another solar energy solution – it&apos;s a
               comprehensive platform designed to maximize your solar investment
-              and energy savings. Here&apos;s why PrabhaWatt stands out:
+              and energy savings. Here&apos;s why Ecowatt stands out:
             </p>
             <div className="grid md:grid-cols-2 gap-6">
               <Card>
@@ -206,7 +206,7 @@ export default function LearnMore() {
                   <CardTitle>Real-time Monitoring</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  With PrabhaWatt, you get access to real-time data and insights
+                  With Ecowatt, you get access to real-time data and insights
                   about your energy production, consumption, and savings,
                   allowing you to make informed decisions.
                 </CardContent>
@@ -217,7 +217,7 @@ export default function LearnMore() {
                   <CardTitle>Smart Storage Management</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  If you have a battery storage system, PrabhaWatt optimizes
+                  If you have a battery storage system, Ecowatt optimizes
                   when to store excess energy and when to use it, maximizing
                   your savings and reducing reliance on the grid.
                 </CardContent>
@@ -229,7 +229,7 @@ export default function LearnMore() {
                 </CardHeader>
                 <CardContent>
                   By optimizing your energy usage and taking advantage of
-                  time-of-use rates, PrabhaWatt helps you save more money
+                  time-of-use rates, Ecowatt helps you save more money
                   compared to a standard solar setup.
                 </CardContent>
               </Card>
@@ -238,11 +238,11 @@ export default function LearnMore() {
 
           <section>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Projected Savings with PrabhaWatt
+              Projected Savings with Ecowatt
             </h2>
             <p className="mb-4">
               See how much you could potentially save over time by using
-              PrabhaWatt to optimize your solar energy system:
+              Ecowatt to optimize your solar energy system:
             </p>
             <div className="flex items-center justify-center">
               <SavingsProjectionChart />
@@ -260,12 +260,12 @@ export default function LearnMore() {
             </h2>
             <p className="mb-6">
               Join thousands of satisfied customers who are maximizing their
-              solar investment with PrabhaWatt. Start your journey to greater
+              solar investment with Ecowatt. Start your journey to greater
               energy efficiency and savings today!
             </p>
             <Link href="/sign-in">
               <Button className="bg-green-600 text-white hover:bg-green-700">
-                Get Started with PrabhaWatt
+                Get Started with Ecowatt
               </Button>
             </Link>
           </section>
@@ -274,7 +274,7 @@ export default function LearnMore() {
       <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 PrabhaWatt. All rights reserved.
+            © 2024 Ecowatt. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             For more information about solar energy, visit the{" "}

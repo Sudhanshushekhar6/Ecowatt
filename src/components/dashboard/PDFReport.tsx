@@ -4,6 +4,7 @@ import {
   SolarAnalysis,
   TariffAnalysis,
   UserData,
+  DetailedReport,
 } from "@/types/user";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { User } from "firebase/auth";
@@ -17,10 +18,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color: "#1a365d",
+    color: "#2c3e50",
   },
   section: {
-    marginBottom: 30,
+    margin: 10,
+    padding: 10,
+    flexGrow: 1
   },
   sectionTitle: {
     fontSize: 18,
@@ -40,11 +43,11 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 15,
+    marginBottom: 10,
   },
   gridItem: {
     width: "50%",
-    padding: 10,
+    padding: 5,
   },
   label: {
     fontSize: 12,
@@ -90,335 +93,130 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: "right",
   },
+  subtitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: "#34495e"
+  },
+  text: {
+    fontSize: 12,
+    marginBottom: 5
+  },
+  recommendation: {
+    marginBottom: 10,
+    padding: 5
+  },
+  recommendationTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5
+  },
+  userInfo: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 5
+  },
+  userInfoTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#2c3e50"
+  },
+  userInfoItem: {
+    fontSize: 12,
+    marginBottom: 5,
+    color: "#4a5568"
+  }
 });
 
 interface PDFReportProps {
   user: User;
   userData: UserData;
-  executiveSummary: ExecutiveSummary;
-  tariffAnalysis: TariffAnalysis;
-  consumptionAnalytics: ConsumptionAnalytics;
-  solarAnalysis: SolarAnalysis | null;
+  detailedReport: DetailedReport;
 }
 
-const PDFReport = ({
-  user,
-  userData,
-  executiveSummary,
-  tariffAnalysis,
-  consumptionAnalytics,
-  solarAnalysis,
-}: PDFReportProps) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      {/* Header */}
-      <Text style={styles.title}>Energy Report for {user.displayName}</Text>
+const PDFReport = ({ user, userData, detailedReport }: PDFReportProps) => {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.title}>Energy Consumption Report</Text>
+          
+          {/* User Information Section */}
+          <View style={styles.userInfo}>
+            <Text style={styles.userInfoTitle}>Report Analysis</Text>
+            <Text style={styles.userInfoItem}>Name: {user.displayName || 'User'}</Text>
+            <Text style={styles.userInfoItem}>Email: {user.email || 'Not provided'}</Text>
+            <Text style={styles.userInfoItem}>Electricity Provider: {userData.electricityProvider || 'Not specified'}</Text>
+            <Text style={styles.userInfoItem}>User Category: {userData.userCategory || 'Not specified'}</Text>
+            <Text style={styles.userInfoItem}>Report Generated On: {new Date().toLocaleDateString()}</Text>
+          </View>
 
-      {/* User Profile Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>User Profile</Text>
-        <View style={styles.grid}>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Electricity Provider</Text>
-            <Text style={styles.value}>{userData.electricityProvider}</Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Monthly Bill</Text>
-            <Text style={styles.value}>
-              ₹{userData.monthlyBill.toLocaleString()}
-            </Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Solar Panels</Text>
-            <Text style={styles.value}>
-              {userData.hasSolarPanels ? "Installed" : "Not Installed"}
-            </Text>
-            {userData.hasSolarPanels && (
-              <Text style={styles.smallText}>
-                Capacity: {userData.solarCapacity} kW
-              </Text>
-            )}
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Battery Storage</Text>
-            <Text style={styles.value}>
-              {userData.hasBatteryStorage ? "Installed" : "Not Installed"}
-            </Text>
-            {userData.hasBatteryStorage && (
-              <>
-                <Text style={styles.smallText}>
-                  Capacity: {userData.storageCapacity}
+          <Text style={styles.subtitle}>Executive Summary</Text>
+          <Text style={styles.text}>
+            Your monthly electricity bill is Rs. {detailedReport.executiveSummary.monthlyBill}
                 </Text>
-                {userData.currentBatteryPower !== undefined && (
-                  <Text style={styles.smallText}>
-                    Current Power: {userData.currentBatteryPower} kWh
+          <Text style={styles.text}>
+            Your primary goal is to {detailedReport.executiveSummary.primaryGoal}
+              </Text>
+          <Text style={styles.text}>
+            You have a {detailedReport.executiveSummary.energyProfile.type} energy profile with a storage capacity of {detailedReport.executiveSummary.energyProfile.storageCapacity} kWh and solar capacity of {detailedReport.executiveSummary.energyProfile.solarCapacity} kW
+              </Text>
+          <Text style={styles.text}>
+            Your DISCOM is {detailedReport.executiveSummary.discom}
+              </Text>
+
+          <Text style={styles.subtitle}>Tariff Analysis</Text>
+          <Text style={styles.text}>
+            Your average power purchase cost is Rs. {detailedReport.tariffAnalysis.averagePowerPurchaseCost} per kWh
+              </Text>
+          <Text style={styles.text}>
+            Your average cost of supply is Rs. {detailedReport.tariffAnalysis.averageCostOfSupply} per kWh
+              </Text>
+          <Text style={styles.text}>
+            Your average billing rate is Rs. {detailedReport.tariffAnalysis.averageBillingRate} per kWh
+              </Text>
+
+          <Text style={styles.subtitle}>Consumption Analytics</Text>
+          <Text style={styles.text}>
+            Your energy usage is quite high, considering your solar installation and storage capacity
+              </Text>
+          <Text style={styles.text}>
+            You have a peak demand of {detailedReport.consumptionAnalytics.peakDemand} kW during the {detailedReport.consumptionAnalytics.peakDemandTime}
                   </Text>
-                )}
-              </>
-            )}
-          </View>
-        </View>
-      </View>
-
-      {/* Executive Summary Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Executive Summary</Text>
-        <View style={styles.grid}>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Current Month's Cost</Text>
-            <Text style={styles.value}>
-              ₹{executiveSummary.currentMonthCost.toLocaleString()}
-            </Text>
-            <Text style={styles.smallText}>
-              {executiveSummary.costTrend === "up" ? "↑" : "↓"}{" "}
-              {Math.abs(executiveSummary.costComparisonPercentage)}% vs last
-              month
-            </Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Total Energy Savings</Text>
-            <Text style={styles.value}>
-              ₹{executiveSummary.totalEnergySavings.toLocaleString()}
-            </Text>
-          </View>
-          {executiveSummary.solarGeneration && (
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Solar Generation</Text>
-              <Text style={styles.value}>
-                {executiveSummary.solarGeneration} kWh
+          <Text style={styles.text}>
+            Your energy consumption is {detailedReport.consumptionAnalytics.consumptionPattern}, likely due to the usage of your {detailedReport.consumptionAnalytics.mainConsumers.join(" and ")}
               </Text>
-            </View>
-          )}
-          {executiveSummary.batteryUsage && (
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Battery Usage</Text>
-              <Text style={styles.value}>
-                {executiveSummary.batteryUsage} kWh
+
+          <Text style={styles.subtitle}>Solar Analysis</Text>
+          <Text style={styles.text}>
+            Your solar panels are {detailedReport.solarAnalysis.status}, but your solar capacity is relatively low compared to your energy demand
               </Text>
-            </View>
-          )}
-        </View>
+          <Text style={styles.text}>
+            {detailedReport.solarAnalysis.potential}
+                    </Text>
 
-        <Text style={styles.subSectionTitle}>Key Recommendations</Text>
-        <View style={styles.list}>
-          {executiveSummary.keyRecommendations.map((rec, index) => (
-            <View key={index}>
-              <Text style={styles.listItem}>
-                • {rec.text}
-                {"\n"} Impact: {rec.estimatedImpact}
+          <Text style={styles.subtitle}>Smart Devices Analysis</Text>
+          <Text style={styles.text}>
+            You have {detailedReport.smartDevicesAnalysis.installedDevices.map(device => device.name).join(" and ")} installed, which are energy-intensive appliances
               </Text>
+          <Text style={styles.text}>
+            You don't have any other smart devices installed, such as {detailedReport.smartDevicesAnalysis.missingDevices.join(" or ")}
+                    </Text>
+
+          <Text style={styles.subtitle}>Recommendations for Energy Efficiency</Text>
+          {detailedReport.recommendations.map((recommendation, index) => (
+            <View key={index} style={styles.recommendation}>
+              <Text style={styles.recommendationTitle}>{recommendation.title}</Text>
+              <Text style={styles.text}>{recommendation.details}</Text>
             </View>
-          ))}
-        </View>
-      </View>
-
-      {/* Rest of the previous implementation remains the same */}
-      {/* Tariff Analysis Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tariff Analysis</Text>
-        <View style={styles.grid}>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Current Rate</Text>
-            <Text style={styles.value}>₹{tariffAnalysis.currentRate}/kWh</Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Average Rate</Text>
-            <Text style={styles.value}>₹{tariffAnalysis.averageRate}/kWh</Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Peak Rate</Text>
-            <Text style={styles.value}>₹{tariffAnalysis.peakRate}/kWh</Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Off-Peak Rate</Text>
-            <Text style={styles.value}>₹{tariffAnalysis.offPeakRate}/kWh</Text>
-          </View>
-        </View>
-
-        <Text style={styles.subSectionTitle}>Pattern Analysis</Text>
-        <Text style={styles.listItem}>{tariffAnalysis.patternAnalysis}</Text>
-
-        <Text style={styles.subSectionTitle}>Forecasted Rates</Text>
-        <View style={styles.list}>
-          {tariffAnalysis.forecastedRates.map((rate, index) => (
-            <Text key={index} style={styles.listItem}>
-              • {rate.time}: ₹{rate.rate}/kWh
-            </Text>
-          ))}
-        </View>
-
-        <Text style={styles.subSectionTitle}>Savings Opportunities</Text>
-        <View style={styles.list}>
-          {tariffAnalysis.savingsOpportunities.map((opportunity, index) => (
-            <Text key={index} style={styles.listItem}>
-              • {opportunity}
-            </Text>
-          ))}
-        </View>
-      </View>
-
-      {/* Consumption Analytics Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Consumption Analytics</Text>
-        <View style={styles.grid}>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Total Consumption</Text>
-            <Text style={styles.value}>
-              {consumptionAnalytics.totalConsumption} kWh
-            </Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Daily Average</Text>
-            <Text style={styles.value}>
-              {consumptionAnalytics.averageDailyConsumption} kWh
-            </Text>
-          </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Peak Consumption</Text>
-            <Text style={styles.value}>
-              {consumptionAnalytics.peakConsumptionValue} kW
-            </Text>
-            <Text style={styles.smallText}>
-              at{" "}
-              {new Date(
-                consumptionAnalytics.peakConsumptionTime,
-              ).toLocaleTimeString()}
-            </Text>
-          </View>
-        </View>
-
-        <Text style={styles.subSectionTitle}>Consumption by Time of Day</Text>
-        <View style={styles.list}>
-          {consumptionAnalytics.consumptionByTimeOfDay.map((data, index) => (
-            <Text key={index} style={styles.listItem}>
-              • {data.hour}:00 - Average: {data.average} kW
-            </Text>
-          ))}
-        </View>
-
-        {consumptionAnalytics.unusualPatterns && (
-          <>
-            <Text style={styles.subSectionTitle}>Unusual Patterns</Text>
-            <View style={styles.list}>
-              {consumptionAnalytics.unusualPatterns.map((pattern, index) => (
-                <Text key={index} style={styles.listItem}>
-                  • {pattern}
-                </Text>
               ))}
             </View>
-          </>
-        )}
-
-        {consumptionAnalytics.weatherImpact && (
-          <>
-            <Text style={styles.subSectionTitle}>Weather Impact</Text>
-            <Text style={styles.listItem}>
-              {consumptionAnalytics.weatherImpact}
-            </Text>
-          </>
-        )}
-
-        {consumptionAnalytics.optimizationOpportunities && (
-          <>
-            <Text style={styles.subSectionTitle}>
-              Optimization Opportunities
-            </Text>
-            <View style={styles.list}>
-              {consumptionAnalytics.optimizationOpportunities.map(
-                (opportunity, index) => (
-                  <Text key={index} style={styles.listItem}>
-                    • {opportunity}
-                  </Text>
-                ),
-              )}
-            </View>
-          </>
-        )}
-
-        {consumptionAnalytics.timeOfDayRecommendations && (
-          <>
-            <Text style={styles.subSectionTitle}>
-              Time-of-Day Recommendations
-            </Text>
-            <View style={styles.list}>
-              {consumptionAnalytics.timeOfDayRecommendations.map(
-                (rec, index) => (
-                  <Text key={index} style={styles.listItem}>
-                    • {rec}
-                  </Text>
-                ),
-              )}
-            </View>
-          </>
-        )}
-      </View>
-
-      {/* Solar Analysis Section */}
-      {solarAnalysis && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Solar Analysis</Text>
-          <View style={styles.grid}>
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Daily Generation</Text>
-              <Text style={styles.value}>
-                {solarAnalysis.dailyGeneration} kWh
-              </Text>
-            </View>
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Monthly Generation</Text>
-              <Text style={styles.value}>
-                {solarAnalysis.monthlyGeneration} kWh
-              </Text>
-            </View>
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>System Efficiency</Text>
-              <Text style={styles.value}>{solarAnalysis.efficiency}%</Text>
-            </View>
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Monthly Savings</Text>
-              <Text style={styles.value}>
-                ₹{solarAnalysis.savingsFromSolar}
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.subSectionTitle}>System Optimizations</Text>
-          <View style={styles.list}>
-            {solarAnalysis.optimizations.map((optimization, index) => (
-              <Text key={index} style={styles.listItem}>
-                • {optimization}
-              </Text>
-            ))}
-          </View>
-
-          <Text style={styles.subSectionTitle}>Maintenance Tasks</Text>
-          <View style={styles.list}>
-            {solarAnalysis.maintenance_tasks.map((task, index) => (
-              <Text key={index} style={styles.listItem}>
-                • {task}
-              </Text>
-            ))}
-          </View>
-
-          <Text style={styles.subSectionTitle}>Weather Impact</Text>
-          <Text style={styles.listItem}>{solarAnalysis.weather_impact}</Text>
-
-          <Text style={styles.subSectionTitle}>Storage Tips</Text>
-          <View style={styles.list}>
-            {solarAnalysis.storage_tips.map((tip, index) => (
-              <Text key={index} style={styles.listItem}>
-                • {tip}
-              </Text>
-            ))}
-          </View>
-        </View>
-      )}
-
-      <Text style={styles.dateGenerated}>
-        Generated on: {new Date().toLocaleString()}
-      </Text>
-    </Page>
-  </Document>
-);
+      </Page>
+    </Document>
+  );
+};
 
 export default PDFReport;
+

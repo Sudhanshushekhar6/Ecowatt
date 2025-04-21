@@ -134,8 +134,14 @@ export default function Navbar() {
     <header className="px-4 lg:px-6 h-16 flex items-center border-b sticky top-0 bg-background z-10">
       <Link className="flex items-center justify-center" href="/">
         <Sun className="h-6 w-6 text-green-600" />
-        <span className="ml-2 text-xl font-semibold text-foreground">
-          PrabhaWatt
+        <span className="ml-2 text-xl font-semibold text-foreground flex items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="16" fill="#22C55E"/>
+            <path d="M16 8L8 16L16 24L24 16L16 8Z" fill="white"/>
+            <path d="M16 12L12 16L16 20L20 16L16 12Z" fill="#22C55E"/>
+            <text x="16" y="28" text-anchor="middle" font-family="Arial" font-size="8" fill="white">E</text>
+          </svg>
+          Ecowatt
         </span>
       </Link>
 

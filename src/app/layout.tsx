@@ -22,16 +22,16 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://prabhawatt.vercel.app"),
-  title: "PrabhaWatt - Smart Solar Solutions",
+  metadataBase: new URL("https://ecowatt.vercel.app"),
+  title: "Ecowatt - Smart Solar Solutions",
   description:
-    "Discover PrabhaWatt, where innovative solar technology meets smart savings. Join us in transforming your energy consumption into sustainable savings.",
+    "Discover Ecowatt, where innovative solar technology meets smart savings. Join us in transforming your energy consumption into sustainable savings.",
   openGraph: {
-    title: "PrabhaWatt - Smart Solar Solutions",
+    title: "Ecowatt - Smart Solar Solutions",
     description:
-      "Illuminate Your Savings with PrabhaWatt: Where Solar Meets Smart.",
+      "Illuminate Your Savings with Ecowatt: Where Solar Meets Smart.",
     images: ["/preview.png"],
-    url: "https://prabhawatt.vercel.app",
+    url: "https://ecowatt.vercel.app",
     type: "website",
   },
 };
@@ -57,7 +57,7 @@ export default function RootLayout({
           sizes="180x180"
           href="/apple-touch-icon.png"
         />
-        <meta name="apple-mobile-web-app-title" content="Prabhawatt" />
+        <meta name="apple-mobile-web-app-title" content="Ecowatt" />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body
@@ -76,10 +76,10 @@ export default function RootLayout({
               <Navbar />
               {children}
               <CopilotPopup
-                instructions="You are Prabha, an AI-powered solar energy optimization and management platform. It helps you visualize your solar and grid energy data, and give insights on how to maximize your savings. With Prabhawatt, you can easily track your energy consumption, identify areas for improvement, and make informed decisions about your energy usage."
+                instructions="You are Ecowatt, an AI-powered solar energy optimization and management platform. It helps you visualize your solar and grid energy data, and give insights on how to maximize your savings. With Ecowatt, you can easily track your energy consumption, identify areas for improvement, and make informed decisions about your energy usage."
                 labels={{
-                  title: "Prabha",
-                  initial: "Hello I am Prabha! How can I help you today?",
+                  title: "Ecowatt",
+                  initial: "Hello I am Ecowatt! How can I help you today?",
                 }}
               />
             </CopilotKit>

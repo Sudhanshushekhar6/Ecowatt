@@ -22,6 +22,7 @@ export interface UserData {
   notificationMethod: "email" | "push" | "sms" | "none" | null;
   reportFrequency: "daily" | "weekly" | "monthly" | null;
   currentBatteryPower?: number;
+  discomInfo?: DiscomInfo;
 }
 
 export interface TOUData {
@@ -69,70 +70,58 @@ export interface EnergyData {
 }
 
 export interface ExecutiveSummary {
-  currentMonthCost: number;
-  costComparisonPercentage: number;
-  costTrend: "up" | "down";
-  totalEnergySavings: number;
-  solarGeneration: number | null;
-  batteryUsage: number | null;
-  keyRecommendations: Array<{
-    text: string;
-    priority: "high" | "medium" | "low";
-    estimatedImpact: string;
-  }>;
+  monthlyBill: number;
+  primaryGoal: string;
+  energyProfile: {
+    type: string;
+    storageCapacity: number;
+    solarCapacity: number;
+  };
+  discom: string;
 }
 
 export interface TariffAnalysis {
-  currentRate: number;
-  averageRate: number;
-  peakRate: number;
-  offPeakRate: number;
-  forecastedRates: Array<{
-    time: string;
-    rate: number;
-  }>;
-  savingsOpportunities: string[];
-  patternAnalysis: string;
+  averagePowerPurchaseCost: number;
+  averageCostOfSupply: number;
+  averageBillingRate: number;
 }
 
 export interface ConsumptionAnalytics {
-  totalConsumption: number;
-  averageDailyConsumption: number;
-  peakConsumptionTime: string;
-  peakConsumptionValue: number;
-  consumptionByTimeOfDay: Array<{
-    hour: number;
-    average: number;
-  }>;
-  unusualPatterns?: string[];
-  weatherImpact?: string;
-  optimizationOpportunities?: string[];
-  timeOfDayRecommendations?: string[];
+  peakDemand: number;
+  peakDemandTime: string;
+  consumptionPattern: string;
+  mainConsumers: string[];
 }
 
 export interface SolarAnalysis {
-  dailyGeneration: number;
-  monthlyGeneration: number;
-  efficiency: number;
-  savingsFromSolar: number;
-  optimizations: string[];
-  maintenance_tasks: string[];
-  weather_impact: string;
-  storage_tips: string[];
+  status: string;
+  capacity: number;
+  potential: string;
 }
 
 export interface SmartDevicesAnalysis {
-  deviceSchedules: {
-    deviceName: string;
-    optimalHours: number[];
-    expectedSavings: number;
-    currentUsagePattern: string;
-    recommendedPattern: string;
-    reasonForRecommendation: string;
-  }[];
-  totalPotentialSavings: number;
-  generalRecommendations: string[];
-  automationOpportunities: string[];
-  peakUsageWarnings: string[];
-  deviceIntegrationTips: string[];
+  installedDevices: Array<{
+    name: string;
+    type: string;
+  }>;
+  missingDevices: string[];
+}
+
+export interface Recommendation {
+  title: string;
+  details: string;
+}
+
+export interface DetailedReport {
+  executiveSummary: ExecutiveSummary;
+  tariffAnalysis: TariffAnalysis;
+  consumptionAnalytics: ConsumptionAnalytics;
+  solarAnalysis: SolarAnalysis;
+  smartDevicesAnalysis: SmartDevicesAnalysis;
+  recommendations: Recommendation[];
+}
+
+export interface DiscomInfo {
+  name: string;
+  // Add other discom-related properties as needed
 }

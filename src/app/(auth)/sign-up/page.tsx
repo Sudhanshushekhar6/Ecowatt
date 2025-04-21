@@ -24,6 +24,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import emailjs from "@emailjs/browser";
+import { sendWelcomeEmail } from "@/lib/email";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -45,12 +47,12 @@ export default function SignUp() {
     setError("");
     try {
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
+      
+      // Send welcome email
+      await sendWelcomeEmail(email, name);
+
       toast.success("You have signed up successfully");
       router.push("/onboarding");
     } catch (error) {
@@ -65,12 +67,21 @@ export default function SignUp() {
     setError("");
     try {
       setLoading(true);
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      // Send welcome email for Google signup
+      if (user.email && user.displayName) {
+        await sendWelcomeEmail(user.email, user.displayName);
+      }
+
       toast.success("You have signed up successfully");
       router.push("/onboarding");
     } catch (error) {
       setError("Failed to sign up with Google. Please try again.");
       console.error("Google sign-up error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,7 +94,7 @@ export default function SignUp() {
               Create an account
             </CardTitle>
             <CardDescription className="text-center">
-              Enter your details to create your PrabhaWatt account
+              Enter your details to create your Ecowatt account
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -91,10 +102,7 @@ export default function SignUp() {
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <div className="relative">
-                  <User
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                    size={20}
-                  />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
                   <Input
                     id="name"
                     type="text"
@@ -109,10 +117,7 @@ export default function SignUp() {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                    size={20}
-                  />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
                   <Input
                     id="email"
                     type="email"
@@ -127,10 +132,7 @@ export default function SignUp() {
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                    size={20}
-                  />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
                   <Input
                     id="password"
                     type="password"
@@ -203,10 +205,11 @@ export default function SignUp() {
       <footer className="py-6 px-4 md:px-6 mt-8 bg-background border-t border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 PrabhaWatt. All rights reserved.
+            © 2024 Ecowatt. All rights reserved.
           </p>
         </div>
       </footer>
     </div>
   );
 }
+

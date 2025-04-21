@@ -13,13 +13,11 @@ import {
   WeatherData,
 } from "@/types/user";
 import { useCopilotReadable } from "@copilotkit/react-core";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { User } from "firebase/auth";
-import { AlertCircle, BarChart3, Download, Settings } from "lucide-react";
+import { AlertCircle, BarChart3, Settings } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import PDFReport from "./PDFReport";
 import {
   ConsumptionAnalyticsCard,
   ExecutiveSummaryCard,
@@ -27,6 +25,7 @@ import {
   SolarAnalysisCard,
   TariffAnalysisCard,
 } from "./ReportCards";
+import PDFDownloadButton from "./PDFDownloadButton";
 
 interface Report {
   executiveSummary: ExecutiveSummary | null;
@@ -77,6 +76,7 @@ const GenerateReportButton = ({
   const [report, setReport] = useState<Report>(INITIAL_REPORT_STATE);
   const [sectionStatus, setSectionStatus] = useState(INITIAL_STATUS_STATE);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [allSectionsGenerated, setAllSectionsGenerated] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const defaultWeatherData = useCallback(
@@ -92,7 +92,7 @@ const GenerateReportButton = ({
 
   const generateReportSection = async (
     section: keyof Report,
-    fullReport: any, // Add the full report as an argument
+    fullReport: any,
   ) => {
     setSectionStatus((prev) => ({
       ...prev,
@@ -102,7 +102,6 @@ const GenerateReportButton = ({
     try {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Extract the section from the full report
       const generatedSection = fullReport[section];
 
       if (generatedSection) {
@@ -112,6 +111,7 @@ const GenerateReportButton = ({
         }));
       }
     } catch (error) {
+      console.error(`Error generating ${section}:`, error);
       setSectionStatus((prev) => ({
         ...prev,
         [section]: {
@@ -129,7 +129,7 @@ const GenerateReportButton = ({
 
   const handleGenerateReport = async () => {
     if (!userData || !discomInfo) {
-      setSectionStatus(INITIAL_STATUS_STATE);
+      toast.error("Missing required data. Please check your settings.");
       return;
     }
 
@@ -141,11 +141,11 @@ const GenerateReportButton = ({
     const signal = abortControllerRef.current.signal;
 
     setIsGenerating(true);
+    setAllSectionsGenerated(false);
     setReport(INITIAL_REPORT_STATE);
     setSectionStatus(INITIAL_STATUS_STATE);
 
     try {
-      // Generate the full report once
       const fullReport = await generateReport(
         userData,
         touHistory,
@@ -157,20 +157,6 @@ const GenerateReportButton = ({
       if (signal.aborted) return;
       setReportGenerated(true);
 
-      toast.success("Report generated successfully!", {
-        description: "Scroll down to view the report",
-        action: {
-          label: "View",
-          onClick: () => {
-            window.scrollTo({
-              top: document.body.scrollHeight,
-              behavior: "smooth",
-            });
-          },
-        },
-      });
-
-      // Generate individual sections after the full report is generated
       const sections: (keyof Report)[] = [
         "executiveSummary",
         "tariffAnalysis",
@@ -184,14 +170,62 @@ const GenerateReportButton = ({
         await generateReportSection(section, fullReport);
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
+
+      if (!signal.aborted) {
+        setAllSectionsGenerated(true);
+        toast.success("Report generated successfully!", {
+          description: "Scroll down to view the report",
+          action: {
+            label: "View",
+            onClick: () => {
+              window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth",
+              });
+            },
+          },
+        });
+      }
     } catch (error) {
-      setIsGenerating(false);
-      setSectionStatus(INITIAL_STATUS_STATE);
+      console.error("Error generating report:", error);
+      toast.error("Failed to generate report. Please try again.");
+    } finally {
+      if (!signal.aborted) {
+        setIsGenerating(false);
+        abortControllerRef.current = null;
+      }
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    if (!userData || !discomInfo) {
+      toast.error("Missing required data. Please check your settings.");
+      return;
     }
 
-    if (!signal.aborted) {
-      setIsGenerating(false);
-      abortControllerRef.current = null;
+    try {
+      const fullReport = await generateReport(
+        userData,
+        touHistory,
+        weatherData || defaultWeatherData(),
+        discomInfo!,
+        energyData,
+      );
+
+      if (fullReport) {
+        setReportGenerated(true);
+        setReport({
+          executiveSummary: fullReport.executiveSummary,
+          tariffAnalysis: fullReport.tariffAnalysis,
+          consumptionAnalytics: fullReport.consumptionAnalytics,
+          solarAnalysis: fullReport.solarAnalysis,
+          smartDevicesAnalysis: fullReport.smartDevicesAnalysis,
+        });
+        setAllSectionsGenerated(true);
+      }
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error("Failed to generate report. Please try again.");
     }
   };
 
@@ -237,9 +271,9 @@ const GenerateReportButton = ({
     return data && <Component data={data} />;
   };
 
-  const isReportComplete = Object.values(report).every(
-    (section) => section !== null,
-  );
+  const isReportComplete = report.executiveSummary !== null && 
+                          report.tariffAnalysis !== null && 
+                          report.consumptionAnalytics !== null;
 
   return (
     <div className="w-full space-y-6">
@@ -249,13 +283,33 @@ const GenerateReportButton = ({
             <Button
               className="bg-green-600 text-white hover:bg-green-700"
               onClick={handleGenerateReport}
-              disabled={isGenerating || energyData.length === 0}
+              disabled={isGenerating}
             >
-              <BarChart3 className="mr-2 h-4 w-4" />
-              {isGenerating ? "Generating Report..." : "Generate Report"}
+              {isGenerating ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Generating Report...
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Generate Report
+                </div>
+              )}
             </Button>
           ) : (
-            <></>
+            <div className="flex items-center space-x-4">
+              <Button
+                className="bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleGenerateReport}
+                disabled={isGenerating}
+              >
+                <div className="flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Regenerate Report
+                </div>
+              </Button>
+            </div>
           )}
           {energyData.length === 0 && (
             <div className="text-sm text-muted-foreground mt-2">
@@ -264,7 +318,8 @@ const GenerateReportButton = ({
           )}
         </div>
 
-        {Object.values(report).every((section) => section === null) && (
+        <div className="flex items-center space-x-4">
+          <PDFDownloadButton user={user} userData={userData} />
           <Link href="/settings">
             <Button
               variant="outline"
@@ -273,7 +328,7 @@ const GenerateReportButton = ({
               <Settings className="mr-2 h-4 w-4" /> System Settings
             </Button>
           </Link>
-        )}
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -284,30 +339,11 @@ const GenerateReportButton = ({
         {renderSection("smartDevicesAnalysis", SmartDevicesAnalysisCard)}
       </div>
 
-      {isReportComplete && (
-        <div className="flex justify-start">
-          <PDFDownloadLink
-            document={
-              <PDFReport
-                user={user}
-                userData={userData}
-                executiveSummary={report.executiveSummary!}
-                tariffAnalysis={report.tariffAnalysis!}
-                consumptionAnalytics={report.consumptionAnalytics!}
-                solarAnalysis={report.solarAnalysis!}
-              />
-            }
-            fileName="energy_report.pdf"
-          >
-            {/* @ts-ignore */}
-            {({ loading }) => (
-              <Button disabled={loading} variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                {loading ? "Preparing PDF..." : "Download PDF Report"}
-              </Button>
-            )}
-          </PDFDownloadLink>
-        </div>
+      {isReportComplete && allSectionsGenerated && (
+        <PDFDownloadButton
+          user={user}
+          userData={userData}
+        />
       )}
     </div>
   );
